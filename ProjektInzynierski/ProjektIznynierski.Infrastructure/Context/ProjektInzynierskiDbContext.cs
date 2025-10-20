@@ -16,6 +16,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<FinancialMetric> FinancialMetrics { get; set; }
         public DbSet<InvestInstrument> InvestInstruments { get; set; }
         public DbSet<FinancialReport> FinancialReports { get; set; }
+        public DbSet<MarketData> MarketDatas { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
