@@ -14,6 +14,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<Region> Regions { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<FinancialMetric> FinancialMetrics { get; set; }
+        public DbSet<InvestInstrument> InvestInstruments { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
