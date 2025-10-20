@@ -6,5 +6,8 @@
         public string Recommendation { get; set; } // Buy / Hold / Sell
         public string KeyInsights { get; set; }    // main points from the analysis
         public decimal ConfidenceScore { get; set; } // e.g. 0.87 (87%)
+
+        public int ClientId { get; set; }
+        public Client Client { get; set; }
     }
 }
