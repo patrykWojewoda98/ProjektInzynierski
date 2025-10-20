@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Infrastructure.Context;
+using ProjektIznynierski.Infrastructure.Repositories;
 
 namespace ProjektIznynierski.Infrastructure
 {
@@ -9,6 +11,7 @@ namespace ProjektIznynierski.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>
             {
                 var connectionString = configuration.GetConnectionString("ProjektInzynierskiDatabase");

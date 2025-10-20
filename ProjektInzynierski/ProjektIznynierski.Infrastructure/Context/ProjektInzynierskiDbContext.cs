@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjektIznynierski.Domain.Entities;
+using ProjektIznynierski.Domain.Enums;
 
 namespace ProjektIznynierski.Infrastructure.Context
 {
     internal class ProjektInzynierskiDbContext : DbContext
     {
         public DbSet<Client> Clients { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
