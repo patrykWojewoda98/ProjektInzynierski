@@ -3,7 +3,7 @@ using ProjektIznynierski.Domain.Entities;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
-    public class AnalizeRepository : IAnalizeRepository
+    internal class AnalizeRepository : IAnalizeRepository
     {
         public Task<Analize> GetAnalizeById(int id, CancellationToken cancellationToken = default)
         {

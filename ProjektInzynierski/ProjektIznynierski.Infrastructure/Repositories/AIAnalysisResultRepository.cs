@@ -3,7 +3,7 @@ using ProjektIznynierski.Domain.Entities;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
-    public class AIAnalysisResultRepository : IAIAnalysisResultRepository
+    internal class AIAnalysisResultRepository : IAIAnalysisResultRepository
     {
         public Task<AIAnalysisResult> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {

@@ -3,7 +3,7 @@ using ProjektIznynierski.Domain.Entities;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
-    public class AIAnalisisRequestRepository : IAIAnalisisRequestRepository
+    internal class AIAnalisisRequestRepository : IAIAnalisisRequestRepository
     {
         public Task<FinancialReport> GetFinancialReportByIdAsync(int id, CancellationToken cancellationToken = default)
         {
