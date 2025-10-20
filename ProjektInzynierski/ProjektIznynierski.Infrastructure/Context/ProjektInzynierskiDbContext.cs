@@ -10,6 +10,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<AIAnalysisRequest> AIAnalysisRequests { get; set; }
         public DbSet<AIAnalysisResult> AIAnalysisResults { get; set; }
+        public DbSet<InvestProfile> InvestProfiles { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
