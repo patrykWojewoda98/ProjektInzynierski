@@ -16,7 +16,7 @@
             public int CountryId { get; set; }
             public Country Country { get; set; }
 
-            public ICollection<ClientAnalize> ClientAnalizes { get; set; } = new List<ClientAnalize>();
+            public ICollection<AIAnalysisResult> AIAnalysisResults { get; set; } = new List<AIAnalysisResult>();
             public ICollection<WatchList> WatchLists { get; set; }
     }
     

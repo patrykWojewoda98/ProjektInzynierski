@@ -5,7 +5,7 @@
         public int ClientId { get; set; }
         public Client Client { get; set; }
 
-        public int AnalyzeId { get; set; }
-        public Analize Analyze { get; set; }
+        public int AnalizeId { get; set; }
+        public AIAnalysisResult AIAnalysisResult { get; set; }
     }
 }
