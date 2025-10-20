@@ -3,11 +3,13 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public class IClientRepository
+    public interface IClientRepository
     {
-        Task<AIAnalysisResult> GetByIdAsync(int id, CancellationToken cancellationToken = default);
-        void Add(Client entity);
-        void Update(Client entity);
-        void Delete(Client entity);
+        Task<Client> GetByIdAsync(int id);
+        Task<bool> CheckIfClientExist(string email);
+        Task<Client?> GetByEmailAsync(string email);
+        void Add(Client client);
+        void Update(Client client);
+        void Delete(Client client);
     }
 }
