@@ -1,10 +1,22 @@
-﻿using ProjektIznynierski.Domain.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
+using ProjektIznynierski.Infrastructure.Context;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
     internal class AIAnalisisRequestRepository : IAIAnalisisRequestRepository
     {
+        private readonly ProjektInzynierskiDbContext _dbContext;
+        public AIAnalisisRequestRepository(ProjektInzynierskiDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task<AIAnalysisRequest> GetAIAnalysisRequestByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.AIAnalysisRequests.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+        }
         public Task<FinancialReport> GetFinancialReportByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -17,18 +29,18 @@ namespace ProjektIznynierski.Infrastructure.Repositories
 
         public void Add(AIAnalysisRequest request)
         {
-            throw new NotImplementedException();
+            _dbContext.AIAnalysisRequests.Add(request);
         }
 
         public void Update(AIAnalysisRequest request)
         {
-            throw new NotImplementedException();
+            _dbContext.AIAnalysisRequests.Update(request);
         }
 
         public void Delete(AIAnalysisRequest request)
         {
-            throw new NotImplementedException();
+            _dbContext.AIAnalysisRequests.Remove(request);
         }
-        
+
     }
 }

@@ -12,6 +12,7 @@ namespace ProjektIznynierski.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<IAIAnalisisRequestRepository, AIAnalisisRequestRepository>();
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>
             {
                 var connectionString = configuration.GetConnectionString("ProjektInzynierskiDatabase");

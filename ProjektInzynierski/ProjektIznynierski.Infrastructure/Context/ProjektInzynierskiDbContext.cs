@@ -8,6 +8,7 @@ namespace ProjektIznynierski.Infrastructure.Context
     {
         public DbSet<Client> Clients { get; set; }
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<AIAnalysisRequest> AIAnalysisRequests { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
