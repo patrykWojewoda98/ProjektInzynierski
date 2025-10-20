@@ -1,27 +1,34 @@
-﻿using ProjektIznynierski.Domain.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
+using ProjektIznynierski.Infrastructure.Context;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
     internal class AIAnalysisResultRepository : IAIAnalysisResultRepository
     {
-        public Task<AIAnalysisResult> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        private readonly ProjektInzynierskiDbContext _dbContext;
+        public AIAnalysisResultRepository(ProjektInzynierskiDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
+        }
+        public async Task<AIAnalysisResult> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.AIAnalysisResults.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
         public void Add(AIAnalysisResult entity)
         {
-            throw new NotImplementedException();
+            _dbContext.AIAnalysisResults.Add(entity);
         }
 
         public void Update(AIAnalysisResult entity)
         {
-            throw new NotImplementedException();
+            _dbContext.AIAnalysisResults.Update(entity);
         }
 
         public void Delete(AIAnalysisResult entity)
         {
-            throw new NotImplementedException();
+            _dbContext.AIAnalysisResults.Remove(entity);
         }
         
     }
