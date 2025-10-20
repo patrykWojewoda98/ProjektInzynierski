@@ -11,6 +11,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<AIAnalysisRequest> AIAnalysisRequests { get; set; }
         public DbSet<AIAnalysisResult> AIAnalysisResults { get; set; }
         public DbSet<InvestProfile> InvestProfiles { get; set; }
+        public DbSet<Region> Regions { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
