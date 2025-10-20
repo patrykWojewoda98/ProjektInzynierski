@@ -21,6 +21,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IFinancialMetricRepository, FinancialMetricRepository>();
             services.AddScoped<IInvestInstrumentRepository, InvestInstrumentRepository>();
+            services.AddScoped<IFinancialReportRepository, FinancialReportRepository>();
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>
             {
                 var connectionString = configuration.GetConnectionString("ProjektInzynierskiDatabase");
