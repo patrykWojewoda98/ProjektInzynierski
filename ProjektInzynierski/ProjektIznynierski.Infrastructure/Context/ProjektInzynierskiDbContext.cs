@@ -19,6 +19,8 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<MarketData> MarketDatas { get; set; }
         public DbSet<Sector> Sectors { get; set; }
         public DbSet<TradeHistory> TradeHistories { get; set; }
+        public DbSet<Wallet> Wallets { get; set; }
+        public DbSet<WalletInstrument> WalletInstruments { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }

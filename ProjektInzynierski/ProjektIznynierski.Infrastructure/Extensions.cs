@@ -25,6 +25,8 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IMarketDataRepository, MarketDataRepository>();
             services.AddScoped<ISectorRepository, SectorRepository>();
             services.AddScoped<ITradeHistoryRepository, TradeHistoryRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<IWalletInstrumentRepository, WalletInstrumentRepository>();
 
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>

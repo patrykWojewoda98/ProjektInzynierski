@@ -1,6 +1,6 @@
 ﻿namespace ProjektIznynierski.Domain.Entities
 {
-    public class Wallet
+    public class Wallet : BaseEntity
     {
         public int ClientId { get; set; }
         public Client Client { get; set; }
