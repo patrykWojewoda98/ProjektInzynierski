@@ -2,11 +2,7 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IFinancialReportRepository
+    public interface IFinancialReportRepository : IRepository<FinancialReport>
     {
-        Task<FinancialReport> GetByIdAsync(int id);
-        void Add(FinancialReport entity);
-        void Update(FinancialReport entity);
-        void Delete(FinancialReport entity);
     }
 }

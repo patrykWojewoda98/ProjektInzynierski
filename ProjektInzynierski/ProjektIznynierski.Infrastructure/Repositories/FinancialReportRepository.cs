@@ -6,31 +6,11 @@ using ProjektIznynierski.Infrastructure.Context;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
-    internal class FinancialReportRepository : IFinancialReportRepository
+    internal class FinancialReportRepository : GenericRepository<FinancialReport>, IFinancialReportRepository
     {
-        private readonly ProjektInzynierskiDbContext _dbContext;
-        public FinancialReportRepository(ProjektInzynierskiDbContext dbContext)
+        public FinancialReportRepository(ProjektInzynierskiDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
-        }
 
-        public async Task<FinancialReport> GetByIdAsync(int id)
-        {
-            return await _dbContext.FinancialReports.SingleOrDefaultAsync(fr => fr.Id == id);
-        }
-
-        public void Add(FinancialReport entity)
-        {
-            _dbContext.FinancialReports.Add(entity);
-        }
-        public void Update(FinancialReport entity)
-        {
-            _dbContext.FinancialReports.Add(entity);
-        }
-
-        public void Delete(FinancialReport entity)
-        {
-            _dbContext.FinancialReports.Remove(entity);
         }
     }
 }

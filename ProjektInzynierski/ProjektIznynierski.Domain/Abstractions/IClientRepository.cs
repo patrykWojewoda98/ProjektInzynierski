@@ -3,13 +3,9 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IClientRepository
+    public interface IClientRepository : IRepository<Client>
     {
-        Task<Client> GetByIdAsync(int id);
         Task<bool> CheckIfClientExist(string email);
         Task<Client?> GetByEmailAsync(string email);
-        void Add(Client client);
-        void Update(Client client);
-        void Delete(Client client);
     }
 }

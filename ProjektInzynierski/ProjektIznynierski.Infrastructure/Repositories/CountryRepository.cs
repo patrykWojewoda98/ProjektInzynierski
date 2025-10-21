@@ -5,35 +5,16 @@ using ProjektIznynierski.Infrastructure.Context;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
-    internal class CountryRepository : ICountryRepository
+    internal class CountryRepository : GenericRepository<Country>, ICountryRepository
     {
-        private readonly ProjektInzynierskiDbContext _dbContext;
-        public CountryRepository(ProjektInzynierskiDbContext dbContext)
+        
+        public CountryRepository(ProjektInzynierskiDbContext dbContext) : base (dbContext)
         {
-            _dbContext = dbContext;
-        }
-        public async Task<Country> GetByIdAsync(int id)
-        {
-            return await _dbContext.Countries.SingleOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<List<Country>> GetAllAsync()
         {
             return await _dbContext.Countries.ToListAsync();
-        }
-
-        public void Add(Country country)
-        {
-            _dbContext.Countries.Add(country);
-        }
-        public void Update(Country country)
-        {
-            _dbContext.Countries.Update(country);
-        }
-
-        public void Delete(Country country)
-        {
-            _dbContext.Countries.Remove(country);
         }
     }
 }

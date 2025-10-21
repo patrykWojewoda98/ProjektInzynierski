@@ -7,7 +7,7 @@ namespace ProjektIznynierski.Infrastructure.Repositories
 {
     internal class GenericRepository<T> : IRepository<T> where T : BaseEntity
     {
-        private readonly ProjektInzynierskiDbContext _dbContext;
+        protected readonly ProjektInzynierskiDbContext _dbContext;
         public GenericRepository(ProjektInzynierskiDbContext dbContext)
         {
             _dbContext = dbContext;

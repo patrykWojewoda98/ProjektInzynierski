@@ -2,11 +2,7 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IInvestProfileRepository
+    public interface IInvestProfileRepository : IRepository<InvestProfile>
     {
-        Task<InvestProfile> GetInvestProfileByIdAsync(int id, CancellationToken cancellationToken = default);
-        void Add(InvestProfile entity);
-        void Update(InvestProfile entity);
-        void Delete(InvestProfile entity);
     }
 }

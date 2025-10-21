@@ -2,11 +2,7 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IInvestInstrumentRepository
+    public interface IInvestInstrumentRepository : IRepository<InvestInstrument>
     {
-        Task<InvestInstrument> GetByIdAsync(int id);
-        void Add(InvestInstrument investInstrument);
-        void Update(InvestInstrument investInstrument);
-        void Delete(InvestInstrument investInstrument);
     }
 }

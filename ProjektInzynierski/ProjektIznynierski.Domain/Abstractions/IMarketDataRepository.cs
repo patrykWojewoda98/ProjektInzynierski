@@ -2,11 +2,7 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IMarketDataRepository
+    public interface IMarketDataRepository : IRepository<MarketData>
     {
-        Task<MarketData> GetByIdAsync(int id);
-        void Add(MarketData entity);
-        void Update(MarketData entity);
-        void Delete(MarketData entity);
     }
 }

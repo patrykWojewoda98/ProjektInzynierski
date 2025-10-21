@@ -2,11 +2,7 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IFinancialMetricRepository
+    public interface IFinancialMetricRepository : IRepository<FinancialMetric>
     {
-        Task<FinancialMetric> GetByIdAsync(int id);
-        void Add(FinancialMetric financialMetric);
-        void Update(FinancialMetric financialMetric);
-        void Delete(FinancialMetric financialMetric);
     }
 }

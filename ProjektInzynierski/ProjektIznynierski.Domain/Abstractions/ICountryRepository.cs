@@ -2,13 +2,9 @@
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface ICountryRepository
+    public interface ICountryRepository : IRepository<Country>
     {
-        Task<Country> GetByIdAsync(int id);
         Task<List<Country>> GetAllAsync();
-        void Add(Country country);
-        void Update(Country country);
-        void Delete(Country country);
 
     }
 }

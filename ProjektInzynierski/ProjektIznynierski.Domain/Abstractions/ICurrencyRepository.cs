@@ -3,13 +3,10 @@ using ProjektIznynierski.Domain.Enums;
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface ICurrencyRepository
+    public interface ICurrencyRepository : IRepository<Currency>
     {
-        Task<Currency> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<RiskLevel> GetRiscLevelById(int id,CancellationToken cancellationToken = default);
-        void Add(Currency entity);
-        void Update(Currency entity);
-        void Delete(Currency entity);
+
 
     }
 }

@@ -3,13 +3,9 @@ using ProjektIznynierski.Domain.Enums;
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
-    public interface IRegionRepository
+    public interface IRegionRepository : IRepository<Region>
     {
-        Task<Region> GetRegiionByIdAsync(int id);
         Task<Region> GetRegionByCodeAsync(RegionCode code);
-        void AddRegion(Region region);
-        void UpdateRegion(Region region);
-        void RemoveRegion(Region region);
 
     }
 }
