@@ -11,6 +11,8 @@ namespace ProjektIznynierski.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<IAIAnalisisRequestRepository, AIAnalisisRequestRepository>();
             services.AddScoped<IAIAnalysisResultRepository, AIAnalysisResultRepository>();
