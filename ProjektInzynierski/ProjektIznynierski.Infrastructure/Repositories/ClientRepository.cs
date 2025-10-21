@@ -12,15 +12,19 @@ namespace ProjektIznynierski.Infrastructure.Repositories
 
         }
 
-        public Task<Client?> GetByEmailAsync(string email)
+        public async Task<Client?> GetByEmailAsync(string email)
         {
-            return _dbContext.Clients.SingleOrDefaultAsync(c => c.Email == email);
+            return await _dbContext.Clients.SingleOrDefaultAsync(c => c.Email == email);
         }
 
-        public Task<bool> CheckIfClientExist(string email)
+        public async Task<bool> CheckIfClientExist(string email)
         {
-            return _dbContext.Clients.AnyAsync(c => c.Email == email);
+            return await _dbContext.Clients.AnyAsync(c => c.Email == email);
         }
 
+        public async Task<Wallet?> GetClientWalletAsync(int clientId)
+        {
+            return await _dbContext.Wallets.SingleOrDefaultAsync(w => w.ClientId == clientId);
+        }
     }
 }

@@ -7,5 +7,7 @@ namespace ProjektIznynierski.Domain.Abstractions
     {
         Task<bool> CheckIfClientExist(string email);
         Task<Client?> GetByEmailAsync(string email);
+
+        Task<Wallet?> GetClientWalletAsync(int clientId);
     }
 }

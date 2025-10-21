@@ -4,7 +4,8 @@
     {
             public string Name { get; set; }
             public string Email { get; set; }
-            public string Wallet { get; set; }
+            public int WalletID { get; set; }
+            public Wallet Wallet { get; set; }
 
             public int InvestProfileId { get; set; }
             public InvestProfile InvestProfile { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjektIznynierski.Domain.Entities;
 using ProjektIznynierski.Domain.Enums;
+using ProjektIznynierski.Infrastructure.Config;
 
 namespace ProjektIznynierski.Infrastructure.Context
 {
@@ -29,6 +30,8 @@ namespace ProjektIznynierski.Infrastructure.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("ProjektInzynierski");
+
+            modelBuilder.ApplyConfiguration(new ClientConfiguration());
         }
 
     }
