@@ -21,6 +21,8 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<TradeHistory> TradeHistories { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<WalletInstrument> WalletInstruments { get; set; }
+        public DbSet<WatchList> WatchLists { get; set; }
+        public DbSet<WatchListItem> WatchListItems { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
