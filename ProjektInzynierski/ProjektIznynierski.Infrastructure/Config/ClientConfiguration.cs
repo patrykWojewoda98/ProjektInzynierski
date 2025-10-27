@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ProjektIznynierski.Domain.Entities;
 
@@ -65,4 +65,4 @@ namespace ProjektIznynierski.Infrastructure.Config
         }
     }
 }
-}
+

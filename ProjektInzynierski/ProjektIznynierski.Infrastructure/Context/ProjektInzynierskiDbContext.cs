@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ProjektIznynierski.Domain.Entities;
 using ProjektIznynierski.Domain.Enums;
 using ProjektIznynierski.Infrastructure.Config;
@@ -31,7 +31,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         {
             modelBuilder.HasDefaultSchema("ProjektInzynierski");
 
-            modelBuilder.ApplyConfiguration(new ClientConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProjektInzynierskiDbContext).Assembly);
         }
 
     }
