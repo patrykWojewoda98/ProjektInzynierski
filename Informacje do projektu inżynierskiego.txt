@@ -1,2 +1,14 @@
 1. Na pewno trzeba będzie utowrzyć prezentację w powerpoint z działania aplikacji.
-2. Praca inżynierska trzeba pisać? 
+2. Praca inżynierska trzeba pisać domument tekstowy (chyba nie)?
+3. 
+
+
+
+
+
+Uzyte wzrorce Projektowe: 
+Unit of work
+Wzorzec repozytorium
+CQRS?
+MediatR?
+

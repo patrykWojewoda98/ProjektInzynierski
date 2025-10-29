@@ -35,7 +35,7 @@ namespace ProjektIznynierski.Infrastructure
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("ProjektInzynierskiDatabase");
+                var connectionString = configuration.GetConnectionString("ProjektInzynierskiCS");
                 options.UseSqlServer(connectionString);
             });
             return services;

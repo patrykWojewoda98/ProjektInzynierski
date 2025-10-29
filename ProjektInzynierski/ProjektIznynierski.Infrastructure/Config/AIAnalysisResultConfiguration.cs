@@ -32,7 +32,7 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.HasOne(r => r.Client)
                    .WithMany(c => c.AIAnalysisResults)
                    .HasForeignKey(r => r.ClientId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             base.Configure(builder);
         }

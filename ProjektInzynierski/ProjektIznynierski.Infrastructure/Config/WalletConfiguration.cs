@@ -10,8 +10,8 @@ namespace ProjektIznynierski.Infrastructure.Config
         {
             builder.ToTable("Wallets");
 
-            builder.Property(w => w.ClientId)
-                   .IsRequired();
+            // The 1:1 FK is defined on Client.WalletID; avoid shadowing with Wallet.ClientId
+            builder.Ignore(w => w.ClientId);
 
             builder.Property(w => w.CurrencyId)
                    .IsRequired();

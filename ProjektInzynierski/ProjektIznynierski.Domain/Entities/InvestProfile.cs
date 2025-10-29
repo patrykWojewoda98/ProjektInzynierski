@@ -11,8 +11,8 @@ namespace ProjektIznynierski.Domain.Entities
 
         public InvestHorizon InvestHorizon { get; set; }
 
-        public double TargetReturn { get; set; }
-        public double MaxDrawDown { get; set; }
+        public double? TargetReturn { get; set; }
+        public double? MaxDrawDown { get; set; }
 
         public ICollection<Region> PreferredRegions { get; set; }
         public ICollection<Sector> PreferredSectors { get; set; }

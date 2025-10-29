@@ -53,12 +53,14 @@ namespace ProjektIznynierski.Infrastructure.Config
 
             // 🔹 Relacja z AIAnalysisResults (1:N)
             builder.HasMany(c => c.AIAnalysisResults)
-                .WithOne()
+                .WithOne(r => r.Client)
+                .HasForeignKey(r => r.ClientId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // 🔹 Relacja z WatchLists (1:N)
             builder.HasMany(c => c.WatchLists)
-                .WithOne()
+                .WithOne(wl => wl.Client)
+                .HasForeignKey(wl => wl.ClientId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.Configure(builder);

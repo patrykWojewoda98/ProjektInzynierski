@@ -34,6 +34,16 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .HasForeignKey<InvestProfile>(ip => ip.ClientId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            // Many-to-many: InvestProfile ↔ Regions
+            builder.HasMany(ip => ip.PreferredRegions)
+                   .WithMany()
+                   .UsingEntity(j => j.ToTable("InvestProfileRegions", "ProjektInzynierski"));
+
+            // Many-to-many: InvestProfile ↔ Sectors
+            builder.HasMany(ip => ip.PreferredSectors)
+                   .WithMany()
+                   .UsingEntity(j => j.ToTable("InvestProfileSectors", "ProjektInzynierski"));
+
             base.Configure(builder);
         }
     }
