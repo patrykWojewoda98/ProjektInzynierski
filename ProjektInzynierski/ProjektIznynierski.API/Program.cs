@@ -1,9 +1,11 @@
 using ProjektIznynierski.Infrastructure;
+using ProjektIznynierski.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
