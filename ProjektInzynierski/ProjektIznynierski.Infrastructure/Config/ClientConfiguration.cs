@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Infrastructure.Config
 
             // 🔹 City, Address, PostalCode – brak limitu znaków
             builder.Property(c => c.City)
-                .IsRequired(false); // może być null
+                .IsRequired(false);
 
             builder.Property(c => c.Address)
                 .IsRequired(false);
@@ -33,16 +33,16 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(c => c.PostalCode)
                 .IsRequired(false);
 
-            // 🔹 Relacja z Wallet (1:1)
+            // 🔹 Relacja z Wallet (1:1) – klucz obcy w Wallet
             builder.HasOne(c => c.Wallet)
                 .WithOne(w => w.Client)
-                .HasForeignKey<Client>(c => c.WalletID)
+                .HasForeignKey<Wallet>(w => w.ClientId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 🔹 Relacja z InvestProfile (1:1)
+            // 🔹 Relacja z InvestProfile (1:1) – klucz obcy w InvestProfile
             builder.HasOne(c => c.InvestProfile)
                 .WithOne(ip => ip.Client)
-                .HasForeignKey<Client>(c => c.InvestProfileId)
+                .HasForeignKey<InvestProfile>(ip => ip.ClientId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // 🔹 Relacja z Country (wiele klientów może należeć do jednego kraju)
@@ -67,4 +67,3 @@ namespace ProjektIznynierski.Infrastructure.Config
         }
     }
 }
-

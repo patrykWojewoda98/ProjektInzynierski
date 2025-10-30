@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ProjektIznynierski.Domain.Entities;
 
@@ -10,9 +10,6 @@ namespace ProjektIznynierski.Infrastructure.Config
         {
             builder.ToTable("Wallets");
 
-            // The 1:1 FK is defined on Client.WalletID; avoid shadowing with Wallet.ClientId
-            builder.Ignore(w => w.ClientId);
-
             builder.Property(w => w.CurrencyId)
                    .IsRequired();
 
@@ -20,16 +17,19 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .HasColumnType("decimal(18,2)")
                    .IsRequired();
 
+            // 🔹 Relacja 1:1 z Client – klucz obcy w Wallet
             builder.HasOne(w => w.Client)
                    .WithOne(c => c.Wallet)
-                   .HasForeignKey<Client>(c => c.WalletID)
+                   .HasForeignKey<Wallet>(w => w.ClientId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            // 🔹 Relacja z Currency (wiele Walletów może mieć jedną walutę)
             builder.HasOne(w => w.Currency)
                    .WithMany()
                    .HasForeignKey(w => w.CurrencyId)
                    .OnDelete(DeleteBehavior.Restrict);
 
+            // 🔹 Relacja 1:N z Instruments
             builder.HasMany(w => w.Instruments)
                    .WithOne(i => i.Wallet)
                    .HasForeignKey(i => i.WalletId)

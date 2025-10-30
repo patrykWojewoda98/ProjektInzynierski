@@ -26,23 +26,21 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(ip => ip.MaxDrawDown)
                    .IsRequired(false);
 
-            builder.Property(ip => ip.ClientId)
-                   .IsRequired();
-
+            // 🔹 Relacja 1:1 z Client – klucz obcy w InvestProfile
             builder.HasOne(ip => ip.Client)
                    .WithOne(c => c.InvestProfile)
                    .HasForeignKey<InvestProfile>(ip => ip.ClientId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // Many-to-many: InvestProfile ↔ Regions
+            // 🔹 Many-to-many: InvestProfile ↔ Regions
             builder.HasMany(ip => ip.PreferredRegions)
                    .WithMany()
-                   .UsingEntity(j => j.ToTable("InvestProfileRegions", "ProjektInzynierski"));
+                   .UsingEntity(j => j.ToTable("InvestProfileRegions"));
 
-            // Many-to-many: InvestProfile ↔ Sectors
+            // 🔹 Many-to-many: InvestProfile ↔ Sectors
             builder.HasMany(ip => ip.PreferredSectors)
                    .WithMany()
-                   .UsingEntity(j => j.ToTable("InvestProfileSectors", "ProjektInzynierski"));
+                   .UsingEntity(j => j.ToTable("InvestProfileSectors"));
 
             base.Configure(builder);
         }
