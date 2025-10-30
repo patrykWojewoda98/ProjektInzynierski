@@ -12,9 +12,21 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
         }
 
+        public async Task<IEnumerable<Region>> GetAllRegionsAsync()
+        {
+            return await _dbContext.Regions.ToListAsync();
+        }
+
         public async Task<Region> GetRegionByCodeAsync(RegionCode code)
         {
             return await _dbContext.Regions.SingleOrDefaultAsync(r => r.Code == code);
+        }
+
+        public async Task<IEnumerable<Region>> GetRegionsByRiskLevelAsync(RiskLevel riskLevel)
+        {
+            return await _dbContext.Regions
+                .Where(r => r.RegionRisk == riskLevel)
+                .ToListAsync();
         }
     }
 }
