@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjektIznynierski.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using ProjektIznynierski.Infrastructure.Context;
 namespace ProjektIznynierski.Infrastructure.Migrations
 {
     [DbContext(typeof(ProjektInzynierskiDbContext))]
-    partial class ProjektInzynierskiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251102105021_MakeWalletAndInvestProfileOptionalForClient")]
+    partial class MakeWalletAndInvestProfileOptionalForClient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

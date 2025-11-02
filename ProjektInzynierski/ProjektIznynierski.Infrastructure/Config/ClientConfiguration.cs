@@ -37,13 +37,15 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.HasOne(c => c.Wallet)
                 .WithOne(w => w.Client)
                 .HasForeignKey<Wallet>(w => w.ClientId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
 
             // 🔹 Relacja z InvestProfile (1:1) – klucz obcy w InvestProfile
             builder.HasOne(c => c.InvestProfile)
                 .WithOne(ip => ip.Client)
                 .HasForeignKey<InvestProfile>(ip => ip.ClientId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
 
             // 🔹 Relacja z Country (wiele klientów może należeć do jednego kraju)
             builder.HasOne(c => c.Country)

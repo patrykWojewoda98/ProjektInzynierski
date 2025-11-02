@@ -30,7 +30,8 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.HasOne(ip => ip.Client)
                    .WithOne(c => c.InvestProfile)
                    .HasForeignKey<InvestProfile>(ip => ip.ClientId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Cascade)
+                   .IsRequired(false);
 
             // 🔹 Many-to-many: InvestProfile ↔ Regions
             builder.HasMany(ip => ip.PreferredRegions)

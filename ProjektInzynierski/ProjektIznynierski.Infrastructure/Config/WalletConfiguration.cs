@@ -21,7 +21,8 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.HasOne(w => w.Client)
                    .WithOne(c => c.Wallet)
                    .HasForeignKey<Wallet>(w => w.ClientId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Cascade)
+                   .IsRequired(false);
 
             // 🔹 Relacja z Currency (wiele Walletów może mieć jedną walutę)
             builder.HasOne(w => w.Currency)

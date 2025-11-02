@@ -2,8 +2,8 @@
 {
     public class Wallet : BaseEntity
     {
-        public int ClientId { get; set; }
-        public Client Client { get; set; }
+        public int? ClientId { get; set; }
+        public Client? Client { get; set; }
 
         public decimal CashBalance { get; set; }     
         public int CurrencyId { get; set; }          

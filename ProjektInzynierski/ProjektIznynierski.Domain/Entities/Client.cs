@@ -4,9 +4,9 @@
     {
             public string Name { get; set; }
             public string Email { get; set; }
-            public Wallet Wallet { get; set; }
+            public Wallet? Wallet { get; set; }
 
-            public InvestProfile InvestProfile { get; set; }
+            public InvestProfile? InvestProfile { get; set; }
 
             public string City { get; set; }
             public string Address { get; set; }

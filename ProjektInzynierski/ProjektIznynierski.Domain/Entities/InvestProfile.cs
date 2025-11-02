@@ -17,7 +17,7 @@ namespace ProjektIznynierski.Domain.Entities
         public ICollection<Region> PreferredRegions { get; set; }
         public ICollection<Sector> PreferredSectors { get; set; }
 
-        public int ClientId { get; set; }
-        public Client Client { get; set; }
+        public int? ClientId { get; set; }
+        public Client? Client { get; set; }
     }
 }
