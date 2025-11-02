@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using MediatR;
 using ProjektIznynierski.Application.Comands.Client.AddClient;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
@@ -10,13 +12,22 @@ namespace ProjektIznynierski.Application.Commands.Client.AddClient
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public AddClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork)
+        private readonly IValidator<AddClientCommand> _validator;
+        public AddClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork, IValidator<AddClientCommand> validator)
         {
             _clientRepository = clientRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
         }
         public async Task<ClientDto> Handle(AddClientCommand request, CancellationToken cancellationToken)
         {
+            ValidationResult validationResult = _validator.Validate(request);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new ValidationException($"Walidacja nie powiodła sie. Przyczyny: {string.Join(", ", errors)}");
+            }
+
             bool clientExists = await _clientRepository.CheckIfClientExist(request.Email);
             if (clientExists)
             {
