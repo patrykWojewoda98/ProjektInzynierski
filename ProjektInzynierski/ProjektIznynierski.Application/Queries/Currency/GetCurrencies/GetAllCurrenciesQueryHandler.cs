@@ -4,18 +4,19 @@ using ProjektIznynierski.Domain.Abstractions;
 
 namespace ProjektIznynierski.Application.Queries.Currency.GetCurrencies
 {
-    public class GetAllCurenciesQueryHandler : IRequestHandler<GetAllCurenciesQuery, List<CurrencyDto>>
+    internal class GetAllCurrenciesQueryHandler : IRequestHandler<GetAllCurrenciesQuery, List<CurrencyDto>>
     {
         private readonly ICurrencyRepository _currencyRepository;
-        
-        public GetAllCurenciesQueryHandler(ICurrencyRepository currencyRepository)
+
+        public GetAllCurrenciesQueryHandler(ICurrencyRepository currencyRepository)
         {
             _currencyRepository = currencyRepository;
         }
 
-        public async Task<List<CurrencyDto>> Handle(GetAllCurenciesQuery request, CancellationToken cancellationToken)
+        public async Task<List<CurrencyDto>> Handle(GetAllCurrenciesQuery request, CancellationToken cancellationToken)
         {
-            var currencies = await _currencyRepository.GetAllAsync(cancellationToken);
+            var currencies = await _currencyRepository.GetAllAsync();
+
             return currencies.Select(currency => new CurrencyDto
             {
                 Id = currency.Id,

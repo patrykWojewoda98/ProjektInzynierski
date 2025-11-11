@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
 using ProjektIznynierski.Infrastructure.Context;
@@ -29,6 +29,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         public void Delete(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
+        }
+
+        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Set<T>().ToListAsync(cancellationToken);
         }
     }
 }
