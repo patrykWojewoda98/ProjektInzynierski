@@ -12,6 +12,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
         }
 
+        public Task<List<Currency>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return this.GetAllAsync(cancellationToken);
+        }
+
         public async Task<RiskLevel> GetRiscLevelById(int id, CancellationToken cancellationToken = default)
         {
             return this.GetByIdAsync(id, cancellationToken).Result.CurrencyRisk;

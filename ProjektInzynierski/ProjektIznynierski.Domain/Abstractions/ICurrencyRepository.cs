@@ -7,6 +7,7 @@ namespace ProjektIznynierski.Domain.Abstractions
     {
         Task<RiskLevel> GetRiscLevelById(int id,CancellationToken cancellationToken = default);
 
+        Task<List<Currency>> GetAllAsync(CancellationToken cancellationToken = default);
 
     }
 }
