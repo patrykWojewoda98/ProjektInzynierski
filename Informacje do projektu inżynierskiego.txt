@@ -12,3 +12,4 @@ Wzorzec repozytorium
 CQRS?
 MediatR?
 
+Dodana Biblioteka FluentValidator.ASPNetCore
