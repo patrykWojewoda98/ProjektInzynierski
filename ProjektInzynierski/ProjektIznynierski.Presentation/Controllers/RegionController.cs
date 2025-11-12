@@ -1,5 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ProjektIznynierski.Application.Commands.Region.CreateRegion;
+using ProjektIznynierski.Application.Commands.Region.DeleteRegion;
+using ProjektIznynierski.Application.Commands.Region.UpdateRegion;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.Region.GetAllRegions;
 using ProjektIznynierski.Application.Queries.Region.GetRegionById;
@@ -27,10 +30,47 @@ namespace ProjektIznynierski.Presentation.Controllers
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Get Region by ID", Description = "Retrieves a specific region by its ID.")]
         [ProducesResponseType(typeof(RegionDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetRegionByIdQuery(id));
             return Ok(result);
+        }
+
+        [HttpPost]
+        [SwaggerOperation(Summary = "Create a new region", Description = "Creates a new region with the provided details.")]
+        [ProducesResponseType(typeof(RegionDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateRegionCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Update an existing region", Description = "Updates an existing region with the provided details.")]
+        [ProducesResponseType(typeof(RegionDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateRegionCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("ID in the URL does not match the ID in the request body.");
+            }
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Delete a region", Description = "Deletes a specific region by its ID.")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _mediator.Send(new DeleteRegionCommand { Id = id });
+            return NoContent();
         }
     }
 }
