@@ -1,6 +1,10 @@
 using MediatR;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ProjektIznynierski.Application.Queries.InvestProfile.GetAllInvestProfiles
 {

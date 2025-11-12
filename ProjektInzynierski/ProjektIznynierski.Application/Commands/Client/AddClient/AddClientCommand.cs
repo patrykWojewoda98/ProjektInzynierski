@@ -1,25 +1,18 @@
 ﻿using MediatR;
 using ProjektIznynierski.Application.Dtos;
-using ProjektIznynierski.Domain.Entities;
 
-namespace ProjektIznynierski.Application.Comands.Client.AddClient
+namespace ProjektIznynierski.Application.Commands.Client.AddClient
 {
     public class AddClientCommand : IRequest<ClientDto>
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public Wallet Wallet { get; set; }
-
-        public InvestProfile InvestProfile { get; set; }
-
-        public string City { get; set; }
-        public string Address { get; set; }
-        public string PostalCode { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string PostalCode { get; set; } = string.Empty;
 
         public int CountryId { get; set; }
-        public Country Country { get; set; }
-
-        public ICollection<AIAnalysisResult>? AIAnalysisResults { get; set; } = new List<AIAnalysisResult>();
-        public ICollection<WatchList>? WatchLists { get; set; }
+        public int? WalletId { get; set; }
+        public int? InvestProfileId { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using ProjektIznynierski.Application.Comands.Client.AddClient;
 namespace ProjektIznynierski.Application.Commands.Client.AddClient
 {
     public class AddClientCommandValidation : AbstractValidator<AddClientCommand>
