@@ -23,6 +23,10 @@ namespace ProjektIznynierski.Infrastructure.Config
                 .HasMaxLength(255)
                 .IsRequired();
 
+            // 🔹 PasswordHash (wymagany)
+            builder.Property(c => c.PasswordHash)
+            .IsRequired();
+
             // 🔹 City, Address, PostalCode – brak limitu znaków
             builder.Property(c => c.City)
                 .IsRequired(false);

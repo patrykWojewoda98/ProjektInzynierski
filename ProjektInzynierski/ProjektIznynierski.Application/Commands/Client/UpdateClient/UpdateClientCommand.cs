@@ -12,5 +12,7 @@ namespace ProjektIznynierski.Application.Commands.Client.UpdateClient
         public string Address { get; set; }
         public string PostalCode { get; set; }
         public int CountryId { get; set; }
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 }

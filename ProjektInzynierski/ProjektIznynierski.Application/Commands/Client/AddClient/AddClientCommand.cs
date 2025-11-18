@@ -10,6 +10,7 @@ namespace ProjektIznynierski.Application.Commands.Client.AddClient
         public string City { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
+        public string Password { get; set; }
 
         public int CountryId { get; set; }
         public int? WalletId { get; set; }

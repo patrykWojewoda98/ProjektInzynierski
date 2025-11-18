@@ -4,8 +4,10 @@ using ProjektIznynierski.Application.Commands.Country.CreateCountry;
 using ProjektIznynierski.Application.Commands.Country.DeleteCountry;
 using ProjektIznynierski.Application.Commands.Country.UpdateCountry;
 using ProjektIznynierski.Application.Dtos;
+using ProjektIznynierski.Application.Queries.Country.GetAllContriesByRegionId;
 using ProjektIznynierski.Application.Queries.Country.GetAllCountries;
 using ProjektIznynierski.Application.Queries.Country.GetCountryById;
+using ProjektIznynierski.Domain.Entities;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
@@ -34,6 +36,16 @@ namespace ProjektIznynierski.Presentation.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetCountryByIdQuery(id));
+            return Ok(result);
+        }
+
+        [HttpGet("region/{regionId}")]
+        [SwaggerOperation(Summary = "Get Countryies by RegionID", Description = "Retrieves a specific country by its RegionID.")]
+        [ProducesResponseType(typeof(CountryDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetByRegionId(int regionId)
+        {
+            var result = await _mediator.Send(new GetCountryByRegionIdQuery(regionId));
             return Ok(result);
         }
 

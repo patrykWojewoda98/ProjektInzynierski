@@ -3,6 +3,8 @@ using MediatR;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
 using FluentValidation.Results;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace ProjektIznynierski.Application.Commands.Client.UpdateClient
 {
@@ -40,6 +42,19 @@ namespace ProjektIznynierski.Application.Commands.Client.UpdateClient
             client.Address = request.Address;
             client.PostalCode = request.PostalCode;
             client.CountryId = request.CountryId;
+
+            if (!string.IsNullOrWhiteSpace(request.OldPassword) && !string.IsNullOrWhiteSpace(request.NewPassword))
+            {
+                using var sha256 = SHA256.Create();
+                var oldPasswordBytes = Encoding.UTF8.GetBytes(request.OldPassword);
+                var oldPasswordHash = Convert.ToBase64String(sha256.ComputeHash(oldPasswordBytes));
+
+                if (client.PasswordHash != oldPasswordHash)
+                    throw new Exception("Old password is incorrect.");
+
+                var newPasswordBytes = Encoding.UTF8.GetBytes(request.NewPassword);
+                client.PasswordHash = Convert.ToBase64String(sha256.ComputeHash(newPasswordBytes));
+            }
 
             _clientRepository.Update(client);
             await _unitOfWork.SaveChangesAsync();

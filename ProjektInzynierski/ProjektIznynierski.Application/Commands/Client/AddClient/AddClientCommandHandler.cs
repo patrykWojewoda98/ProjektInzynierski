@@ -3,6 +3,8 @@ using FluentValidation.Results;
 using MediatR;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ProjektIznynierski.Application.Commands.Client.AddClient
 {
@@ -35,6 +37,11 @@ namespace ProjektIznynierski.Application.Commands.Client.AddClient
             if (clientExists)
                 throw new Exception("Client with this email already exists.");
 
+            using var sha256 = SHA256.Create();
+            var passwordBytes = Encoding.UTF8.GetBytes(request.Password);
+            var hashBytes = sha256.ComputeHash(passwordBytes);
+            var passwordHash = Convert.ToBase64String(hashBytes);
+
             var client = new Domain.Entities.Client
             {
                 Name = request.Name,
@@ -43,6 +50,7 @@ namespace ProjektIznynierski.Application.Commands.Client.AddClient
                 Address = request.Address,
                 PostalCode = request.PostalCode,
                 CountryId = request.CountryId,
+                PasswordHash = passwordHash
             };
 
             _clientRepository.Add(client);

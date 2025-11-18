@@ -28,6 +28,9 @@ namespace ProjektIznynierski.Application.Commands.Client.AddClient
 
             RuleFor(x => x.CountryId)
                 .GreaterThan(0).WithMessage("Identyfikator kraju jest wymagany i musi być większy od zera.");
+
+            RuleFor(x => x.Password)
+                .MinimumLength(6).WithMessage("Hasło musi mieć co najmniej 6 znaków.");
         }
     }
 }
