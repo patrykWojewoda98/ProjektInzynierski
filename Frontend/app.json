@@ -19,7 +19,10 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "useCleartextTraffic": true,
+      "networkSecurityConfig": "./network_security_config.xml",
+      "package": "com.anonymous.Frontend"
     },
     "web": {
       "output": "static",
