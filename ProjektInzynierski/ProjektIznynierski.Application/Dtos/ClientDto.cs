@@ -10,5 +10,7 @@ namespace ProjektIznynierski.Application.Dtos
         public string City { get; set; }
         public string Address { get; set; }
         public string PostalCode { get; set; }
+        public int? InvestProfileId { get; set; }
+        public int? WalletId { get; set; }
     }
 }

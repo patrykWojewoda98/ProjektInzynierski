@@ -129,6 +129,42 @@ export const globalStyles = StyleSheet.create({
     resizeMode: "contain",
   },
 
+  // App header
+  headerContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: COLORS.mediumGrey,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerLogo: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+  },
+  headerWelcome: {
+    color: COLORS.whiteHeader,
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  headerLogoutButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary,
+  },
+  headerLogoutText: {
+    color: COLORS.whiteHeader,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
   // Loading indicator
   loadingIndicator: {
     marginVertical: 10,
@@ -147,5 +183,80 @@ export const globalStyles = StyleSheet.create({
   },
   largeSpacing: {
     marginVertical: 24,
+  },
+  // Root container for layout
+  rootContainer: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: COLORS.background,
+  },
+
+  // Main content wrapper (below header)
+  contentWrapper: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: COLORS.background,
+    padding: 20,
+  },
+  // Main Menu specific styles
+  mainMenuScroll: {
+    flexGrow: 1,
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
+  },
+  mainMenuScrollStyle: {
+    backgroundColor: COLORS.background,
+  },
+  mainMenuTop: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  mainMenuLogoSmall: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain",
+    marginBottom: 12,
+  },
+  mainMenuTitle: {
+    color: COLORS.whiteHeader,
+    fontSize: 22,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  gridContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  gridTile: {
+    width: "100%",
+    maxWidth: 760,
+    backgroundColor: COLORS.lightGrey,
+    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    // Shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  gridTileIcon: {
+    width: 56,
+    height: 56,
+    resizeMode: "contain",
+    marginBottom: 12,
+  },
+  gridTileLabel: {
+    color: COLORS.whiteHeader,
+    fontSize: 14,
+    textAlign: "center",
   },
 });

@@ -401,7 +401,9 @@ const RegisterScreen = () => {
             Already have an account?{" "}
           </Text>
           <TouchableOpacity onPress={() => router.push("/auth/login")}>
-            <Text style={globalStyles.buttonText}>Login</Text>
+            <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
+              Login
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

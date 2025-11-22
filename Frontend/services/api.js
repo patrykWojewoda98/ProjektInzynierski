@@ -21,7 +21,6 @@ const ApiService = {
       );
       const data = response.data;
 
-      // Jeśli API zwraca obiekt zamiast tablicy, opakuj go w tablicę:
       return Array.isArray(data) ? data : [data];
     } catch (error) {
       console.error("Error fetching countries:", error);
@@ -30,6 +29,19 @@ const ApiService = {
   },
 
   // Client endpoints
+  async getClientById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Client/${id}`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw ["Client not found. Please check your ID."];
+      }
+      console.error("Error fetching client:", error);
+      throw ["An error occurred while fetching client data. Please try again."];
+    }
+  },
+
   async registerClient(clientData) {
     try {
       const response = await axios.post(`${API_BASE_URL}/Client`, clientData);
@@ -40,6 +52,23 @@ const ApiService = {
       }
       console.error("Registration error:", error);
       throw ["An error occurred during registration. Please try again."];
+    }
+  },
+
+  // InvestProfile endpoints
+  async createInvestProfile(profileDto) {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvestProfile`,
+        profileDto
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+      console.error("Error creating investment profile:", error);
+      throw ["An error occurred while creating the investment profile."];
     }
   },
 };
