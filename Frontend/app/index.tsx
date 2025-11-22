@@ -19,7 +19,7 @@ export default function HomeScreen() {
     <View style={globalStyles.centerContainer}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <Text style={[globalStyles.header, { marginBottom: 20 }]}>Witamy</Text>
+      <Text style={[globalStyles.header, { marginBottom: 20 }]}>Welcome</Text>
 
       <Image
         source={require("../assets/images/Logo.png")}
@@ -35,7 +35,7 @@ export default function HomeScreen() {
           onPress={handleLogin}
         >
           <Text style={[globalStyles.buttonText, { fontSize: 18 }]}>
-            Zaloguj się
+            Log In
           </Text>
         </TouchableOpacity>
 
@@ -51,7 +51,7 @@ export default function HomeScreen() {
           onPress={handleRegister}
         >
           <Text style={[globalStyles.buttonText, { fontSize: 18 }]}>
-            Zarejestruj się
+            Register
           </Text>
         </TouchableOpacity>
       </View>

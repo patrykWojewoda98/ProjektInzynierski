@@ -26,13 +26,11 @@ const LoginScreen = ({ navigation }) => {
         style={[globalStyles.logo, { width: 250, height: 250 }]}
       />
 
-      <Text style={[globalStyles.header, { marginBottom: 40 }]}>
-        Zaloguj się
-      </Text>
+      <Text style={[globalStyles.header, { marginBottom: 40 }]}>Login</Text>
 
       <View style={[globalStyles.section, { width: "80%" }]}>
         <Text style={[globalStyles.text, { marginBottom: 8 }]}>
-          Adres email
+          Email Adress
         </Text>
         <TextInput
           style={[
@@ -45,7 +43,7 @@ const LoginScreen = ({ navigation }) => {
               width: "100%",
             },
           ]}
-          placeholder="Wpisz swój email"
+          placeholder="Enter your email"
           placeholderTextColor={COLORS.placeholderGrey}
           value={email}
           onChangeText={setEmail}
@@ -53,7 +51,7 @@ const LoginScreen = ({ navigation }) => {
           autoCapitalize="none"
         />
 
-        <Text style={[globalStyles.text, { marginBottom: 8 }]}>Hasło</Text>
+        <Text style={[globalStyles.text, { marginBottom: 8 }]}>Password</Text>
         <TextInput
           style={[
             globalStyles.text,
@@ -65,7 +63,7 @@ const LoginScreen = ({ navigation }) => {
               width: "100%",
             },
           ]}
-          placeholder="Wpisz swoje hasło"
+          placeholder="Enter your Password"
           placeholderTextColor={COLORS.placeholderGrey}
           value={password}
           onChangeText={setPassword}
@@ -76,7 +74,7 @@ const LoginScreen = ({ navigation }) => {
           style={[globalStyles.button, { width: "100%", padding: 15 }]}
           onPress={handleLogin}
         >
-          <Text style={globalStyles.buttonText}>Zaloguj</Text>
+          <Text style={globalStyles.buttonText}>Log in</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
