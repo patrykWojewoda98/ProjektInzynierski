@@ -3,7 +3,7 @@ import React, { createContext, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { globalStyles } from "../assets/styles/styles";
 
-// Auth context to hold user/token/clientId globally
+// Auth context (globalny kontekst dla użytkownika, tokena i clientId)
 export const AuthContext = createContext<any>({
   user: null,
   setUser: (_u: any) => {},
@@ -20,32 +20,41 @@ export default function RootLayout() {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Clear auth-related global state
+    // Czyszczenie stanu logowania
     setToken("");
     setClientId("");
     setUser(null);
-    // Navigate to login
     router.replace("/auth/login");
   };
 
   const Header = () => {
     return (
-      <View style={globalStyles.headerContainer}>
-        <View style={globalStyles.headerLeft}>
+      <View style={globalStyles.topHeader}>
+        <View style={[globalStyles.row, globalStyles.alignCenter]}>
           <Image
             source={require("../assets/images/Logo.png")}
-            style={globalStyles.headerLogo}
+            style={globalStyles.logoSmall}
           />
           {user && user.name ? (
-            <Text style={globalStyles.headerWelcome}>Welcome, {user.name}</Text>
+            <Text
+              style={[
+                globalStyles.text,
+                { color: "white", marginLeft: 10, fontWeight: "600" },
+              ]}
+            >
+              Welcome, {user.name}
+            </Text>
           ) : null}
         </View>
 
         <Pressable
           onPress={handleLogout}
-          style={globalStyles.headerLogoutButton}
+          style={({ pressed }) => [
+            globalStyles.buttonSmall,
+            pressed && globalStyles.buttonPressed,
+          ]}
         >
-          <Text style={globalStyles.headerLogoutText}>Logout</Text>
+          <Text style={globalStyles.buttonText}>Logout</Text>
         </Pressable>
       </View>
     );
@@ -55,9 +64,9 @@ export default function RootLayout() {
     <AuthContext.Provider
       value={{ user, setUser, token, setToken, clientId, setClientId }}
     >
-      <View style={globalStyles.rootContainer}>
+      <View style={[globalStyles.container, globalStyles.flex1]}>
         <Header />
-        <View style={globalStyles.contentWrapper}>
+        <View style={[globalStyles.flex1, globalStyles.containerPadding]}>
           <Slot />
         </View>
       </View>

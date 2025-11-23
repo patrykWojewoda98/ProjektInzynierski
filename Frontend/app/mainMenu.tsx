@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { globalStyles } from "../assets/styles/styles";
+import { globalStyles, spacing } from "../assets/styles/styles";
 
 const icons = {
   WatchList: require("../assets/images/WatchList-Icon.png"),
@@ -12,7 +12,6 @@ const icons = {
   FinancialReport: require("../assets/images/FinancialReport-Icon.png"),
   FinancialMetric: require("../assets/images/FinancialMetric-Icon.png"),
   Client: require("../assets/images/Client-Icon.png"),
-  AIAnalysisResult: require("../assets/images/AIAnalysisResult-Icon.png"),
 };
 
 const tiles = [
@@ -36,11 +35,6 @@ const tiles = [
     icon: icons.FinancialMetric,
   },
   { key: "Client", label: "Clients", icon: icons.Client },
-  {
-    key: "AIAnalysisResult",
-    label: "AI Analysis",
-    icon: icons.AIAnalysisResult,
-  },
 ];
 
 const MainMenu = () => {
@@ -48,26 +42,34 @@ const MainMenu = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={globalStyles.mainMenuScroll}
-      style={globalStyles.mainMenuScrollStyle}
+      contentContainerStyle={[
+        globalStyles.scrollContainer,
+        globalStyles.alignCenter,
+      ]}
+      keyboardShouldPersistTaps="handled"
     >
-      <View style={globalStyles.mainMenuTop}>
+      {/* Nagłówek */}
+      <View style={[globalStyles.center, spacing.mb6]}>
         <Image
           source={require("../assets/images/Logo.png")}
-          style={globalStyles.mainMenuLogoSmall}
+          style={[globalStyles.logo, spacing.mb4]}
         />
-        <Text style={globalStyles.mainMenuTitle}>Main Menu</Text>
+        <Text style={[globalStyles.header, spacing.mb2]}>Main Menu</Text>
+        <Text style={[globalStyles.text, { textAlign: "center" }]}>
+          Choose a section to explore
+        </Text>
       </View>
 
-      <View style={globalStyles.gridContainer}>
+      {/* Siatka kafelków */}
+      <View style={globalStyles.menuGrid}>
         {tiles.map((t) => (
           <TouchableOpacity
             key={t.key}
             onPress={() => router.push("/ComingSoon" as any)}
-            style={globalStyles.gridTile}
+            style={globalStyles.menuTile}
           >
-            <Image source={t.icon} style={globalStyles.gridTileIcon} />
-            <Text style={globalStyles.gridTileLabel}>{t.label}</Text>
+            <Image source={t.icon} style={globalStyles.menuIcon} />
+            <Text style={globalStyles.menuLabel}>{t.label}</Text>
           </TouchableOpacity>
         ))}
       </View>

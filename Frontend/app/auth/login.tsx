@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { COLORS } from "../../assets/Constants/colors";
-import { globalStyles } from "../../assets/styles/styles";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 
 const LoginScreen = () => {
@@ -30,9 +30,9 @@ const LoginScreen = () => {
       const client = await ApiService.getClientById(clientId);
 
       if (client.investProfile == null) {
-        router.push("/(invest)/CreateInvestProfile");
+        router.push("/create-invest-profile");
       } else {
-        router.push("/(tabs)");
+        router.push("/main-menu");
       }
     } catch (error) {
       Alert.alert(
@@ -45,18 +45,23 @@ const LoginScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={globalStyles.centerContainer}>
+    <ScrollView
+      contentContainerStyle={[
+        globalStyles.centerContainer,
+        globalStyles.containerPadding,
+      ]}
+    >
       <Image
         source={require("../../assets/images/Logo.png")}
-        style={[globalStyles.logo, { width: 250, height: 250 }]}
+        style={[globalStyles.logo, globalStyles.logoLarge]}
       />
 
-      <Text style={[globalStyles.header, { marginBottom: 40 }]}>Login</Text>
+      <Text style={[globalStyles.header, spacing.mb5]}>Login</Text>
 
-      <View style={[globalStyles.section, { width: "90%", maxWidth: 400 }]}>
+      <View style={[globalStyles.section, globalStyles.formContainer]}>
         <Text style={globalStyles.label}>Client ID</Text>
         <TextInput
-          style={[globalStyles.input, { marginBottom: 30 }]}
+          style={[globalStyles.input, spacing.mb4]}
           placeholder="Enter your client ID"
           placeholderTextColor={COLORS.placeholderGrey}
           value={clientId}
@@ -68,8 +73,9 @@ const LoginScreen = () => {
         <TouchableOpacity
           style={[
             globalStyles.button,
+            globalStyles.fullWidth,
             isLoading && globalStyles.buttonDisabled,
-            { width: "100%" },
+            spacing.py3,
           ]}
           onPress={handleLogin}
           disabled={isLoading}
@@ -81,20 +87,12 @@ const LoginScreen = () => {
           )}
         </TouchableOpacity>
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ color: COLORS.textGrey }}>
-            Don&apos;t have an account?{" "}
+        <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
+          <Text style={[globalStyles.text, spacing.mr1]}>
+            Don't have an account?{" "}
           </Text>
           <TouchableOpacity onPress={() => router.push("/auth/register")}>
-            <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
-              Register
-            </Text>
+            <Text style={globalStyles.link}>Register</Text>
           </TouchableOpacity>
         </View>
       </View>

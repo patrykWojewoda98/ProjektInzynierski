@@ -13,15 +13,15 @@ import {
   View,
 } from "react-native";
 import { COLORS } from "../../assets/Constants/colors";
-import { globalStyles } from "../../assets/styles/styles";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 
 const RegisterScreen = () => {
   const router = useRouter();
   const [regions, setRegions] = useState([]);
   const [countries, setCountries] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState(null);
-  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,13 +45,12 @@ const RegisterScreen = () => {
       try {
         const data = await ApiService.getRegions();
         setRegions(data);
-      } catch (error) {
+      } catch {
         setErrors(["Failed to load regions. Please try again."]);
       } finally {
         setLoading((prev) => ({ ...prev, regions: false }));
       }
     };
-
     fetchRegions();
   }, []);
 
@@ -63,13 +62,12 @@ const RegisterScreen = () => {
         try {
           const data = await ApiService.getCountriesByRegion(selectedRegion);
           setCountries(data);
-        } catch (error) {
+        } catch {
           setErrors(["Failed to load countries. Please try again."]);
         } finally {
           setLoading((prev) => ({ ...prev, countries: false }));
         }
       };
-
       fetchCountries();
     } else {
       setCountries([]);
@@ -77,61 +75,37 @@ const RegisterScreen = () => {
     }
   }, [selectedRegion]);
 
-  // Handle form input changes
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error for this field if it exists
-    if (errors.length > 0) {
-      setErrors([]);
-    }
+    if (errors.length > 0) setErrors([]);
   };
 
-  // Validate form
   const validateForm = (): boolean => {
     const newErrors: string[] = [];
 
-    if (!selectedRegion) {
-      newErrors.push("Please select a region");
-    }
-    if (!selectedCountry) {
-      newErrors.push("Please select a country");
-    }
-    if (!formData.name.trim()) {
-      newErrors.push("Full name is required");
-    }
-    if (!formData.email.trim()) {
-      newErrors.push("Email is required");
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    if (!selectedRegion) newErrors.push("Please select a region");
+    if (!selectedCountry) newErrors.push("Please select a country");
+    if (!formData.name.trim()) newErrors.push("Full name is required");
+    if (!formData.email.trim()) newErrors.push("Email is required");
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.push("Please enter a valid email");
-    }
-    if (!formData.city.trim()) {
-      newErrors.push("City is required");
-    }
-    if (!formData.address.trim()) {
-      newErrors.push("Address is required");
-    }
-    if (!formData.postalCode.trim()) {
-      newErrors.push("Postal code is required");
-    }
-    if (!formData.password) {
-      newErrors.push("Password is required");
-    } else if (formData.password.length < 6) {
+    if (!formData.city.trim()) newErrors.push("City is required");
+    if (!formData.address.trim()) newErrors.push("Address is required");
+    if (!formData.postalCode.trim()) newErrors.push("Postal code is required");
+    if (!formData.password) newErrors.push("Password is required");
+    else if (formData.password.length < 6)
       newErrors.push("Password must be at least 6 characters long");
-    }
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword)
       newErrors.push("Passwords do not match");
-    }
 
     setErrors(newErrors);
     return newErrors.length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
     setLoading((prev) => ({ ...prev, submitting: true }));
-
     try {
       const clientData = {
         name: formData.name,
@@ -145,14 +119,9 @@ const RegisterScreen = () => {
 
       await ApiService.registerClient(clientData);
       Alert.alert("Success", "Registration successful!");
-      // Optionally navigate to login or home screen
       router.push("/auth/login");
-    } catch (error) {
-      if (Array.isArray(error)) {
-        setErrors(error);
-      } else {
-        setErrors(["An error occurred during registration. Please try again."]);
-      }
+    } catch {
+      setErrors(["An error occurred during registration. Please try again."]);
     } finally {
       setLoading((prev) => ({ ...prev, submitting: false }));
     }
@@ -160,19 +129,19 @@ const RegisterScreen = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={globalStyles.centerContainer}
+      contentContainerStyle={globalStyles.scrollContainer}
       keyboardShouldPersistTaps="handled"
     >
       <Image
         source={require("../../assets/images/Logo.png")}
-        style={globalStyles.logo}
+        style={[globalStyles.logo, spacing.mb4]}
       />
 
-      <Text style={globalStyles.header}>Register</Text>
+      <Text style={[globalStyles.header, spacing.mb4]}>Register</Text>
 
       {/* Error Messages */}
       {errors.length > 0 && (
-        <View style={globalStyles.errorContainer}>
+        <View style={[globalStyles.errorContainer, spacing.mb4]}>
           {errors.map((error, index) => (
             <Text key={index} style={globalStyles.errorText}>
               {error}
@@ -183,77 +152,66 @@ const RegisterScreen = () => {
 
       <View style={globalStyles.formContainer}>
         {/* Region Picker */}
-        <View style={globalStyles.section}>
-          <Text style={globalStyles.label}>Region</Text>
-          <View
-            style={[
-              globalStyles.pickerContainer,
-              errors.some((e) => e.includes("region")) &&
-                globalStyles.inputError,
-            ]}
+        <Text style={globalStyles.label}>Region</Text>
+        <View style={[globalStyles.pickerWrapper, spacing.mb3]}>
+          <Picker
+            selectedValue={selectedRegion}
+            onValueChange={(itemValue) => {
+              setSelectedRegion(itemValue);
+              setSelectedCountry(null);
+            }}
+            style={globalStyles.pickerText}
+            enabled={!loading.regions}
           >
-            <Picker
-              selectedValue={selectedRegion}
-              onValueChange={(itemValue) => {
-                setSelectedRegion(itemValue);
-                setSelectedCountry(null);
-              }}
-              style={globalStyles.picker}
-              dropdownIconColor={COLORS.textGrey}
-            >
-              <Picker.Item label="Select region" value={null} />
-              {regions.map((region) => (
-                <Picker.Item
-                  key={region.id}
-                  label={region.name}
-                  value={region.id}
-                />
-              ))}
-            </Picker>
-          </View>
+            <Picker.Item label="Select region" value={null} />
+            {regions.map((region) => (
+              <Picker.Item
+                key={region.id}
+                label={region.name}
+                value={region.id}
+              />
+            ))}
+          </Picker>
+          {loading.regions && (
+            <ActivityIndicator
+              color={COLORS.primary}
+              style={{ marginTop: 5 }}
+            />
+          )}
         </View>
 
         {/* Country Picker */}
-        <View style={globalStyles.section}>
-          <Text style={globalStyles.label}>Country</Text>
-          <View
-            style={[
-              globalStyles.pickerContainer,
-              errors.some((e) => e.includes("country")) &&
-                globalStyles.inputError,
-            ]}
+        <Text style={globalStyles.label}>Country</Text>
+        <View style={[globalStyles.pickerWrapper, spacing.mb3]}>
+          <Picker
+            selectedValue={selectedCountry}
+            onValueChange={(itemValue) => setSelectedCountry(itemValue)}
+            style={globalStyles.pickerText}
+            enabled={!!selectedRegion && !loading.countries}
           >
-            <Picker
-              selectedValue={selectedCountry}
-              onValueChange={(itemValue) => setSelectedCountry(itemValue)}
-              style={globalStyles.picker}
-              dropdownIconColor={COLORS.textGrey}
-              enabled={!!selectedRegion && !loading.countries}
-            >
-              <Picker.Item label="Select country" value={null} />
-              {countries.map((country) => (
-                <Picker.Item
-                  key={country.id}
-                  label={country.name}
-                  value={country.id}
-                />
-              ))}
-            </Picker>
-            {loading.countries && (
-              <ActivityIndicator
-                style={globalStyles.loadingIndicator}
-                color={COLORS.primary}
+            <Picker.Item
+              label={selectedRegion ? "Select country" : "Select region first"}
+              value={null}
+            />
+            {countries.map((country) => (
+              <Picker.Item
+                key={country.id}
+                label={country.name}
+                value={country.id}
               />
-            )}
-          </View>
+            ))}
+          </Picker>
+          {loading.countries && (
+            <ActivityIndicator
+              color={COLORS.primary}
+              style={{ marginTop: 5 }}
+            />
+          )}
         </View>
 
         {/* Full Name */}
         <TextInput
-          style={[
-            globalStyles.input,
-            errors.some((e) => e.includes("name")) && globalStyles.inputError,
-          ]}
+          style={[globalStyles.input, spacing.mb3]}
           placeholder="Full Name"
           placeholderTextColor={COLORS.placeholderGrey}
           value={formData.name}
@@ -262,10 +220,7 @@ const RegisterScreen = () => {
 
         {/* Email */}
         <TextInput
-          style={[
-            globalStyles.input,
-            errors.some((e) => e.includes("email")) && globalStyles.inputError,
-          ]}
+          style={[globalStyles.input, spacing.mb3]}
           placeholder="Email"
           placeholderTextColor={COLORS.placeholderGrey}
           keyboardType="email-address"
@@ -276,10 +231,7 @@ const RegisterScreen = () => {
 
         {/* City */}
         <TextInput
-          style={[
-            globalStyles.input,
-            errors.some((e) => e.includes("city")) && globalStyles.inputError,
-          ]}
+          style={[globalStyles.input, spacing.mb3]}
           placeholder="City"
           placeholderTextColor={COLORS.placeholderGrey}
           value={formData.city}
@@ -288,11 +240,7 @@ const RegisterScreen = () => {
 
         {/* Address */}
         <TextInput
-          style={[
-            globalStyles.input,
-            errors.some((e) => e.includes("address")) &&
-              globalStyles.inputError,
-          ]}
+          style={[globalStyles.input, spacing.mb3]}
           placeholder="Address"
           placeholderTextColor={COLORS.placeholderGrey}
           value={formData.address}
@@ -301,11 +249,7 @@ const RegisterScreen = () => {
 
         {/* Postal Code */}
         <TextInput
-          style={[
-            globalStyles.input,
-            errors.some((e) => e.includes("postal code")) &&
-              globalStyles.inputError,
-          ]}
+          style={[globalStyles.input, spacing.mb3]}
           placeholder="Postal Code"
           placeholderTextColor={COLORS.placeholderGrey}
           keyboardType="number-pad"
@@ -314,63 +258,45 @@ const RegisterScreen = () => {
         />
 
         {/* Password */}
-        <View style={globalStyles.section}>
-          <Text style={globalStyles.label}>Password</Text>
-          <View
+        <Text style={globalStyles.label}>Password</Text>
+        <View style={[globalStyles.passwordContainer, spacing.mb3]}>
+          <TextInput
             style={[
-              globalStyles.passwordContainer,
-              errors.some((e) => e.includes("Password")) &&
-                globalStyles.inputError,
+              globalStyles.input,
+              { marginBottom: 0, borderWidth: 0, paddingRight: 50 },
             ]}
+            placeholder="Enter your password"
+            placeholderTextColor={COLORS.placeholderGrey}
+            secureTextEntry={!showPassword}
+            value={formData.password}
+            onChangeText={(text) => handleInputChange("password", text)}
+          />
+          <TouchableOpacity
+            style={globalStyles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}
           >
-            <TextInput
-              style={[
-                globalStyles.input,
-                { marginBottom: 0, borderWidth: 0, paddingRight: 50 },
-              ]}
-              placeholder="Enter your password"
-              placeholderTextColor={COLORS.placeholderGrey}
-              secureTextEntry={!showPassword}
-              value={formData.password}
-              onChangeText={(text) => handleInputChange("password", text)}
+            <MaterialIcons
+              name={showPassword ? "visibility-off" : "visibility"}
+              size={24}
+              color={COLORS.placeholderGrey}
             />
-            <TouchableOpacity
-              style={globalStyles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <MaterialIcons
-                name={showPassword ? "visibility-off" : "visibility"}
-                size={24}
-                color={COLORS.placeholderGrey}
-              />
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Confirm Password */}
-        <View style={globalStyles.section}>
-          <Text style={globalStyles.label}>Confirm Password</Text>
-          <View
+        <Text style={globalStyles.label}>Confirm Password</Text>
+        <View style={[globalStyles.passwordContainer, spacing.mb4]}>
+          <TextInput
             style={[
-              globalStyles.passwordContainer,
-              errors.some((e) => e.includes("match")) &&
-                globalStyles.inputError,
+              globalStyles.input,
+              { marginBottom: 0, borderWidth: 0, paddingRight: 50 },
             ]}
-          >
-            <TextInput
-              style={[
-                globalStyles.input,
-                { marginBottom: 0, borderWidth: 0, paddingRight: 50 },
-              ]}
-              placeholder="Confirm your password"
-              placeholderTextColor={COLORS.placeholderGrey}
-              secureTextEntry={!showPassword}
-              value={formData.confirmPassword}
-              onChangeText={(text) =>
-                handleInputChange("confirmPassword", text)
-              }
-            />
-          </View>
+            placeholder="Confirm your password"
+            placeholderTextColor={COLORS.placeholderGrey}
+            secureTextEntry={!showPassword}
+            value={formData.confirmPassword}
+            onChangeText={(text) => handleInputChange("confirmPassword", text)}
+          />
         </View>
 
         {/* Submit Button */}
@@ -390,20 +316,12 @@ const RegisterScreen = () => {
         </TouchableOpacity>
 
         {/* Login Link */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            marginTop: 10,
-          }}
-        >
-          <Text style={{ color: COLORS.textGrey }}>
-            Already have an account?{" "}
+        <View style={[globalStyles.row, globalStyles.center, spacing.mt4]}>
+          <Text style={[globalStyles.text, spacing.mr1]}>
+            Already have an account?
           </Text>
           <TouchableOpacity onPress={() => router.push("/auth/login")}>
-            <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
-              Login
-            </Text>
+            <Text style={globalStyles.link}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>
