@@ -3,7 +3,8 @@
 3. 
 
 
-
+Wzozec architektoniczny:
+Onion Architecture
 
 
 Uzyte wzrorce Projektowe: 
@@ -13,3 +14,7 @@ CQRS?
 MediatR?
 
 Dodana Biblioteka FluentValidator.ASPNetCore
+
+
+Co dodać:
+Przy rejestracji na pewno musi być ablokowana możliwość klikniecia w kraj jeśli nie ma regionu.

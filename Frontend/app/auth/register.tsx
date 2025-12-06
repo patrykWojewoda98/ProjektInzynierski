@@ -187,7 +187,7 @@ const RegisterScreen = () => {
             selectedValue={selectedCountry}
             onValueChange={(itemValue) => setSelectedCountry(itemValue)}
             style={globalStyles.pickerText}
-            enabled={!!selectedRegion && !loading.countries}
+            enabled={selectedRegion !== null && !loading.countries}
           >
             <Picker.Item
               label={selectedRegion ? "Select country" : "Select region first"}

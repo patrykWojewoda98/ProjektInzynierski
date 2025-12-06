@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Infrastructure.Context;
 using ProjektIznynierski.Infrastructure.Repositories;
+using ProjektIznynierski.Infrastructure.Services;
 
 namespace ProjektIznynierski.Infrastructure
 {
@@ -32,6 +33,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IWatchListItemRepository, WatchListItemRepository>();
             services.AddScoped<IWatchListRepository, WatchListRepository>();
 
+            services.AddScoped<IJwtTokenService, JwtService>();
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>
             {
