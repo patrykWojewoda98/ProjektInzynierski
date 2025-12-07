@@ -1,9 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Slot, useRouter } from "expo-router";
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // ← NOWY IMPORT
 import { globalStyles } from "../assets/styles/styles";
+import { decodeToken } from "../utils/decodeToken";
 
-// Auth context (globalny kontekst dla użytkownika, tokena i clientId)
 export const AuthContext = createContext<any>({
   user: null,
   setUser: (_u: any) => {},
@@ -17,59 +19,78 @@ export default function RootLayout() {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
+
   const router = useRouter();
 
-  const handleLogout = () => {
-    // Czyszczenie stanu logowania
+  useEffect(() => {
+    const loadUserFromToken = async () => {
+      const storedToken = await AsyncStorage.getItem("userToken");
+
+      if (storedToken) {
+        setToken(storedToken);
+        const decoded = decodeToken(storedToken);
+
+        if (decoded) {
+          setUser({
+            name: decoded.name,
+            id: decoded.id,
+          });
+        }
+      }
+    };
+
+    loadUserFromToken();
+  }, []);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userToken");
     setToken("");
-    setClientId("");
     setUser(null);
     router.replace("/auth/login");
   };
 
-  const Header = () => {
-    return (
-      <View style={globalStyles.topHeader}>
-        <View style={[globalStyles.row, globalStyles.alignCenter]}>
-          <Image
-            source={require("../assets/images/Logo.png")}
-            style={globalStyles.logoSmall}
-          />
-          {user && user.name ? (
-            <Text
-              style={[
-                globalStyles.text,
-                { color: "white", marginLeft: 10, fontWeight: "600" },
-              ]}
-            >
-              Welcome, {user.name}
-            </Text>
-          ) : null}
-        </View>
+  const Header = () => (
+    <View style={globalStyles.topHeader}>
+      <View style={[globalStyles.row, globalStyles.alignCenter]}>
+        <Image
+          source={require("../assets/images/Logo.png")}
+          style={globalStyles.logoSmall}
+        />
 
-        <Pressable
-          onPress={handleLogout}
-          style={({ pressed }) => [
-            globalStyles.buttonSmall,
-            pressed && globalStyles.buttonPressed,
-          ]}
-        >
-          <Text style={globalStyles.buttonText}>Logout</Text>
-        </Pressable>
+        {user?.name ? (
+          <Text
+            style={[
+              globalStyles.text,
+              { color: "white", marginLeft: 10, fontWeight: "600" },
+            ]}
+          >
+            Welcome, {user.name}
+          </Text>
+        ) : null}
       </View>
-    );
-  };
+
+      <Pressable
+        onPress={handleLogout}
+        style={({ pressed }) => [
+          globalStyles.buttonSmall,
+          pressed && globalStyles.buttonPressed,
+        ]}
+      >
+        <Text style={globalStyles.buttonText}>Logout</Text>
+      </Pressable>
+    </View>
+  );
 
   return (
     <AuthContext.Provider
       value={{ user, setUser, token, setToken, clientId, setClientId }}
     >
-      <View style={[globalStyles.container, globalStyles.flex1]}>
+      <SafeAreaView style={[globalStyles.container, globalStyles.flex1]}>
         <Header />
         <View style={[globalStyles.flex1, globalStyles.containerPadding]}>
           <Slot />
         </View>
-      </View>
+      </SafeAreaView>
     </AuthContext.Provider>
   );
 }

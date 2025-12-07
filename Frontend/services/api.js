@@ -1,8 +1,44 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const API_BASE_URL = "http://10.0.2.2:5036/api";
 
 const ApiService = {
+  // Authentication endpoints
+  async login(data) {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Invalid credentials");
+    }
+
+    const json = await response.json();
+
+    // Zapis tokenu do AsyncStorage
+    if (json?.token) {
+      await AsyncStorage.setItem("userToken", json.token);
+    }
+
+    return json;
+  },
+  // Register endpoint
+  async registerClient(clientData) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/Client`, clientData);
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+      console.error("Registration error:", error);
+      throw ["An error occurred during registration. Please try again."];
+    }
+  },
+
   // Region endpoints
   async getRegions() {
     try {
@@ -39,19 +75,6 @@ const ApiService = {
       }
       console.error("Error fetching client:", error);
       throw ["An error occurred while fetching client data. Please try again."];
-    }
-  },
-
-  async registerClient(clientData) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Client`, clientData);
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-      console.error("Registration error:", error);
-      throw ["An error occurred during registration. Please try again."];
     }
   },
 

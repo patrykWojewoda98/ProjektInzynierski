@@ -161,7 +161,7 @@ export const globalStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    paddingVertical: 12,
+    paddingVertical: 1,
     paddingHorizontal: 16,
   },
 
@@ -190,8 +190,8 @@ export const globalStyles = StyleSheet.create({
     marginBottom: 40,
   },
   logoSmall: {
-    width: 40,
-    height: 40,
+    width: 80,
+    height: 80,
   },
 
   // Alignment

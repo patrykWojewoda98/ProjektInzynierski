@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles, spacing } from "../assets/styles/styles";
+import { authGuard } from "../utils/authGuard";
 
 const icons = {
   WatchList: require("../assets/images/WatchList-Icon.png"),
@@ -39,6 +40,26 @@ const tiles = [
 
 const MainMenu = () => {
   const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isValid = await authGuard();
+      if (isValid) {
+        setIsReady(true);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  if (!isReady) {
+    return (
+      <View style={[globalStyles.centerContainer]}>
+        <Text style={globalStyles.header}>Checking authentication...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView

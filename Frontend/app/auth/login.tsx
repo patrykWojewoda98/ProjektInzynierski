@@ -16,29 +16,39 @@ import ApiService from "../../services/api";
 
 const LoginScreen = () => {
   const router = useRouter();
-  const [clientId, setClientId] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!clientId.trim()) {
-      Alert.alert("Error", "Please enter your client ID");
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Error", "Please enter your email and password");
       return;
     }
 
     setIsLoading(true);
-    try {
-      const client = await ApiService.getClientById(clientId);
 
-      if (client.investProfile == null) {
-        router.push("/create-invest-profile");
-      } else {
-        router.push("/main-menu");
+    try {
+      const response = await ApiService.login({
+        email: email,
+        password: password,
+      });
+
+      // Jeśli API zwraca wiadomość → pokazujemy ją
+      if (response?.message) {
+        Alert.alert("Info", response.message);
       }
+
+      // Jeśli jest token → logowanie OK
+      if (response?.token) {
+        router.push("/mainMenu");
+        return;
+      }
+
+      // Jeśli nie ma tokena → logowanie nieudane
+      Alert.alert("Error", "Invalid email or/and password");
     } catch (error) {
-      Alert.alert(
-        "Error",
-        Array.isArray(error) ? error[0] : "An error occurred"
-      );
+      Alert.alert("Error", "Invalid email or/and password");
     } finally {
       setIsLoading(false);
     }
@@ -59,17 +69,30 @@ const LoginScreen = () => {
       <Text style={[globalStyles.header, spacing.mb5]}>Login</Text>
 
       <View style={[globalStyles.section, globalStyles.formContainer]}>
-        <Text style={globalStyles.label}>Client ID</Text>
+        {/* EMAIL */}
+        <Text style={globalStyles.label}>Email</Text>
         <TextInput
           style={[globalStyles.input, spacing.mb4]}
-          placeholder="Enter your client ID"
+          placeholder="Enter your email"
           placeholderTextColor={COLORS.placeholderGrey}
-          value={clientId}
-          onChangeText={setClientId}
-          keyboardType="number-pad"
+          value={email}
+          onChangeText={setEmail}
           autoCapitalize="none"
+          keyboardType="email-address"
         />
 
+        {/* PASSWORD */}
+        <Text style={globalStyles.label}>Password</Text>
+        <TextInput
+          style={[globalStyles.input, spacing.mb4]}
+          placeholder="Enter your password"
+          placeholderTextColor={COLORS.placeholderGrey}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        {/* LOGIN BUTTON */}
         <TouchableOpacity
           style={[
             globalStyles.button,
@@ -87,6 +110,7 @@ const LoginScreen = () => {
           )}
         </TouchableOpacity>
 
+        {/* REGISTER LINK */}
         <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
           <Text style={[globalStyles.text, spacing.mr1]}>
             Don't have an account?{" "}
