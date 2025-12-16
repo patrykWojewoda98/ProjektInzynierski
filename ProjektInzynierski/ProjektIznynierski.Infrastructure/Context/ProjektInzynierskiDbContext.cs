@@ -24,6 +24,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<WalletInstrument> WalletInstruments { get; set; }
         public DbSet<WatchList> WatchLists { get; set; }
         public DbSet<WatchListItem> WatchListItems { get; set; }
+        public DbSet<Domain.Entities.InvestHorizon> InvestHorizons { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }

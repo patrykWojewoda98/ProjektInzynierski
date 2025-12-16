@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Application.Queries.InvestProfile.GetInvestProfileB
                 Id = profile.Id,
                 ProfileName = profile.ProfileName,
                 AcceptableRisk = (int)profile.AcceptableRisk,
-                InvestHorizon = (int)profile.InvestHorizon,
+                InvestHorizonId = profile.InvestHorizonId,
                 TargetReturn = profile.TargetReturn,
                 MaxDrawDown = profile.MaxDrawDown,
                 ClientId = profile.ClientId

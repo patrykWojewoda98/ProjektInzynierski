@@ -9,7 +9,8 @@ namespace ProjektIznynierski.Domain.Entities
 
         public RiskLevel AcceptableRisk { get; set; }
 
-        public InvestHorizon InvestHorizon { get; set; }
+        public int? InvestHorizonId { get; set; }
+        public InvestHorizon? InvestHorizon { get; set; }
 
         public double? TargetReturn { get; set; }
         public double? MaxDrawDown { get; set; }

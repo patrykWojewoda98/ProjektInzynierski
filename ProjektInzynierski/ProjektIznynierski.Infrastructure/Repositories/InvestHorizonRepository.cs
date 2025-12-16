@@ -4,14 +4,13 @@ using ProjektIznynierski.Infrastructure.Context;
 
 namespace ProjektIznynierski.Infrastructure.Repositories
 {
-    internal class AIAnalysisResultRepository : GenericRepository<AIAnalysisResult>, IAIAnalysisResultRepository
+    internal class InvestHorizonRepository : GenericRepository<InvestHorizon>, IInvestHorizonRepository
     {
-        public AIAnalysisResultRepository(ProjektInzynierskiDbContext dbContext) : base(dbContext)
+        public InvestHorizonRepository(ProjektInzynierskiDbContext dbContext) : base(dbContext)
         {
 
         }
         
-        
-        
+
     }
 }

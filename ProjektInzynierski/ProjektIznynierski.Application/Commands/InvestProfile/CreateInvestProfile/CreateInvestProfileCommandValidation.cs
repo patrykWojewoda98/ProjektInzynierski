@@ -13,8 +13,8 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProf
             RuleFor(x => x.AcceptableRisk)
                 .InclusiveBetween(0, 3).WithMessage("Akceptowalne ryzyko musi być poprawną wartością enum.");
 
-            RuleFor(x => x.InvestHorizon)
-                .InclusiveBetween(0, 5).WithMessage("Horyzont inwestycyjny musi być poprawną wartością enum.");
+            RuleFor(x => x.InvestHorizonID)
+                .GreaterThan(0).When(x => x.ClientId.HasValue).WithMessage("InvesthorizonID can't be 0 or less.");
 
             RuleFor(x => x.TargetReturn)
                 .GreaterThanOrEqualTo(0).When(x => x.TargetReturn.HasValue).WithMessage("Docelowy zwrot nie może być ujemny.");
