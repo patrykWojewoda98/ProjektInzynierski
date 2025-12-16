@@ -26,6 +26,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<WatchListItem> WatchListItems { get; set; }
         public DbSet<Domain.Entities.InvestHorizon> InvestHorizons { get; set; }
         public DbSet<Domain.Entities.InvestmentType> InvestmentType { get; set; }
+        public DbSet<Domain.Entities.RegionCode> RegionCodes { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }

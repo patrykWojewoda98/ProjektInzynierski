@@ -17,9 +17,9 @@ namespace ProjektIznynierski.Infrastructure.Repositories
             return await _dbContext.Regions.ToListAsync();
         }
 
-        public async Task<Region> GetRegionByCodeAsync(RegionCode code)
+        public async Task<Region> GetRegionByCodeAsync(int regioncodeid)
         {
-            return await _dbContext.Regions.SingleOrDefaultAsync(r => r.Code == code);
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<Region>> GetRegionsByRiskLevelAsync(RiskLevel riskLevel)

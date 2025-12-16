@@ -6,7 +6,7 @@ namespace ProjektIznynierski.Domain.Entities
     {
         public string Name { get; set; }
 
-        public RegionCode Code { get; set; }
+        public int RegionCodeId { get; set; }
 
         public RiskLevel RegionRisk { get; set; }
 

@@ -20,7 +20,7 @@ namespace ProjektIznynierski.Application.Commands.Region.CreateRegion
             var entity = new Domain.Entities.Region
             {
                 Name = request.Name,
-                Code = (RegionCode)request.Code,
+                RegionCodeId = request.RegionCodeId,
                 RegionRisk = (RiskLevel)request.RegionRisk
             };
             _repository.Add(entity);
@@ -30,7 +30,7 @@ namespace ProjektIznynierski.Application.Commands.Region.CreateRegion
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                Code = (int)entity.Code,
+                RegionCodeId = entity.RegionCodeId,
                 RegionRisk = (int)entity.RegionRisk
             };
         }

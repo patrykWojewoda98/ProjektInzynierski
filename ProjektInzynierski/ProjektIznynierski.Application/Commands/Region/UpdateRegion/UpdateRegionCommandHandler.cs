@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Application.Commands.Region.UpdateRegion
             }
 
             entity.Name = request.Name;
-            entity.Code = (RegionCode)request.Code;
+            entity.RegionCodeId = request.RegionCodeId;
             entity.RegionRisk = (RiskLevel)request.RegionRisk;
 
             _repository.Update(entity);
@@ -34,7 +34,7 @@ namespace ProjektIznynierski.Application.Commands.Region.UpdateRegion
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                Code = (int)entity.Code,
+                RegionCodeId = entity.RegionCodeId,
                 RegionRisk = (int)entity.RegionRisk
             };
         }

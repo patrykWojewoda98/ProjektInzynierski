@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Application.Queries.Region.GetAllRegions
             {
                 Id = r.Id,
                 Name = r.Name,
-                Code = (int)r.Code,
+                RegionCodeId = r.RegionCodeId,
                 RegionRisk = (int)r.RegionRisk
             }).ToList();
         }
