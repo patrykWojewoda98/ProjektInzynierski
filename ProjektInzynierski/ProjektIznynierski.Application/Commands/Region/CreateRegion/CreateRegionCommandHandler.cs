@@ -21,7 +21,7 @@ namespace ProjektIznynierski.Application.Commands.Region.CreateRegion
             {
                 Name = request.Name,
                 RegionCodeId = request.RegionCodeId,
-                RegionRisk = (RiskLevel)request.RegionRisk
+                RegionRiskLevelId = request.RegionRiskLevelId   
             };
             _repository.Add(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -31,7 +31,7 @@ namespace ProjektIznynierski.Application.Commands.Region.CreateRegion
                 Id = entity.Id,
                 Name = entity.Name,
                 RegionCodeId = entity.RegionCodeId,
-                RegionRisk = (int)entity.RegionRisk
+                RegionRiskLevelId = entity.RegionRiskLevelId
             };
         }
     }

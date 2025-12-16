@@ -14,8 +14,7 @@ namespace ProjektIznynierski.Infrastructure.Repositories
 
         public async Task<RiskLevel> GetRiscLevelById(int id, CancellationToken cancellationToken = default)
         {
-            var currency = await GetByIdAsync(id, cancellationToken);
-            return currency.CurrencyRisk;
+            throw new NotImplementedException();
         }
 
     }

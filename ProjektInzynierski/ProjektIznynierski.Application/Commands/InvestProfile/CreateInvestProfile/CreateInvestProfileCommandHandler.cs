@@ -20,7 +20,7 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProf
             var entity = new Domain.Entities.InvestProfile
             {
                 ProfileName = request.ProfileName,
-                AcceptableRisk = (RiskLevel)request.AcceptableRisk,
+                AcceptableRiskLevelId = request.AcceptableRiskLevelId,
                 InvestHorizonId = request.InvestHorizonID,
                 TargetReturn = request.TargetReturn,
                 MaxDrawDown = request.MaxDrawDown,
@@ -33,7 +33,7 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProf
             {
                 Id = entity.Id,
                 ProfileName = entity.ProfileName,
-                AcceptableRisk = (int)entity.AcceptableRisk,
+                AcceptableRiskLevelId = entity.AcceptableRiskLevelId,
                 InvestHorizonId = entity.InvestHorizonId,
                 TargetReturn = entity.TargetReturn,
                 MaxDrawDown = entity.MaxDrawDown,

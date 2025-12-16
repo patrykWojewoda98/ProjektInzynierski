@@ -14,7 +14,7 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .HasMaxLength(120)
                    .IsRequired();
 
-            builder.Property(ip => ip.AcceptableRisk)
+            builder.Property(ip => ip.AcceptableRiskLevelId)
                    .IsRequired();
 
             builder.Property(ip => ip.InvestHorizon)

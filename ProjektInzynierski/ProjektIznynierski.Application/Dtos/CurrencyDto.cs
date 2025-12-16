@@ -4,6 +4,6 @@ namespace ProjektIznynierski.Application.Dtos
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int CurrencyRisk { get; set; }
+        public int CurrencyRiskLevelId { get; set; }
     }
 }

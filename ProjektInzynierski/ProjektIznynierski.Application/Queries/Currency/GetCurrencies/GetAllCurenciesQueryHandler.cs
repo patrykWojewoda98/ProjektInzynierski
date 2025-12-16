@@ -20,7 +20,7 @@ namespace ProjektIznynierski.Application.Queries.Currency.GetCurrencies
             {
                 Id = currency.Id,
                 Name = currency.Name,
-                CurrencyRisk = (int)currency.CurrencyRisk
+                CurrencyRiskLevelId = currency.CurrencyRiskLevelId
             }).ToList();
         }
     }

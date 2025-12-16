@@ -16,8 +16,8 @@ namespace ProjektIznynierski.Application.Commands.Region.UpdateRegion
             RuleFor(x => x.RegionCodeId)
                 .InclusiveBetween(0, 10).WithMessage("RegionCodeId can't be 0 or less");
 
-            RuleFor(x => x.RegionRisk)
-                .InclusiveBetween(0, 3).WithMessage("Poziom ryzyka regionu musi być poprawną wartością enum.");
+            RuleFor(x => x.RegionRiskLevelId)
+                .GreaterThan(0).WithMessage("RegionRiskLevelId can't be 0 or less.");
         }
     }
 }

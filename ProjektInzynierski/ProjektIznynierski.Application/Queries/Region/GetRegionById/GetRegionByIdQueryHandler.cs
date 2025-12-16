@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Application.Queries.Region.GetRegionById
                 Id = entity.Id,
                 Name = entity.Name,
                 RegionCodeId = entity.RegionCodeId,
-                RegionRisk = (int)entity.RegionRisk
+                RegionRiskLevelId = entity.RegionRiskLevelId
             };
         }
     }

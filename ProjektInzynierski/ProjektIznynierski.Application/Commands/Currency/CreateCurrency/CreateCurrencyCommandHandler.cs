@@ -20,7 +20,7 @@ namespace ProjektIznynierski.Application.Commands.Currency.CreateCurrency
             var entity = new Domain.Entities.Currency
             {
                 Name = request.Name,
-                CurrencyRisk = (RiskLevel)request.CurrencyRisk
+                CurrencyRiskLevelId = request.CurrencyRiskLevelId
             };
             _repository.Add(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -29,7 +29,7 @@ namespace ProjektIznynierski.Application.Commands.Currency.CreateCurrency
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                CurrencyRisk = (int)entity.CurrencyRisk
+                CurrencyRiskLevelId = entity.CurrencyRiskLevelId
             };
         }
     }

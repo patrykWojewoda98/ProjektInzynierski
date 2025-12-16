@@ -17,7 +17,7 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.HasIndex(c => c.Name)
                    .IsUnique();
 
-            builder.Property(c => c.CurrencyRisk)
+            builder.Property(c => c.CurrencyRiskLevelId)
                    .IsRequired();
 
             base.Configure(builder);

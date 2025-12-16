@@ -14,7 +14,7 @@ namespace ProjektIznynierski.Domain.Entities
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
 
-        public RiskLevel CountryRisk { get; set; }
+        public int CountryRiskLevelId { get; set; }
 
         public ICollection<Client> Clients { get; set; } = new List<Client>();
     }

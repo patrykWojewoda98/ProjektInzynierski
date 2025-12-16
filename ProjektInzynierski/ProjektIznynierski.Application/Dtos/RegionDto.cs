@@ -5,6 +5,6 @@ namespace ProjektIznynierski.Application.Dtos
         public int Id { get; set; }
         public string Name { get; set; }
         public int RegionCodeId { get; set; }
-        public int RegionRisk { get; set; }
+        public int RegionRiskLevelId { get; set; }
     }
 }

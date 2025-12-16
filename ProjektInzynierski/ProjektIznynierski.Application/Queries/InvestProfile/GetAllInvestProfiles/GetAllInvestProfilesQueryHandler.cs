@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Application.Queries.InvestProfile.GetAllInvestProfi
             {
                 Id = ip.Id,
                 ProfileName = ip.ProfileName,
-                AcceptableRisk = (int)ip.AcceptableRisk,
+                AcceptableRiskLevelId = ip.AcceptableRiskLevelId,
                 InvestHorizonId = ip.InvestHorizonId,
                 TargetReturn = ip.TargetReturn,
                 MaxDrawDown = ip.MaxDrawDown,

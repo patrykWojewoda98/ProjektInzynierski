@@ -20,8 +20,8 @@ namespace ProjektIznynierski.Application.Commands.Country.CreateCountry
             RuleFor(x => x.CurrencyId)
                 .GreaterThan(0).WithMessage("Identyfikator waluty jest wymagany i musi być większy od zera.");
 
-            RuleFor(x => x.CountryRisk)
-                .InclusiveBetween(0, 3).WithMessage("Poziom ryzyka kraju musi być poprawną wartością enum.");
+            RuleFor(x => x.CountryRiskLevelId)
+                .GreaterThan(0).WithMessage("CountryRiskLevelId can't be 0 or less.");
         }
     }
 }

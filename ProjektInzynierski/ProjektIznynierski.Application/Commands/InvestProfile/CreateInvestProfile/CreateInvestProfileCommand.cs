@@ -6,7 +6,7 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProf
     public class CreateInvestProfileCommand : IRequest<InvestProfileDto>
     {
         public string ProfileName { get; set; }
-        public int AcceptableRisk { get; set; }
+        public int AcceptableRiskLevelId { get; set; }
         public int InvestHorizonID { get; set; }
         public double? TargetReturn { get; set; }
         public double? MaxDrawDown { get; set; }

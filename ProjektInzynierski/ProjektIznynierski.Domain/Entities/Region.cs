@@ -8,7 +8,7 @@ namespace ProjektIznynierski.Domain.Entities
 
         public int RegionCodeId { get; set; }
 
-        public RiskLevel RegionRisk { get; set; }
+        public int RegionRiskLevelId { get; set; }
 
         public ICollection<Country> Countries { get; set; }
     }

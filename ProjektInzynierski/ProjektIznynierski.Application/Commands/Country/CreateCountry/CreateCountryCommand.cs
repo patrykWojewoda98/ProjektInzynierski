@@ -9,6 +9,6 @@ namespace ProjektIznynierski.Application.Commands.Country.CreateCountry
         public string IsoCode { get; set; }
         public int RegionId { get; set; }
         public int CurrencyId { get; set; }
-        public int CountryRisk { get; set; }
+        public int CountryRiskLevelId { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Application.Queries.Currency.GetCurrencyById
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                CurrencyRisk = (int)entity.CurrencyRisk
+                CurrencyRiskLevelId = entity.CurrencyRiskLevelId,
             };
         }
     }

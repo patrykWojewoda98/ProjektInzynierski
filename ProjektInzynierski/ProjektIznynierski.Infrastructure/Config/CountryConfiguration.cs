@@ -21,7 +21,7 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.HasIndex(c => c.IsoCode)
                    .IsUnique();
 
-            builder.Property(c => c.CountryRisk)
+            builder.Property(c => c.CountryRiskLevelId)
                    .IsRequired();
 
             builder.Property(c => c.RegionId)

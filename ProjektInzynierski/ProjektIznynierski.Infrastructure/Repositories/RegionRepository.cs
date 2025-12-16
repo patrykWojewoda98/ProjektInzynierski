@@ -24,9 +24,7 @@ namespace ProjektIznynierski.Infrastructure.Repositories
 
         public async Task<IEnumerable<Region>> GetRegionsByRiskLevelAsync(RiskLevel riskLevel)
         {
-            return await _dbContext.Regions
-                .Where(r => r.RegionRisk == riskLevel)
-                .ToListAsync();
+            throw new NotImplementedException();
         }
     }
 }

@@ -27,7 +27,7 @@ namespace ProjektIznynierski.Application.Commands.Country.UpdateCountry
             entity.IsoCode = request.IsoCode;
             entity.RegionId = request.RegionId;
             entity.CurrencyId = request.CurrencyId;
-            entity.CountryRisk = (RiskLevel)request.CountryRisk;
+            entity.CountryRiskLevelId = request.CountryRiskLevelId;
 
             _repository.Update(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -39,7 +39,7 @@ namespace ProjektIznynierski.Application.Commands.Country.UpdateCountry
                 IsoCode = entity.IsoCode,
                 RegionId = entity.RegionId,
                 CurrencyId = entity.CurrencyId,
-                CountryRisk = (int)entity.CountryRisk
+                CountryRiskLevelId = entity.CountryRiskLevelId,
             };
         }
     }

@@ -29,7 +29,7 @@ namespace ProjektIznynierski.Application.Queries.Country.GetAllContriesByRegionI
                 IsoCode = country.IsoCode,
                 RegionId = country.RegionId,
                 CurrencyId = country.CurrencyId,
-                CountryRisk = (int)country.CountryRisk
+                CountryRiskLevelId = country.CountryRiskLevelId
             }).ToList();
         }
     }

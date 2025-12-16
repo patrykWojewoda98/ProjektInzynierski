@@ -27,7 +27,7 @@ namespace ProjektIznynierski.Application.Queries.Country.GetCountryById
                 IsoCode = country.IsoCode,
                 RegionId = country.RegionId,
                 CurrencyId = country.CurrencyId,
-                CountryRisk = (int)country.CountryRisk
+                CountryRiskLevelId = country.CountryRiskLevelId
             };
         }
     }

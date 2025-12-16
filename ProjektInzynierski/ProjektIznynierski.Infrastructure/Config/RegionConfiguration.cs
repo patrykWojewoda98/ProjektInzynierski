@@ -20,7 +20,7 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(r => r.RegionCodeId)
                    .IsRequired();
 
-            builder.Property(r => r.RegionRisk)
+            builder.Property(r => r.RegionRiskLevelId)
                    .IsRequired();
 
             base.Configure(builder);

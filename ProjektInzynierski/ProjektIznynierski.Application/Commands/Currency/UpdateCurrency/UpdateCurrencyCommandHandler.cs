@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Application.Commands.Currency.UpdateCurrency
             }
 
             entity.Name = request.Name;
-            entity.CurrencyRisk = (RiskLevel)request.CurrencyRisk;
+            entity.CurrencyRiskLevelId = request.CurrencyRiskLevelId;
 
             _repository.Update(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -33,7 +33,7 @@ namespace ProjektIznynierski.Application.Commands.Currency.UpdateCurrency
             {
                 Id = entity.Id,
                 Name = entity.Name,
-                CurrencyRisk = (int)entity.CurrencyRisk
+                CurrencyRiskLevelId = entity.CurrencyRiskLevelId
             };
         }
     }

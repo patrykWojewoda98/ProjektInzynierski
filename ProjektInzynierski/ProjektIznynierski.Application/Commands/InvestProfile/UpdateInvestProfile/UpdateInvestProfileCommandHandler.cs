@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProf
             }
 
             entity.ProfileName = request.ProfileName;
-            entity.AcceptableRisk = (RiskLevel)request.AcceptableRisk;
+            entity.AcceptableRiskLevelId = request.AcceptableRiskLevelId;
             entity.InvestHorizonId = request.InvestHorizon;
             entity.TargetReturn = request.TargetReturn;
             entity.MaxDrawDown = request.MaxDrawDown;
@@ -37,7 +37,7 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProf
             {
                 Id = entity.Id,
                 ProfileName = entity.ProfileName,
-                AcceptableRisk = (int)entity.AcceptableRisk,
+                AcceptableRiskLevelId = entity.AcceptableRiskLevelId,
                 InvestHorizonId = entity.InvestHorizonId,
                 TargetReturn = entity.TargetReturn,
                 MaxDrawDown = entity.MaxDrawDown,
