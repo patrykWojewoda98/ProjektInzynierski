@@ -22,7 +22,7 @@ namespace ProjektIznynierski.Application.Queries.InvestInstrument.GetAllInvestIn
                 Id = i.Id,
                 Name = i.Name,
                 Ticker = i.Ticker,
-                Type = (int)i.Type,
+                InvestmentTypeId = i.InvestmentTypeId,
                 Description = i.Description,
                 MarketDataDate = i.MarketDataDate,
                 SectorId = i.SectorId,

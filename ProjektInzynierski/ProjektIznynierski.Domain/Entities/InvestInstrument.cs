@@ -8,7 +8,7 @@ namespace ProjektIznynierski.Domain.Entities
 
         public string Ticker { get; set; }
 
-        public InvestmentType Type { get; set; }
+        public int InvestmentTypeId { get; set; }
 
         public string Description { get; set; }
         public DateTime? MarketDataDate { get; set; }

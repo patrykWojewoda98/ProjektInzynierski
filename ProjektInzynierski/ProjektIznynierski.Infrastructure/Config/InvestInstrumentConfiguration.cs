@@ -20,7 +20,7 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .HasMaxLength(20)
                    .IsRequired();
 
-            builder.Property(i => i.Type)
+            builder.Property(i => i.InvestmentTypeId)
                    .IsRequired();
 
             builder.Property(i => i.Description)

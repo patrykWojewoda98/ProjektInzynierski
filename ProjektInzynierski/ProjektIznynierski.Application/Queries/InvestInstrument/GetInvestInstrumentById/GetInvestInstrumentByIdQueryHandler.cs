@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Application.Queries.InvestInstrument.GetInvestInstr
                 Id = entity.Id,
                 Name = entity.Name,
                 Ticker = entity.Ticker,
-                Type = (int)entity.Type,
+                InvestmentTypeId = entity.InvestmentTypeId,
                 Description = entity.Description,
                 MarketDataDate = entity.MarketDataDate,
                 SectorId = entity.SectorId,

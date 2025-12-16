@@ -25,7 +25,7 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestI
 
             entity.Name = request.Name;
             entity.Ticker = request.Ticker;
-            entity.Type = (InvestmentType)request.Type;
+            entity.InvestmentTypeId = request.InvestmentTypeId;
             entity.Description = request.Description;
             entity.MarketDataDate = request.MarketDataDate;
             entity.SectorId = request.SectorId;
@@ -42,7 +42,7 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestI
                 Id = entity.Id,
                 Name = entity.Name,
                 Ticker = entity.Ticker,
-                Type = (int)entity.Type,
+                InvestmentTypeId = entity.InvestmentTypeId,
                 Description = entity.Description,
                 MarketDataDate = entity.MarketDataDate,
                 SectorId = entity.SectorId,

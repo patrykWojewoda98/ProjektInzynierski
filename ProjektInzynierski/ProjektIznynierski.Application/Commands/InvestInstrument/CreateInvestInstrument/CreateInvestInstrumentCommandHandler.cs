@@ -21,7 +21,7 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.CreateInvestI
             {
                 Name = request.Name,
                 Ticker = request.Ticker,
-                Type = (InvestmentType)request.Type,
+                InvestmentTypeId = request.InvestmentTypeId,
                 Description = request.Description,
                 MarketDataDate = request.MarketDataDate,
                 SectorId = request.SectorId,
@@ -38,7 +38,7 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.CreateInvestI
                 Id = entity.Id,
                 Name = entity.Name,
                 Ticker = entity.Ticker,
-                Type = (int)entity.Type,
+                InvestmentTypeId = entity.InvestmentTypeId,
                 Description = entity.Description,
                 MarketDataDate = entity.MarketDataDate,
                 SectorId = entity.SectorId,
