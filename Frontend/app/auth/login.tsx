@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -10,15 +10,46 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
+import { decodeToken } from "../../utils/decodeToken";
 
 const LoginScreen = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
+
+  // Sprawdzenie tokenu po uruchomieniu widoku
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem("userToken");
+        if (token) {
+          const decoded = decodeToken(token);
+          const now = Date.now() / 1000;
+
+          if (decoded && decoded.exp && decoded.exp > now) {
+            console.log("✅ Token valid — skipping login screen");
+            router.replace("/mainMenu");
+            return;
+          } else {
+            console.log("⚠️ Token expired — clearing storage");
+            await AsyncStorage.removeItem("userToken");
+          }
+        }
+      } catch (error) {
+        console.error("Error checking token:", error);
+      } finally {
+        setIsCheckingToken(false);
+      }
+    };
+
+    checkToken();
+  }, []);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
