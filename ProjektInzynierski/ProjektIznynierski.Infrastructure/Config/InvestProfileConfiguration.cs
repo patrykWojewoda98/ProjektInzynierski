@@ -29,6 +29,12 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(ip => ip.MaxDrawDown)
                    .IsRequired(false);
 
+            // 🔹 Relacja z RiskLevel 
+            builder.HasOne(ip => ip.AcceptableRiskLevel)
+                   .WithMany()
+                   .HasForeignKey(ip => ip.AcceptableRiskLevelId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
             // 🔹 Relacja 1:1 z Client – klucz obcy w InvestProfile
             builder.HasOne(ip => ip.Client)
                    .WithOne(c => c.InvestProfile)

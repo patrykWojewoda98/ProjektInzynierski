@@ -1,5 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProfile;
+using ProjektIznynierski.Application.Commands.InvestProfile.DeleteInvestProfile;
+using ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProfile;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.InvestProfile.GetAllInvestProfiles;
 using ProjektIznynierski.Application.Queries.InvestProfile.GetInvestProfileById;
@@ -31,6 +34,42 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetInvestProfileByIdQuery(id));
             return Ok(result);
+        }
+
+        [HttpPost]
+        [SwaggerOperation(Summary = "Create a new Investment Profile", Description = "Creates a new Investment Profile with the provided details.")]
+        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateInvestProfileCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Update an existing Investment Profile", Description = "Updates an existing Investment Profile with the provided details.")]
+        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateInvestProfileCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("ID in the URL does not match the ID in the request body.");
+            }
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Delete a client", Description = "Deletes a specific Investment Profile by their ID.")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _mediator.Send(new DeleteInvestProfileCommand { Id = id });
+            return NoContent();
         }
     }
 }

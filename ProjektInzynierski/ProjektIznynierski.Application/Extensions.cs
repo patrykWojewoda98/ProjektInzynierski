@@ -35,6 +35,8 @@ using ProjektIznynierski.Application.Commands.WatchList.UpdateWatchList;
 using ProjektIznynierski.Application.Commands.WatchListItem.CreateWatchListItem;
 using ProjektIznynierski.Application.Commands.WatchListItem.UpdateWatchListItem;
 using System.Reflection;
+using ProjektIznynierski.Application.Commands.InvestHorizon.AddInvestHorizon;
+using ProjektIznynierski.Application.Commands.InvestHorizon.UpdateInvestHorizon;
 
 namespace ProjektIznynierski.Application
 {
@@ -95,6 +97,9 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<CreateWatchListItemCommand>, CreateWatchListItemCommandValidation>();
             services.AddScoped<IValidator<UpdateWatchListItemCommand>, UpdateWatchListItemCommandValidation>();
+
+            services.AddScoped<IValidator<AddInvestHorizonCommand>, AddInvestHorizonCommandValidation>();
+            services.AddScoped<IValidator<UpdateInvestHorizonCommand>, UpdateInvestHorizonCommandValidation>();
 
             return services;
         }

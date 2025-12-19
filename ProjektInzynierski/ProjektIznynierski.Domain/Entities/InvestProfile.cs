@@ -8,6 +8,7 @@ namespace ProjektIznynierski.Domain.Entities
         public string ProfileName { get; set; } // np. "Aggressive", "Crypto-focused"
 
         public int AcceptableRiskLevelId { get; set; }
+        public RiskLevel? AcceptableRiskLevel { get; set; }
 
         public int? InvestHorizonId { get; set; }
         public InvestHorizon? InvestHorizon { get; set; }
