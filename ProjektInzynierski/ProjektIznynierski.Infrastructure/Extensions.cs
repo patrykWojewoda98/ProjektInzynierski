@@ -33,6 +33,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IWatchListItemRepository, WatchListItemRepository>();
             services.AddScoped<IWatchListRepository, WatchListRepository>();
             services.AddScoped<IInvestHorizonRepository, InvestHorizonRepository>();
+            services.AddScoped<IRiskLevelRepository, RiskLevelRepository>();
 
             services.AddScoped<IJwtTokenService, JwtService>();
 

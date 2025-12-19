@@ -1,4 +1,5 @@
-﻿using ProjektIznynierski.Domain.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
 using ProjektIznynierski.Infrastructure.Context;
 
@@ -10,7 +11,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
 
         }
-
+        public async Task<bool> ExistsByRiskScaleAsync(int riskScale)
+        {
+            return await _dbContext.RiskLevels
+                .AnyAsync(x => x.RiskLevelScale == riskScale);
+        }
 
     }
 }

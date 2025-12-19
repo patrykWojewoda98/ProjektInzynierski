@@ -37,6 +37,9 @@ using ProjektIznynierski.Application.Commands.WatchListItem.UpdateWatchListItem;
 using System.Reflection;
 using ProjektIznynierski.Application.Commands.InvestHorizon.AddInvestHorizon;
 using ProjektIznynierski.Application.Commands.InvestHorizon.UpdateInvestHorizon;
+using ProjektIznynierski.Application.Commands.RiskLevel.CreateRiskLevel;
+using ProjektIznynierski.Application.Commands.RiskLevel.UpdateRiskLevel;
+using MediatR;
 
 namespace ProjektIznynierski.Application
 {
@@ -100,6 +103,11 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<AddInvestHorizonCommand>, AddInvestHorizonCommandValidation>();
             services.AddScoped<IValidator<UpdateInvestHorizonCommand>, UpdateInvestHorizonCommandValidation>();
+
+            services.AddScoped<IValidator<CreateRiskLevelCommand>, CreateRiskLevelCommandValidation>();
+            services.AddScoped<IValidator<UpdateRiskLevelCommand>, UpdateRiskLevelCommandValidation>();
+
+            services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 
             return services;
         }
