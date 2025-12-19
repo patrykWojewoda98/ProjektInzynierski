@@ -1,6 +1,4 @@
-﻿using ProjektIznynierski.Domain.Enums;
-
-namespace ProjektIznynierski.Domain.Entities
+﻿namespace ProjektIznynierski.Domain.Entities
 {
     public class Country : BaseEntity
     {

@@ -1,7 +1,6 @@
 using MediatR;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
-using ProjektIznynierski.Domain.Enums;
 
 namespace ProjektIznynierski.Application.Commands.Currency.CreateCurrency
 {

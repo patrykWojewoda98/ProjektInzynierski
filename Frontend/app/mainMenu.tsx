@@ -5,6 +5,7 @@ import { globalStyles, spacing } from "../assets/styles/styles";
 import { authGuard } from "../utils/authGuard";
 
 const icons = {
+  InvestProfile: require("../assets/images/Client-Icon.png"),
   WatchList: require("../assets/images/WatchList-Icon.png"),
   Wallet: require("../assets/images/Wallet-Icon.png"),
   TradeHistory: require("../assets/images/TradeHistory-Icon.png"),
@@ -12,10 +13,14 @@ const icons = {
   InvestInstrument: require("../assets/images/InvestInstrument-Icon.png"),
   FinancialReport: require("../assets/images/FinancialReport-Icon.png"),
   FinancialMetric: require("../assets/images/FinancialMetric-Icon.png"),
-  Client: require("../assets/images/Client-Icon.png"),
 };
 
 const tiles = [
+  {
+    key: "InvestProfile",
+    label: "My Investment Profile",
+    icon: icons.InvestProfile,
+  },
   { key: "WatchList", label: "Watchlist", icon: icons.WatchList },
   { key: "Wallet", label: "Wallet", icon: icons.Wallet },
   { key: "TradeHistory", label: "Trade History", icon: icons.TradeHistory },
@@ -35,7 +40,6 @@ const tiles = [
     label: "Financial Metrics",
     icon: icons.FinancialMetric,
   },
-  { key: "Client", label: "Clients", icon: icons.Client },
 ];
 
 const MainMenu = () => {

@@ -21,8 +21,8 @@ namespace ProjektIznynierski.Application.Commands.TradeHistory.UpdateTradeHistor
             RuleFor(x => x.Price)
                 .GreaterThanOrEqualTo(0).WithMessage("Cena nie może być ujemna.");
 
-            RuleFor(x => x.Type)
-                .InclusiveBetween(0, 10).WithMessage("Typ transakcji musi być poprawną wartością enum.");
+            RuleFor(x => x.TradeTypeId)
+                .GreaterThan(0).WithMessage("TradeTypeId can't be 0 or less.");
 
             RuleFor(x => x.TradeDate)
                 .NotEmpty().WithMessage("Data transakcji jest wymagana.");

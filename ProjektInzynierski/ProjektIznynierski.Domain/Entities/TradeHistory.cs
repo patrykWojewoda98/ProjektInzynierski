@@ -1,4 +1,4 @@
-﻿using ProjektIznynierski.Domain.Enums;
+﻿
 
 namespace ProjektIznynierski.Domain.Entities
 {
@@ -13,7 +13,7 @@ namespace ProjektIznynierski.Domain.Entities
         public decimal Quantity { get; set; }
         public decimal Price { get; set; }
 
-        public TradeType Type { get; set; } 
+        public int TradeTypeId { get; set; } 
         public DateTime TradeDate { get; set; } = DateTime.UtcNow;
     }
 }

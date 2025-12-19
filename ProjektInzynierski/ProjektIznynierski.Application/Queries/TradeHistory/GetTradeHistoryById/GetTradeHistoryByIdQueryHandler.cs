@@ -27,7 +27,7 @@ namespace ProjektIznynierski.Application.Queries.TradeHistory.GetTradeHistoryByI
                 InvestInstrumentId = entity.InvestInstrumentId,
                 Quantity = entity.Quantity,
                 Price = entity.Price,
-                Type = (int)entity.Type,
+                TradeTypeId = entity.TradeTypeId,
                 TradeDate = entity.TradeDate
             };
         }

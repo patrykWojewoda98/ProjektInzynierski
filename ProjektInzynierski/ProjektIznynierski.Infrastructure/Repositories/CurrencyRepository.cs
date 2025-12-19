@@ -1,6 +1,5 @@
 using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
-using ProjektIznynierski.Domain.Enums;
 using ProjektIznynierski.Infrastructure.Context;
 
 namespace ProjektIznynierski.Infrastructure.Repositories

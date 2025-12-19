@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjektIznynierski.Domain.Entities;
-using ProjektIznynierski.Domain.Enums;
-using ProjektIznynierski.Infrastructure.Config;
+
 
 namespace ProjektIznynierski.Infrastructure.Context
 {
@@ -24,10 +23,11 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<WalletInstrument> WalletInstruments { get; set; }
         public DbSet<WatchList> WatchLists { get; set; }
         public DbSet<WatchListItem> WatchListItems { get; set; }
-        public DbSet<Domain.Entities.InvestHorizon> InvestHorizons { get; set; }
-        public DbSet<Domain.Entities.InvestmentType> InvestmentType { get; set; }
-        public DbSet<Domain.Entities.RegionCode> RegionCodes { get; set; }
-        public DbSet<Domain.Entities.RiskLevel> RiskLevel { get; set; }
+        public DbSet<InvestHorizon> InvestHorizons { get; set; }
+        public DbSet<InvestmentType> InvestmentTypes { get; set; }
+        public DbSet<RegionCode> RegionCodes { get; set; }
+        public DbSet<RiskLevel> RiskLevels { get; set; }
+        public DbSet<TradeType> TradeTypes { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }

@@ -1,7 +1,6 @@
 using MediatR;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
-using ProjektIznynierski.Domain.Enums;
 
 namespace ProjektIznynierski.Application.Commands.TradeHistory.CreateTradeHistory
 {
@@ -23,7 +22,7 @@ namespace ProjektIznynierski.Application.Commands.TradeHistory.CreateTradeHistor
                 InvestInstrumentId = request.InvestInstrumentId,
                 Quantity = request.Quantity,
                 Price = request.Price,
-                Type = (TradeType)request.Type,
+                TradeTypeId = request.TradeTypeId,
                 TradeDate = request.TradeDate
             };
             _repository.Add(entity);
@@ -36,7 +35,7 @@ namespace ProjektIznynierski.Application.Commands.TradeHistory.CreateTradeHistor
                 InvestInstrumentId = entity.InvestInstrumentId,
                 Quantity = entity.Quantity,
                 Price = entity.Price,
-                Type = (int)entity.Type,
+                TradeTypeId = entity.TradeTypeId,
                 TradeDate = entity.TradeDate
             };
         }

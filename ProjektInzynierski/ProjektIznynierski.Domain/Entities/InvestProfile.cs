@@ -1,4 +1,4 @@
-﻿using ProjektIznynierski.Domain.Enums;
+﻿
 
 namespace ProjektIznynierski.Domain.Entities
 {

@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .HasColumnType("decimal(18,4)")
                    .IsRequired();
 
-            builder.Property(th => th.Type)
+            builder.Property(th => th.TradeTypeId)
                    .IsRequired();
 
             builder.Property(th => th.TradeDate)

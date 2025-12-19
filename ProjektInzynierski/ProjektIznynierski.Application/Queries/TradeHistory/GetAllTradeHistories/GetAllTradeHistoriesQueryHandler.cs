@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Application.Queries.TradeHistory.GetAllTradeHistori
                 InvestInstrumentId = th.InvestInstrumentId,
                 Quantity = th.Quantity,
                 Price = th.Price,
-                Type = (int)th.Type,
+                TradeTypeId = th.TradeTypeId,
                 TradeDate = th.TradeDate
             }).ToList();
         }

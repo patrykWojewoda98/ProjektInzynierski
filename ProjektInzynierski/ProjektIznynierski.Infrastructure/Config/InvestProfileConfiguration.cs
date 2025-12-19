@@ -17,8 +17,11 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(ip => ip.AcceptableRiskLevelId)
                    .IsRequired();
 
-            builder.Property(ip => ip.InvestHorizon)
-                   .IsRequired();
+            builder.HasOne(ip => ip.InvestHorizon)
+            .WithMany()
+            .HasForeignKey(ip => ip.InvestHorizonId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
             builder.Property(ip => ip.TargetReturn)
                    .IsRequired(false);

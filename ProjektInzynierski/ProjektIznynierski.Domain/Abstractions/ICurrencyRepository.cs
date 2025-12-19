@@ -1,5 +1,4 @@
 ﻿using ProjektIznynierski.Domain.Entities;
-using ProjektIznynierski.Domain.Enums;
 
 namespace ProjektIznynierski.Domain.Abstractions
 {
