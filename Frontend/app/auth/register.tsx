@@ -15,6 +15,7 @@ import {
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
+import { ROUTES } from "../../routes";
 
 const RegisterScreen = () => {
   const router = useRouter();
@@ -119,7 +120,7 @@ const RegisterScreen = () => {
 
       await ApiService.registerClient(clientData);
       Alert.alert("Success", "Registration successful!");
-      router.push("/auth/login");
+      router.push({ pathname: ROUTES.LOGIN });
     } catch {
       setErrors(["An error occurred during registration. Please try again."]);
     } finally {
@@ -320,7 +321,9 @@ const RegisterScreen = () => {
           <Text style={[globalStyles.text, spacing.mr1]}>
             Already have an account?
           </Text>
-          <TouchableOpacity onPress={() => router.push("/auth/login")}>
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: ROUTES.LOGIN })}
+          >
             <Text style={globalStyles.link}>Login</Text>
           </TouchableOpacity>
         </View>

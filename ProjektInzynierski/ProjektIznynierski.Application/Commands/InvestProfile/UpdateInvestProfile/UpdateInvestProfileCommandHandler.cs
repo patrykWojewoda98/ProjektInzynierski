@@ -24,7 +24,7 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProf
 
             entity.ProfileName = request.ProfileName;
             entity.AcceptableRiskLevelId = request.AcceptableRiskLevelId;
-            entity.InvestHorizonId = request.InvestHorizon;
+            entity.InvestHorizonId = request.InvestHorizonId;
             entity.TargetReturn = request.TargetReturn;
             entity.MaxDrawDown = request.MaxDrawDown;
             entity.ClientId = request.ClientId;

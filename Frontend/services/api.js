@@ -94,6 +94,50 @@ const ApiService = {
       throw ["An error occurred while creating the investment profile."];
     }
   },
+
+  async getInvestProfileByClientId(clientId) {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/InvestProfile/${clientId}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
+  async updateInvestProfile(id, profileDto) {
+    const response = await axios.put(
+      `${API_BASE_URL}/InvestProfile/${id}`,
+      profileDto
+    );
+    return response.data;
+  },
+
+  // RiskLevel endpoints
+  async getRiskLevels() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/RiskLevel`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching risk levels:", error);
+      throw ["Failed to load risk levels"];
+    }
+  },
+
+  // InvestHorizon endpoints
+  async getInvestHorizons() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/InvestHorizon`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching invest horizons:", error);
+      throw error;
+    }
+  },
 };
 
 export default ApiService;

@@ -18,3 +18,27 @@ Dodana Biblioteka FluentValidator.ASPNetCore
 
 Co dodać:
 Przy rejestracji na pewno musi być ablokowana możliwość klikniecia w kraj jeśli nie ma regionu.
+
+
+Frontend jakie paczki są potrzebne:
+ Npx expo
+ 
+
+Dane do logowania 1
+login asd
+Hasło asdasd
+
+Dane logowania:
+asd@gmail.com
+asdasdasd
+
+Do Commitu
+ 
+
+Na teraz: 
+poprawić backend aby metoda ubdate przyjmowała InvesthorizonId a nie Investhorizon
+
+Na przyszłość:
+Można utworzyć tabele TeamMembers i tak ustawić odnośnik do usera ale też dać dodatkowe informacjetypu np. Pesel czy numer konta bankowego, oraz utworzyć tabele z uprawnieniami i np. do teammember dać odpowiednie id uprawnienia
+
+GetAllRiskLevels

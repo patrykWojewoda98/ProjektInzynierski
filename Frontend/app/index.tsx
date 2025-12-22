@@ -3,16 +3,17 @@ import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { COLORS } from "../assets/Constants/colors";
 import { globalStyles } from "../assets/styles/styles";
+import { ROUTES } from "../routes";
 
 export default function HomeScreen() {
   const router = useRouter();
 
   const handleLogin = () => {
-    router.push("/auth/login");
+    router.push({ pathname: ROUTES.LOGIN });
   };
 
   const handleRegister = () => {
-    router.push("/auth/register");
+    router.push({ pathname: ROUTES.REGISTER });
   };
 
   return (

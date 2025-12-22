@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles, spacing } from "../assets/styles/styles";
 import { authGuard } from "../utils/authGuard";
+import { ROUTES } from "../routes";
 
 const icons = {
   InvestProfile: require("../assets/images/Client-Icon.png"),
@@ -20,25 +21,49 @@ const tiles = [
     key: "InvestProfile",
     label: "My Investment Profile",
     icon: icons.InvestProfile,
+    route: ROUTES.INVEST_PROFILE,
   },
-  { key: "WatchList", label: "Watchlist", icon: icons.WatchList },
-  { key: "Wallet", label: "Wallet", icon: icons.Wallet },
-  { key: "TradeHistory", label: "Trade History", icon: icons.TradeHistory },
-  { key: "MarketData", label: "Market Data", icon: icons.MarketData },
+  {
+    key: "WatchList",
+    label: "Watchlist",
+    icon: icons.WatchList,
+    route: ROUTES.WATCHLIST,
+  },
+  {
+    key: "Wallet",
+    label: "Wallet",
+    icon: icons.Wallet,
+    route: ROUTES.WALLET,
+  },
+  {
+    key: "TradeHistory",
+    label: "Trade History",
+    icon: icons.TradeHistory,
+    route: ROUTES.TRADE_HISTORY,
+  },
+  {
+    key: "MarketData",
+    label: "Market Data",
+    icon: icons.MarketData,
+    route: ROUTES.MARKET_DATA,
+  },
   {
     key: "InvestInstrument",
     label: "Investment Instruments",
     icon: icons.InvestInstrument,
+    route: ROUTES.INVEST_INSTRUMENT,
   },
   {
     key: "FinancialReport",
     label: "Financial Reports",
     icon: icons.FinancialReport,
+    route: ROUTES.FINANCIAL_REPORT,
   },
   {
     key: "FinancialMetric",
     label: "Financial Metrics",
     icon: icons.FinancialMetric,
+    route: ROUTES.FINANCIAL_METRIC,
   },
 ];
 
@@ -90,7 +115,7 @@ const MainMenu = () => {
         {tiles.map((t) => (
           <TouchableOpacity
             key={t.key}
-            onPress={() => router.push("/ComingSoon" as any)}
+            onPress={() => router.push(t.route)}
             style={globalStyles.menuTile}
           >
             <Image source={t.icon} style={globalStyles.menuIcon} />

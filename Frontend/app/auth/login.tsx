@@ -15,6 +15,7 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 import { decodeToken } from "../../utils/decodeToken";
+import { ROUTES } from "../../routes";
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -34,7 +35,7 @@ const LoginScreen = () => {
 
           if (decoded && decoded.exp && decoded.exp > now) {
             console.log("✅ Token valid — skipping login screen");
-            router.replace("/mainMenu");
+            router.replace({ pathname: ROUTES.MAIN_MENU });
             return;
           } else {
             console.log("⚠️ Token expired — clearing storage");
@@ -72,7 +73,7 @@ const LoginScreen = () => {
 
       // Jeśli jest token → logowanie OK
       if (response?.token) {
-        router.push("/mainMenu");
+        router.push({ pathname: ROUTES.MAIN_MENU });
         return;
       }
 
@@ -146,7 +147,9 @@ const LoginScreen = () => {
           <Text style={[globalStyles.text, spacing.mr1]}>
             Don't have an account?{" "}
           </Text>
-          <TouchableOpacity onPress={() => router.push("/auth/register")}>
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: ROUTES.REGISTER })}
+          >
             <Text style={globalStyles.link}>Register</Text>
           </TouchableOpacity>
         </View>
