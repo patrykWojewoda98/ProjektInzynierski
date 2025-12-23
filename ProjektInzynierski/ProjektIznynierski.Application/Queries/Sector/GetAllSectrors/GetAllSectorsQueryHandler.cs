@@ -17,6 +17,7 @@ namespace ProjektIznynierski.Application.Queries.Sector.GetAllSectrors
             return sectors.Select(sector => new SectorDto
             {
                 Id = sector.Id,
+                Code = sector.Code,
                 Name = sector.Name,
                 Description = sector.Description
             }).ToList();

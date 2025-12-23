@@ -107,6 +107,9 @@ namespace ProjektIznynierski.Application
             services.AddScoped<IValidator<CreateRiskLevelCommand>, CreateRiskLevelCommandValidation>();
             services.AddScoped<IValidator<UpdateRiskLevelCommand>, UpdateRiskLevelCommandValidation>();
 
+            services.AddScoped<IValidator<CreateInvestmentTypeCommand>, CreateInvestmentTypeCommandValidation>();
+            services.AddScoped<IValidator<UpdateInvestmentTypeCommand>, UpdateInvestmentTypeCommandValidation>();
+
             services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 
             return services;
