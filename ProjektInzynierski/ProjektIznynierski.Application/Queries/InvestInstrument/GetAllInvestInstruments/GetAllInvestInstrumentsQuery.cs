@@ -1,10 +1,8 @@
 using MediatR;
 using ProjektIznynierski.Application.Dtos;
-using System.Collections.Generic;
 
-namespace ProjektIznynierski.Application.Queries.InvestInstrument.GetAllInvestInstruments
+namespace ProjektIznynierski.Application.Queries.InvestInstrument.GetAllByRegionId
 {
-    public class GetAllInvestInstrumentsQuery : IRequest<List<InvestInstrumentDto>>
-    {
-    }
+    public record GetAllInvestInstrumentsQuery()
+        : IRequest<List<InvestInstrumentDto>>;
 }

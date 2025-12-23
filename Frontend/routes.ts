@@ -8,7 +8,7 @@ export const ROUTES = {
   WALLET: "/wallet",
   TRADE_HISTORY: "/tradeHistory",
   MARKET_DATA: "/marketData",
-  INVEST_INSTRUMENT: "/investInstrument",
+  INVEST_INSTRUMENT: "/investInstrument/investInstrument",
   FINANCIAL_REPORT: "/financialReport",
   FINANCIAL_METRIC: "/financialMetric",
 } as const;
