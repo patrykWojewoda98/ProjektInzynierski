@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Slot, useRouter } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
 import React, { createContext, useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; // ← NOWY IMPORT
+import { SafeAreaView } from "react-native-safe-area-context";
 import { globalStyles } from "../assets/styles/styles";
 import { decodeToken } from "../utils/decodeToken";
 
@@ -21,7 +21,9 @@ export default function RootLayout() {
   const [clientId, setClientId] = useState<string>("");
 
   const router = useRouter();
+  const segments = useSegments();
 
+  // 🔹 Ładowanie użytkownika z tokenu (działa przy każdej zmianie ekranu)
   useEffect(() => {
     const loadUserFromToken = async () => {
       const storedToken = await AsyncStorage.getItem("userToken");
@@ -36,11 +38,14 @@ export default function RootLayout() {
             id: decoded.id,
           });
         }
+      } else {
+        setToken("");
+        setUser(null);
       }
     };
 
     loadUserFromToken();
-  }, []);
+  }, [segments]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userToken");
@@ -56,7 +61,6 @@ export default function RootLayout() {
           source={require("../assets/images/Logo.png")}
           style={globalStyles.logoSmall}
         />
-
         {user?.name ? (
           <Text
             style={[
@@ -69,15 +73,18 @@ export default function RootLayout() {
         ) : null}
       </View>
 
-      <Pressable
-        onPress={handleLogout}
-        style={({ pressed }) => [
-          globalStyles.buttonSmall,
-          pressed && globalStyles.buttonPressed,
-        ]}
-      >
-        <Text style={globalStyles.buttonText}>Logout</Text>
-      </Pressable>
+      {/* 🔹 Pokaż przycisk Logout tylko, jeśli istnieje token */}
+      {token ? (
+        <Pressable
+          onPress={handleLogout}
+          style={({ pressed }) => [
+            globalStyles.buttonSmall,
+            pressed && globalStyles.buttonPressed,
+          ]}
+        >
+          <Text style={globalStyles.buttonText}>Logout</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 

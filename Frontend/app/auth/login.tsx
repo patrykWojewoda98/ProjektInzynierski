@@ -14,8 +14,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
-import { decodeToken } from "../../utils/decodeToken";
 import { ROUTES } from "../../routes";
+import { decodeToken } from "../../utils/decodeToken";
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -29,22 +29,28 @@ const LoginScreen = () => {
     const checkToken = async () => {
       try {
         const token = await AsyncStorage.getItem("userToken");
-        if (token) {
-          const decoded = decodeToken(token);
-          const now = Date.now() / 1000;
 
-          if (decoded && decoded.exp && decoded.exp > now) {
-            console.log("✅ Token valid — skipping login screen");
-            router.replace({ pathname: ROUTES.MAIN_MENU });
-            return;
-          } else {
-            console.log("⚠️ Token expired — clearing storage");
-            await AsyncStorage.removeItem("userToken");
-          }
+        if (!token) {
+          setIsCheckingToken(false);
+          return;
         }
+
+        const decoded = decodeToken(token);
+        const now = Date.now() / 1000;
+
+        if (!decoded || (decoded.exp && decoded.exp < now)) {
+          console.log("❌ Token expired or invalid — removing it...");
+          await AsyncStorage.removeItem("userToken");
+          setIsCheckingToken(false);
+          return;
+        }
+
+        // ✅ Token ważny — przejdź od razu do Main Menu
+        console.log("✅ Token valid — skipping login");
+        router.replace(ROUTES.MAIN_MENU);
       } catch (error) {
-        console.error("Error checking token:", error);
-      } finally {
+        console.error("Token check error:", error);
+        await AsyncStorage.removeItem("userToken");
         setIsCheckingToken(false);
       }
     };
@@ -73,9 +79,12 @@ const LoginScreen = () => {
 
       // Jeśli jest token → logowanie OK
       if (response?.token) {
-        router.push({ pathname: ROUTES.MAIN_MENU });
+        router.replace(ROUTES.MAIN_MENU);
         return;
       }
+      setTimeout(() => {
+        router.reload();
+      }, 200);
 
       // Jeśli nie ma tokena → logowanie nieudane
       Alert.alert("Error", "Invalid email or/and password");
@@ -147,9 +156,7 @@ const LoginScreen = () => {
           <Text style={[globalStyles.text, spacing.mr1]}>
             Don't have an account?{" "}
           </Text>
-          <TouchableOpacity
-            onPress={() => router.push({ pathname: ROUTES.REGISTER })}
-          >
+          <TouchableOpacity onPress={() => router.push("/auth/register")}>
             <Text style={globalStyles.link}>Register</Text>
           </TouchableOpacity>
         </View>
