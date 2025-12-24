@@ -24,10 +24,7 @@ export default function HomeScreen() {
 
       <Image
         source={require("../assets/images/Logo.png")}
-        style={[
-          globalStyles.logo,
-          { width: 250, height: 250, marginBottom: 40 },
-        ]}
+        style={[globalStyles.logo]}
       />
 
       <View style={[globalStyles.section, { width: "80%" }]}>

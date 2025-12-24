@@ -157,11 +157,6 @@ const InvestProfile = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Image
-        source={require("../../assets/images/Logo.png")}
-        style={[globalStyles.logo, spacing.mb4]}
-      />
-
       <Text style={[globalStyles.header, spacing.mb3]}>
         {isEditMode ? "Update Investment Profile" : "Create Investment Profile"}
       </Text>

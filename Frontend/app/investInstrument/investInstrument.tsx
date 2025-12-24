@@ -73,11 +73,6 @@ const InvestInstrument = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Image
-        source={require("../../assets/images/Logo.png")}
-        style={[globalStyles.logo, spacing.mb4]}
-      />
-
       <Text style={[globalStyles.header, spacing.mb4]}>
         Investment Instruments
       </Text>
@@ -154,7 +149,12 @@ const InvestInstrument = () => {
 
             <TouchableOpacity
               style={[globalStyles.buttonSmall, spacing.mt2]}
-              onPress={() => router.push({ pathname: ROUTES.COMING_SOON })}
+              onPress={() =>
+                router.push({
+                  pathname: ROUTES.FINANCIAL_METRIC,
+                  params: { id: i.id },
+                })
+              }
             >
               <Text style={globalStyles.buttonText}>See more</Text>
             </TouchableOpacity>

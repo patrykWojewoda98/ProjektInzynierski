@@ -139,6 +139,17 @@ const ApiService = {
     }
   },
 
+  //FinancialMetric endpoints
+  async getFinancialMetricById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/FinancialMetric/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching financial metric:", error);
+      throw error;
+    }
+  },
+
   //Sector endpoints
   async getSectors() {
     try {
@@ -153,6 +164,11 @@ const ApiService = {
   // InvestInstrument endpoints
   async getInvestInstruments() {
     const res = await axios.get(`${API_BASE_URL}/InvestInstrument`);
+    return res.data;
+  },
+
+  async getInvestInstrumentById(id) {
+    const res = await axios.get(`${API_BASE_URL}/InvestInstrument/${id}`);
     return res.data;
   },
 

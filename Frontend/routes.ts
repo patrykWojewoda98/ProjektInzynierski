@@ -10,6 +10,6 @@ export const ROUTES = {
   MARKET_DATA: "/marketData",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
   FINANCIAL_REPORT: "/financialReport",
-  FINANCIAL_METRIC: "/financialMetric",
+  FINANCIAL_METRIC: "/financialMetric/financialMetric",
   FINANCIAL_METRIC_PREVIEW: "/financialMetric/financialMetricPreview",
 } as const;

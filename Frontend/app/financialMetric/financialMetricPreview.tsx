@@ -41,11 +41,6 @@ const FinancialMetricPreview = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Image
-        source={require("../../assets/images/Logo.png")}
-        style={[globalStyles.logo, spacing.mb4]}
-      />
-
       <Text style={[globalStyles.header, spacing.mb4]}>
         Financial Metrics Overview
       </Text>
