@@ -63,7 +63,7 @@ const tiles = [
     key: "FinancialMetric",
     label: "Financial Metrics",
     icon: icons.FinancialMetric,
-    route: ROUTES.FINANCIAL_METRIC,
+    route: ROUTES.FINANCIAL_METRIC_PREVIEW,
   },
 ];
 
