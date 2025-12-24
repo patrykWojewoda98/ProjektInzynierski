@@ -252,6 +252,30 @@ export const globalStyles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
   },
+
+  card: {
+    backgroundColor: COLORS.darkGrey,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  cardTitle: {
+    color: COLORS.whiteHeader,
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+
+  textSmall: {
+    color: COLORS.textGrey,
+    fontSize: 14,
+    lineHeight: 20,
+  },
 });
 
 // Export individual spacing utilities

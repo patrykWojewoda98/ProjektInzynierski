@@ -1,5 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ProjektIznynierski.Application.Commands.Country.CreateCountry;
+using ProjektIznynierski.Application.Commands.Country.DeleteCountry;
+using ProjektIznynierski.Application.Commands.Country.UpdateCountry;
+using ProjektIznynierski.Application.Commands.FinancialMetric.CreateFinancialMetric;
+using ProjektIznynierski.Application.Commands.FinancialMetric.DeleteFinancialMetric;
+using ProjektIznynierski.Application.Commands.FinancialMetric.UpdateFinancialMetric;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.FinancialMetric.GetAllFinancialMetrics;
 using ProjektIznynierski.Application.Queries.FinancialMetric.GetFinancialMetricById;
@@ -31,6 +37,42 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetFinancialMetricByIdQuery(id));
             return Ok(result);
+        }
+
+        [HttpPost]
+        [SwaggerOperation(Summary = "Create a new Financial Metric", Description = "Creates a new Financial Metric with the provided details.")]
+        [ProducesResponseType(typeof(FinancialMetricDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateFinancialMetricCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Update an existing Financial Metric", Description = "Updates an existing Financial Metric with the provided details.")]
+        [ProducesResponseType(typeof(FinancialMetricDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateFinancialMetricCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("ID in the URL does not match the ID in the request body.");
+            }
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Delete a Financial Metric", Description = "Deletes a specific Financial Metric by its ID.")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _mediator.Send(new DeleteFinancialMetricCommand { Id = id });
+            return NoContent();
         }
     }
 }

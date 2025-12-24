@@ -138,6 +138,44 @@ const ApiService = {
       throw error;
     }
   },
+
+  //Sector endpoints
+  async getSectors() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Sector`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching sectors:", error);
+      throw error;
+    }
+  },
+
+  // InvestInstrument endpoints
+  async getInvestInstruments() {
+    const res = await axios.get(`${API_BASE_URL}/InvestInstrument`);
+    return res.data;
+  },
+
+  async getInvestInstrumentsByRegion(regionId) {
+    const res = await axios.get(
+      `${API_BASE_URL}/InvestInstrument/region/${regionId}`
+    );
+    return res.data;
+  },
+
+  async getInvestInstrumentsByType(typeId) {
+    const res = await axios.get(
+      `${API_BASE_URL}/InvestInstrument/type/${typeId}`
+    );
+    return res.data;
+  },
+
+  async getInvestInstrumentsBySector(sectorId) {
+    const res = await axios.get(
+      `${API_BASE_URL}/InvestInstrument/sector/${sectorId}`
+    );
+    return res.data;
+  },
 };
 
 export default ApiService;
