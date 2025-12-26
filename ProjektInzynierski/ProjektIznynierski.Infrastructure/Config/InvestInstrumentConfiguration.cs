@@ -16,6 +16,10 @@ namespace ProjektIznynierski.Infrastructure.Config
 
             builder.HasIndex(i => i.Name);
 
+            builder.Property(i => i.Isin)
+                   .HasMaxLength(12)
+                   .IsRequired();
+
             builder.Property(i => i.Ticker)
                    .HasMaxLength(20)
                    .IsRequired();

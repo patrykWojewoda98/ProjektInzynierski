@@ -32,7 +32,8 @@ namespace ProjektIznynierski.Application.Queries.InvestInstrument.GetInvestInstr
                 RegionId = entity.RegionId,
                 CountryId = entity.CountryId,
                 CurrencyId = entity.CurrencyId,
-                FinancialMetricId = entity.FinancialMetricId
+                FinancialMetricId = entity.FinancialMetricId,
+                Isin = entity.Isin
             };
         }
     }

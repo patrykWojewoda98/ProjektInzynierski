@@ -37,6 +37,9 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestI
 
             RuleFor(x => x.FinancialMetricId)
                 .GreaterThan(0).When(x => x.FinancialMetricId.HasValue).WithMessage("Identyfikator metryki finansowej musi być większy od zera.");
+            RuleFor(x => x.Isin)
+                .NotEmpty().WithMessage("ISIN jest wymagany.")
+                .Length(12).WithMessage("ISIN musi mieć dokładnie 12 znaków.");
         }
     }
 }

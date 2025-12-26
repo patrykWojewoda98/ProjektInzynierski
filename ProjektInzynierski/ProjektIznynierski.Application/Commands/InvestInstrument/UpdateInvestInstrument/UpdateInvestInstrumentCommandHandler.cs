@@ -32,6 +32,7 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestI
             entity.CountryId = request.CountryId;
             entity.CurrencyId = request.CurrencyId;
             entity.FinancialMetricId = request.FinancialMetricId;
+            entity.Isin = request.Isin;
 
             _repository.Update(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -48,7 +49,8 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestI
                 RegionId = entity.RegionId,
                 CountryId = entity.CountryId,
                 CurrencyId = entity.CurrencyId,
-                FinancialMetricId = entity.FinancialMetricId
+                FinancialMetricId = entity.FinancialMetricId,
+                Isin = entity.Isin
             };
         }
     }

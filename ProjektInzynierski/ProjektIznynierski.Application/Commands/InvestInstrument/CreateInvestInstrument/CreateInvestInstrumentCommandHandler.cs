@@ -27,7 +27,8 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.CreateInvestI
                 RegionId = request.RegionId,
                 CountryId = request.CountryId,
                 CurrencyId = request.CurrencyId,
-                FinancialMetricId = request.FinancialMetricId
+                FinancialMetricId = request.FinancialMetricId,
+                Isin = request.Isin
             };
             _repository.Add(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -44,7 +45,8 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.CreateInvestI
                 RegionId = entity.RegionId,
                 CountryId = entity.CountryId,
                 CurrencyId = entity.CurrencyId,
-                FinancialMetricId = entity.FinancialMetricId
+                FinancialMetricId = entity.FinancialMetricId,
+                Isin = entity.Isin
             };
         }
     }

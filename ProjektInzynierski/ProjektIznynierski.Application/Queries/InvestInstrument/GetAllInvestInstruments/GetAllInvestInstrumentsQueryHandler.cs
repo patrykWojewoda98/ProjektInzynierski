@@ -30,7 +30,8 @@ namespace ProjektIznynierski.Application.Queries.InvestInstrument.GetAllInvestIn
                 RegionId = i.RegionId,
                 CountryId = i.CountryId,
                 CurrencyId = i.CurrencyId,
-                FinancialMetricId = i.FinancialMetricId
+                FinancialMetricId = i.FinancialMetricId,
+                Isin = i.Isin
             }).ToList();
         }
     }

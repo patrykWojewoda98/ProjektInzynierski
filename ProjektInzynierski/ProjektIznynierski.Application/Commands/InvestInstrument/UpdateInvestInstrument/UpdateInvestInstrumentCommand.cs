@@ -16,5 +16,6 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestI
         public int CountryId { get; set; }
         public int CurrencyId { get; set; }
         public int? FinancialMetricId { get; set; }
+        public string Isin { get; set; }
     }
 }
