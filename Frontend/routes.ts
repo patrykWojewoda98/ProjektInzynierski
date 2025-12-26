@@ -12,4 +12,7 @@ export const ROUTES = {
   FINANCIAL_REPORT: "/financialReport",
   FINANCIAL_METRIC: "/financialMetric/financialMetric",
   FINANCIAL_METRIC_PREVIEW: "/financialMetric/financialMetricPreview",
+  FINANCIAL_REPORT_BY_INSTRUMENT:
+    "/financialReport/financialReportsByInstrument",
+  CREATE_FINANCIAL_REPORT_BY_AI: "/financialReport/createFinancialReportByAI",
 } as const;

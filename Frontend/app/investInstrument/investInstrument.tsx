@@ -148,7 +148,13 @@ const InvestInstrument = () => {
             </Text>
 
             <TouchableOpacity
-              style={[globalStyles.buttonSmall, spacing.mt2]}
+              style={[
+                globalStyles.button,
+                globalStyles.fullWidth,
+                globalStyles.buttonDisabled,
+                spacing.py2,
+                spacing.mt1,
+              ]}
               onPress={() =>
                 router.push({
                   pathname: ROUTES.FINANCIAL_METRIC,

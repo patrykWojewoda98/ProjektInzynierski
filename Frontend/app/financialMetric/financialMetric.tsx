@@ -100,11 +100,32 @@ const FinancialMetric = () => {
           globalStyles.button,
           globalStyles.fullWidth,
           globalStyles.buttonDisabled,
-          spacing.py3,
+          spacing.py2,
         ]}
       >
         <Text style={globalStyles.buttonText}>AI Investment Insight</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          globalStyles.fullWidth,
+          globalStyles.buttonDisabled,
+          spacing.py2,
+          spacing.mt1,
+        ]}
+        onPress={() =>
+          router.push({
+            pathname: ROUTES.FINANCIAL_REPORT_BY_INSTRUMENT,
+            params: { id: id },
+          })
+        }
+      >
+        <Text style={globalStyles.buttonText}>
+          See All Financial Reports Details
+        </Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={[spacing.mt6]}
         onPress={() => router.push({ pathname: ROUTES.MAIN_MENU })}

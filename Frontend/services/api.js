@@ -150,6 +150,19 @@ const ApiService = {
     }
   },
 
+  // FinancialReport endpoints
+  async getFinancialReportsByInvestInstrumentId(instrumentId) {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/FinancialReport/invest-instrument/${instrumentId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching financial reports:", error);
+      throw error;
+    }
+  },
+
   //Sector endpoints
   async getSectors() {
     try {
