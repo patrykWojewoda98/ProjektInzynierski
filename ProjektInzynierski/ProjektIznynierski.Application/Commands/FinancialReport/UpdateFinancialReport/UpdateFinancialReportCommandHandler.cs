@@ -23,7 +23,6 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.UpdateFinancia
             }
 
             entity.InvestInstrumentId = request.InvestInstrumentId;
-            entity.ReportDate = request.ReportDate;
             entity.Period = request.Period;
             entity.Revenue = request.Revenue;
             entity.NetIncome = request.NetIncome;
@@ -40,7 +39,6 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.UpdateFinancia
             {
                 Id = entity.Id,
                 InvestInstrumentId = entity.InvestInstrumentId,
-                ReportDate = entity.ReportDate,
                 Period = entity.Period,
                 Revenue = entity.Revenue,
                 NetIncome = entity.NetIncome,

@@ -6,7 +6,6 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.CreateFinancia
     public class CreateFinancialReportCommand : IRequest<FinancialReportDto>
     {
         public int InvestInstrumentId { get; set; }
-        public DateTime ReportDate { get; set; }
         public string Period { get; set; }
         public decimal? Revenue { get; set; }
         public decimal? NetIncome { get; set; }

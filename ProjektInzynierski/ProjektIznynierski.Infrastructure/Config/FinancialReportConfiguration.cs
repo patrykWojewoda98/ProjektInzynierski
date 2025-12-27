@@ -13,9 +13,6 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(fr => fr.InvestInstrumentId)
                    .IsRequired();
 
-            builder.Property(fr => fr.ReportDate)
-                   .HasColumnType("datetime2")
-                   .IsRequired();
 
             builder.Property(fr => fr.Period)
                    .HasMaxLength(50)
@@ -48,6 +45,9 @@ namespace ProjektIznynierski.Infrastructure.Config
             builder.Property(fr => fr.FreeCashFlow)
                    .HasColumnType("decimal(18,4)")
                    .IsRequired(false);
+
+            builder.HasIndex(fr => new { fr.InvestInstrumentId, fr.Period })
+                    .IsUnique();
 
             builder.HasOne(fr => fr.InvestInstrument)
                    .WithMany(ii => ii.FinancialReports)

@@ -19,7 +19,6 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.CreateFinancia
             var entity = new Domain.Entities.FinancialReport
             {
                 InvestInstrumentId = request.InvestInstrumentId,
-                ReportDate = request.ReportDate,
                 Period = request.Period,
                 Revenue = request.Revenue,
                 NetIncome = request.NetIncome,
@@ -29,6 +28,13 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.CreateFinancia
                 OperatingCashFlow = request.OperatingCashFlow,
                 FreeCashFlow = request.FreeCashFlow
             };
+            if (await _repository.ExistsAsync(
+                entity.InvestInstrumentId,
+                entity.Period,
+                cancellationToken))
+            {
+                throw new Exception($"FinancialReport for InvestInstrumentId {entity.InvestInstrumentId} and Period {entity.Period} already exists.");
+            }
             _repository.Add(entity);
             await _unitOfWork.SaveChangesAsync();
 
@@ -36,7 +42,6 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.CreateFinancia
             {
                 Id = entity.Id,
                 InvestInstrumentId = entity.InvestInstrumentId,
-                ReportDate = entity.ReportDate,
                 Period = entity.Period,
                 Revenue = entity.Revenue,
                 NetIncome = entity.NetIncome,

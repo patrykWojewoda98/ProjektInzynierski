@@ -31,5 +31,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                 .Where(i => i.InvestmentTypeId == id)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<InvestInstrument?> GetByIsinAsync(string isin, CancellationToken ct)
+        {
+            return await _dbContext.Set<InvestInstrument>()
+                .SingleOrDefaultAsync(i => i.Isin == isin, ct);
+        }
     }
 }

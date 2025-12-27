@@ -4,7 +4,6 @@ namespace ProjektIznynierski.Application.Dtos
     {
         public int Id { get; set; }
         public int InvestInstrumentId { get; set; }
-        public DateTime ReportDate { get; set; }
         public string Period { get; set; }
         public decimal? Revenue { get; set; }
         public decimal? NetIncome { get; set; }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProjektInzynierski.Application.Interfaces;
 using ProjektInzynierski.Infrastructure.Services;
+using ProjektIznynierski.Application.Services.Sources;
 using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Infrastructure.Context;
 using ProjektIznynierski.Infrastructure.Repositories;
@@ -40,6 +41,8 @@ namespace ProjektIznynierski.Infrastructure
 
             services.AddScoped<IJwtTokenService, JwtService>();
             services.AddHttpClient<IChatGPTService, ChatGPTService>();
+            services.AddScoped<IStrefaInwestorowClientService, StrefaInwestorowClientService>();    
+
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>
             {

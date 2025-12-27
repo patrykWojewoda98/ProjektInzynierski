@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ProjektIznynierski.Application.Commands.FinancialReport.CreateFinancialReport;
 using ProjektIznynierski.Application.Commands.FinancialReport.DeleteFinancialReport;
+using ProjektIznynierski.Application.Commands.FinancialReport.ImportFinancialReports;
 using ProjektIznynierski.Application.Commands.FinancialReport.UpdateFinancialReport;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.FinancialReport.GetAllFinancialReports;
@@ -54,6 +55,28 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPost("import")]
+        [SwaggerOperation(Summary = "Import financial reports by ISIN", Description = "Automatically imports all available historical financial reports for a given ISIN.")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ImportByIsin(
+        [FromBody] ImportFinancialReportsCommand request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Isin))
+                return BadRequest("ISIN is required.");
+
+            var importedCount = await _mediator.Send(
+                new ImportFinancialReportsCommand
+                {
+                    Isin = request.Isin
+                });
+
+            return Ok(new
+            {
+                importedReports = importedCount
+            });
         }
 
         [HttpPut("{id}")]

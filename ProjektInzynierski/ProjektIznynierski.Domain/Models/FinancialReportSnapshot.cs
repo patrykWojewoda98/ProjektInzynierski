@@ -1,13 +1,9 @@
-using MediatR;
-using ProjektIznynierski.Application.Dtos;
-
-namespace ProjektIznynierski.Application.Commands.FinancialReport.UpdateFinancialReport
+﻿namespace ProjektInzynierski.Domain.Models
 {
-    public class UpdateFinancialReportCommand : IRequest<FinancialReportDto>
+    public class FinancialReportSnapshot
     {
-        public int Id { get; set; }
-        public int InvestInstrumentId { get; set; }
         public string Period { get; set; }
+
         public decimal? Revenue { get; set; }
         public decimal? NetIncome { get; set; }
         public decimal? EPS { get; set; }
@@ -16,4 +12,5 @@ namespace ProjektIznynierski.Application.Commands.FinancialReport.UpdateFinancia
         public decimal? OperatingCashFlow { get; set; }
         public decimal? FreeCashFlow { get; set; }
     }
+
 }

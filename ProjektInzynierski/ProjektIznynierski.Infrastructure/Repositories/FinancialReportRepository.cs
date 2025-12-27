@@ -18,5 +18,14 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                 .Where(fr => fr.InvestInstrumentId == instrumentId)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<bool> ExistsAsync(int investInstrumentId,string period,CancellationToken ct)
+        {
+            return await _dbContext.FinancialReports
+                .AnyAsync(fr =>
+                    fr.InvestInstrumentId == investInstrumentId &&
+                    fr.Period == period,
+                    ct);
+        }
     }
 }

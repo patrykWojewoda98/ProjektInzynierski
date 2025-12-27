@@ -21,7 +21,6 @@ namespace ProjektIznynierski.Application.Queries.FinancialReport.GetAllFinancial
             {
                 Id = fr.Id,
                 InvestInstrumentId = fr.InvestInstrumentId,
-                ReportDate = fr.ReportDate,
                 Period = fr.Period,
                 Revenue = fr.Revenue,
                 NetIncome = fr.NetIncome,

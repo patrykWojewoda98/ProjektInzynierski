@@ -35,7 +35,6 @@ namespace ProjektIznynierski.Application.Queries.FinancialReport.GetFinancialRep
                 OperatingCashFlow = r.OperatingCashFlow,
                 FreeCashFlow = r.FreeCashFlow,
                 InvestInstrumentId = r.InvestInstrumentId,
-                ReportDate = r.ReportDate
 
             }).ToList();
         }

@@ -4,8 +4,6 @@
     {
         public int InvestInstrumentId { get; set; }
         public InvestInstrument InvestInstrument { get; set; }
-
-        public DateTime ReportDate { get; set; }
         public string Period { get; set; } // e.g. "Q1 2024", "FY 2023"
 
         public decimal? Revenue { get; set; }
