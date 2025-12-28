@@ -1,21 +1,24 @@
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 import { ROUTES } from "../../routes";
+import { AuthContext } from "../_layout";
 
 const InvestInstrument = () => {
   const router = useRouter();
+  const { user } = useContext(AuthContext);
 
   const [regions, setRegions] = useState([]);
   const [sectors, setSectors] = useState([]);
@@ -26,7 +29,37 @@ const InvestInstrument = () => {
   const [selectedSector, setSelectedSector] = useState<number | null>(null);
   const [selectedType, setSelectedType] = useState<number | null>(null);
 
+  const [watchListItems, setWatchListItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleToggleWatchList = async (instrumentId: number) => {
+    if (!user?.id) return;
+
+    if (watchListItems.includes(instrumentId)) return;
+
+    try {
+      await ApiService.addWatchListItem(user.id, instrumentId);
+
+      setWatchListItems((prev) => [...prev, instrumentId]);
+    } catch (err) {
+      console.error("Error adding to watchlist:", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadWatchList = async () => {
+      if (!user?.id) return;
+
+      try {
+        const items = await ApiService.getWatchListItemsByClientId(user.id);
+        setWatchListItems(items.map((x) => x.investInstrumentId));
+      } catch (err) {
+        console.error("Error loading watchlist:", err);
+      }
+    };
+
+    loadWatchList();
+  }, [user]);
 
   useEffect(() => {
     const loadFilters = async () => {
@@ -36,6 +69,7 @@ const InvestInstrument = () => {
           ApiService.getSectors(),
           ApiService.getInvestInstruments(),
         ]);
+
         setRegions(r);
         setSectors(s);
         setTypes(t);
@@ -47,6 +81,7 @@ const InvestInstrument = () => {
     loadFilters();
   }, []);
 
+  // 🔹 LOAD INSTRUMENTS
   useEffect(() => {
     const loadInstruments = async () => {
       let data = [];
@@ -81,9 +116,9 @@ const InvestInstrument = () => {
       <Text style={globalStyles.label}>Region</Text>
       <View style={globalStyles.pickerWrapper}>
         <Picker
+          selectedValue={selectedRegion}
           style={globalStyles.pickerText}
           dropdownIconColor={COLORS.textGrey}
-          selectedValue={selectedRegion}
           onValueChange={(v) => {
             setSelectedRegion(v);
             setSelectedSector(null);
@@ -101,9 +136,9 @@ const InvestInstrument = () => {
       <Text style={globalStyles.label}>Sector</Text>
       <View style={globalStyles.pickerWrapper}>
         <Picker
+          selectedValue={selectedSector}
           style={globalStyles.pickerText}
           dropdownIconColor={COLORS.textGrey}
-          selectedValue={selectedSector}
           onValueChange={(v) => {
             setSelectedSector(v);
             setSelectedRegion(null);
@@ -121,9 +156,9 @@ const InvestInstrument = () => {
       <Text style={globalStyles.label}>Type</Text>
       <View style={globalStyles.pickerWrapper}>
         <Picker
+          selectedValue={selectedType}
           style={globalStyles.pickerText}
           dropdownIconColor={COLORS.textGrey}
-          selectedValue={selectedType}
           onValueChange={(v) => {
             setSelectedType(v);
             setSelectedRegion(null);
@@ -137,10 +172,24 @@ const InvestInstrument = () => {
         </Picker>
       </View>
 
-      {/* TABLE */}
+      {/* INSTRUMENTS */}
       <View style={[spacing.mt3, globalStyles.fullWidth]}>
         {instruments.map((i) => (
-          <View key={i.id} style={globalStyles.card}>
+          <View
+            key={i.id}
+            style={[globalStyles.card, { position: "relative" }]}
+          >
+            <TouchableOpacity
+              style={[globalStyles.star]}
+              onPress={() => handleToggleWatchList(i.id)}
+            >
+              <Ionicons
+                name={watchListItems.includes(i.id) ? "star" : "star-outline"}
+                size={26}
+                color="white"
+              />
+            </TouchableOpacity>
+
             <Text style={globalStyles.cardTitle}>Ticker: {i.ticker}</Text>
             <Text style={globalStyles.text}>Name: {i.name}</Text>
             <Text style={globalStyles.textSmall}>
@@ -151,7 +200,6 @@ const InvestInstrument = () => {
               style={[
                 globalStyles.button,
                 globalStyles.fullWidth,
-                globalStyles.buttonDisabled,
                 spacing.py2,
                 spacing.mt1,
               ]}

@@ -276,6 +276,12 @@ export const globalStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+  star: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
 });
 
 // Export individual spacing utilities

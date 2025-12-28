@@ -205,6 +205,22 @@ const ApiService = {
     );
     return res.data;
   },
+
+  // WatchListItem endpoints
+  async getWatchListItemsByClientId(clientId) {
+    const response = await axios.get(
+      `${API_BASE_URL}/WatchListItem/client/${clientId}`
+    );
+    return response.data;
+  },
+
+  async addWatchListItem(clientId, investInstrumentId) {
+    const response = await axios.post(`${API_BASE_URL}/WatchListItem`, {
+      clientId,
+      investInstrumentId,
+    });
+    return response.data;
+  },
 };
 
 export default ApiService;

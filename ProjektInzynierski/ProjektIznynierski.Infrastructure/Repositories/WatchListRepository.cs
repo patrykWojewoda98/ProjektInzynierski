@@ -11,6 +11,25 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
         }
 
+        public async Task<WatchList> FindOrCreateWatchListByClientIdAsync(int clientId)
+        {
+            var watchList = await _dbContext.WatchLists
+                .FirstOrDefaultAsync(w => w.ClientId == clientId);
+
+            if (watchList != null)
+                return watchList;
+
+            watchList = new WatchList
+            {
+                ClientId = clientId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _dbContext.WatchLists.Add(watchList);
+
+            return watchList;
+        }
+
         public async Task<List<WatchListItem>> GetWatchListItemsByClientIdAsync(int clientId)
         {
             return await _dbContext.WatchListItems
@@ -24,5 +43,7 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                 .Where(wli => wli.WatchListId == watchListId)
                 .ToListAsync();
         }
+
+        
     }
 }

@@ -6,5 +6,6 @@ namespace ProjektIznynierski.Domain.Abstractions
     {
         Task<List<WatchListItem>> GetWatchListItemsByWatchListIdAsync(int watchListId);
         Task<List<WatchListItem>> GetWatchListItemsByClientIdAsync(int clientId);
+        Task<WatchList> FindOrCreateWatchListByClientIdAsync(int clientId);
     }
 }

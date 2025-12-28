@@ -2,27 +2,54 @@ using MediatR;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
 
+
 namespace ProjektIznynierski.Application.Commands.WatchListItem.CreateWatchListItem
 {
-    internal class CreateWatchListItemCommandHandler : IRequestHandler<CreateWatchListItemCommand, WatchListItemDto>
+    internal class CreateWatchListItemCommandHandler
+        : IRequestHandler<CreateWatchListItemCommand, WatchListItemDto>
     {
-        private readonly IWatchListItemRepository _repository;
+        private readonly IWatchListItemRepository _watchListItemRepository;
+        private readonly IWatchListRepository _watchListRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public CreateWatchListItemCommandHandler(IWatchListItemRepository repository, IUnitOfWork unitOfWork)
+
+        public CreateWatchListItemCommandHandler(
+            IWatchListItemRepository watchListItemRepository,
+            IWatchListRepository watchListRepository,
+            IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _watchListItemRepository = watchListItemRepository;
+            _watchListRepository = watchListRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<WatchListItemDto> Handle(CreateWatchListItemCommand request, CancellationToken cancellationToken)
+        public async Task<WatchListItemDto> Handle(CreateWatchListItemCommand request,CancellationToken cancellationToken)
         {
+            var watchList =
+                await _watchListRepository.FindOrCreateWatchListByClientIdAsync(
+                    request.ClientId);
+
+            var exists = await _watchListItemRepository.ExistsAsync(
+                watchList.Id,
+                request.InvestInstrumentId);
+
+            if (exists)
+            {
+                return new WatchListItemDto
+                {
+                    WatchListId = watchList.Id,
+                    InvestInstrumentId = request.InvestInstrumentId
+                };
+            }
+
             var entity = new Domain.Entities.WatchListItem
             {
-                WatchListId = request.WatchListId,
+                WatchList = watchList,
                 InvestInstrumentId = request.InvestInstrumentId,
-                AddedAt = request.AddedAt
+                AddedAt = DateTime.UtcNow
             };
-            _repository.Add(entity);
+
+            _watchListItemRepository.Add(entity);
+
             await _unitOfWork.SaveChangesAsync();
 
             return new WatchListItemDto
@@ -33,5 +60,6 @@ namespace ProjektIznynierski.Application.Commands.WatchListItem.CreateWatchListI
                 AddedAt = entity.AddedAt
             };
         }
+
     }
 }

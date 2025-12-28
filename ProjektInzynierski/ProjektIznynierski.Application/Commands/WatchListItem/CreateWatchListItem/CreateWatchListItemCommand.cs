@@ -5,7 +5,7 @@ namespace ProjektIznynierski.Application.Commands.WatchListItem.CreateWatchListI
 {
     public class CreateWatchListItemCommand : IRequest<WatchListItemDto>
     {
-        public int WatchListId { get; set; }
+        public int ClientId { get; set; }
         public int InvestInstrumentId { get; set; }
         public DateTime AddedAt { get; set; }
     }

@@ -103,7 +103,7 @@ const FinancialReportsByInstrument = () => {
         }
       >
         <Text style={globalStyles.buttonText}>
-          Create new Financial Report Data
+          Downolad new Financial Report Data
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
