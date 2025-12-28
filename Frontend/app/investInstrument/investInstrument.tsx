@@ -25,42 +25,62 @@ const InvestInstrument = () => {
   const [types, setTypes] = useState([]);
   const [instruments, setInstruments] = useState([]);
 
-  const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
-  const [selectedSector, setSelectedSector] = useState<number | null>(null);
-  const [selectedType, setSelectedType] = useState<number | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [selectedSector, setSelectedSector] = useState(null);
+  const [selectedType, setSelectedType] = useState(null);
 
-  const [watchListItems, setWatchListItems] = useState<number[]>([]);
+  const [watchListItems, setWatchListItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [watchListLoaded, setWatchListLoaded] = useState(false);
 
-  const handleToggleWatchList = async (instrumentId: number) => {
+  // ⭐ ADD TO WATCHLIST (only add, no remove yet)
+  const handleToggleWatchList = async (instrumentId) => {
     if (!user?.id) return;
-
-    if (watchListItems.includes(instrumentId)) return;
+    if (watchListItems.includes(Number(instrumentId))) return;
 
     try {
       await ApiService.addWatchListItem(user.id, instrumentId);
-
-      setWatchListItems((prev) => [...prev, instrumentId]);
+      setWatchListItems((prev) => [...prev, Number(instrumentId)]);
     } catch (err) {
       console.error("Error adding to watchlist:", err);
     }
   };
 
+  // ⭐ LOAD WATCHLIST
   useEffect(() => {
     const loadWatchList = async () => {
-      if (!user?.id) return;
+      if (!user?.id) {
+        setWatchListLoaded(true);
+        return;
+      }
 
       try {
-        const items = await ApiService.getWatchListItemsByClientId(user.id);
-        setWatchListItems(items.map((x) => x.investInstrumentId));
+        console.log("Loading watchlist for user ID:", user.id);
+        const raw = await ApiService.getWatchListItemsByClientId(user.id);
+
+        console.log("WATCHLIST RAW:", raw);
+
+        const arr = Array.isArray(raw) ? raw : [raw];
+
+        const ids = arr
+          .map((x) => Number(x.investInstrumentId))
+          .filter((v) => !isNaN(v));
+
+        console.log("WATCHLIST IDS:", ids);
+
+        setWatchListItems(ids);
       } catch (err) {
         console.error("Error loading watchlist:", err);
+        setWatchListItems([]);
+      } finally {
+        setWatchListLoaded(true);
       }
     };
 
     loadWatchList();
   }, [user]);
 
+  // 🔹 LOAD FILTERS
   useEffect(() => {
     const loadFilters = async () => {
       try {
@@ -102,7 +122,8 @@ const InvestInstrument = () => {
     loadInstruments();
   }, [selectedRegion, selectedSector, selectedType]);
 
-  if (loading) {
+  // ⏳ WAIT UNTIL EVERYTHING IS READY
+  if (loading || !watchListLoaded) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
@@ -180,11 +201,15 @@ const InvestInstrument = () => {
             style={[globalStyles.card, { position: "relative" }]}
           >
             <TouchableOpacity
-              style={[globalStyles.star]}
+              style={globalStyles.star}
               onPress={() => handleToggleWatchList(i.id)}
             >
               <Ionicons
-                name={watchListItems.includes(i.id) ? "star" : "star-outline"}
+                name={
+                  watchListItems.includes(Number(i.id))
+                    ? "star"
+                    : "star-outline"
+                }
                 size={26}
                 color="white"
               />

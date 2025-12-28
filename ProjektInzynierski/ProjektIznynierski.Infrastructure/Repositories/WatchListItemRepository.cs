@@ -14,7 +14,10 @@ namespace ProjektIznynierski.Infrastructure.Repositories
 
         public async Task<List<WatchListItem>> GetAllWatchListItemsByClientId(int clientId, CancellationToken cancellationToken)
         {
-            return await _dbContext.WatchListItems.Where(x => x.Id == clientId).ToListAsync(cancellationToken);
+            return await _dbContext.WatchListItems
+        .Include(wli => wli.WatchList)          // ⬅️ JOIN
+        .Where(wli => wli.WatchList.ClientId == clientId)
+        .ToListAsync(cancellationToken);
         }
 
         public async Task<bool> ExistsAsync(int watchListId, int investInstrumentId)

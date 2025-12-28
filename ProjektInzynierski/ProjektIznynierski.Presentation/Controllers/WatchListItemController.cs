@@ -45,9 +45,9 @@ namespace ProjektIznynierski.Presentation.Controllers
         [HttpGet("client/{clientId}")]
         [SwaggerOperation(Summary = "Get Watch List Items by ClientID", Description = "Retrieves all watch list items ClientID.")]
         [ProducesResponseType(typeof(WatchListItemDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetClientWatchListItems(int id)
+        public async Task<IActionResult> GetClientWatchListItems([FromRoute] int clientId)
         {
-            var result = await _mediator.Send(new GetAllWatchListItemsByClientIdQuery(id));
+            var result = await _mediator.Send(new GetAllWatchListItemsByClientIdQuery(clientId));
             return Ok(result);
         }
 

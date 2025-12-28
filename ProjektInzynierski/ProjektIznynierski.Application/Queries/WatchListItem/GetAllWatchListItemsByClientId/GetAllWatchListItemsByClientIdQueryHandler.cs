@@ -14,7 +14,7 @@ namespace ProjektIznynierski.Application.Queries.WatchListItem.GetAllWatchListIt
         }
         public async Task<List<WatchListItemDto>> Handle(GetAllWatchListItemsByClientIdQuery request, CancellationToken cancellationToken)
         {
-            var watchListItems = await _watchListItemRepository.GetAllWatchListItemsByClientId(request.id, cancellationToken);
+            var watchListItems = await _watchListItemRepository.GetAllWatchListItemsByClientId(request.ClientId, cancellationToken);
 
             return watchListItems.Select(wli => new WatchListItemDto
             {
