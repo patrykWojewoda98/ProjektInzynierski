@@ -221,6 +221,9 @@ const ApiService = {
     });
     return response.data;
   },
+  async deleteWatchListItem(id) {
+    await axios.delete(`${API_BASE_URL}/WatchListItem/${id}`);
+  },
 };
 
 export default ApiService;

@@ -29,20 +29,44 @@ const InvestInstrument = () => {
   const [selectedSector, setSelectedSector] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
 
-  const [watchListItems, setWatchListItems] = useState([]);
+  // ⭐ MAPA: investInstrumentId -> watchListItemId
+  const [watchListMap, setWatchListMap] = useState({});
+
   const [loading, setLoading] = useState(true);
   const [watchListLoaded, setWatchListLoaded] = useState(false);
 
-  // ⭐ ADD TO WATCHLIST (only add, no remove yet)
+  // ⭐ TOGGLE WATCHLIST (ADD / REMOVE)
   const handleToggleWatchList = async (instrumentId) => {
     if (!user?.id) return;
-    if (watchListItems.includes(Number(instrumentId))) return;
+
+    const instrumentKey = Number(instrumentId);
+    const watchListItemId = watchListMap[instrumentKey];
 
     try {
-      await ApiService.addWatchListItem(user.id, instrumentId);
-      setWatchListItems((prev) => [...prev, Number(instrumentId)]);
+      // 🔴 REMOVE
+      if (watchListItemId) {
+        await ApiService.deleteWatchListItem(watchListItemId);
+
+        setWatchListMap((prev) => {
+          const copy = { ...prev };
+          delete copy[instrumentKey];
+          return copy;
+        });
+      }
+      // 🟢 ADD
+      else {
+        const created = await ApiService.addWatchListItem(
+          user.id,
+          instrumentKey
+        );
+
+        setWatchListMap((prev) => ({
+          ...prev,
+          [instrumentKey]: created.id,
+        }));
+      }
     } catch (err) {
-      console.error("Error adding to watchlist:", err);
+      console.error("Error toggling watchlist:", err);
     }
   };
 
@@ -55,23 +79,19 @@ const InvestInstrument = () => {
       }
 
       try {
-        console.log("Loading watchlist for user ID:", user.id);
         const raw = await ApiService.getWatchListItemsByClientId(user.id);
-
-        console.log("WATCHLIST RAW:", raw);
 
         const arr = Array.isArray(raw) ? raw : [raw];
 
-        const ids = arr
-          .map((x) => Number(x.investInstrumentId))
-          .filter((v) => !isNaN(v));
+        const map = {};
+        arr.forEach((x) => {
+          map[Number(x.investInstrumentId)] = x.id;
+        });
 
-        console.log("WATCHLIST IDS:", ids);
-
-        setWatchListItems(ids);
+        setWatchListMap(map);
       } catch (err) {
         console.error("Error loading watchlist:", err);
-        setWatchListItems([]);
+        setWatchListMap({});
       } finally {
         setWatchListLoaded(true);
       }
@@ -205,11 +225,7 @@ const InvestInstrument = () => {
               onPress={() => handleToggleWatchList(i.id)}
             >
               <Ionicons
-                name={
-                  watchListItems.includes(Number(i.id))
-                    ? "star"
-                    : "star-outline"
-                }
+                name={watchListMap[Number(i.id)] ? "star" : "star-outline"}
                 size={26}
                 color="white"
               />
