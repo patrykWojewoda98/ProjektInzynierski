@@ -4,7 +4,7 @@ export const ROUTES = {
   LOGIN: "/auth/login",
   REGISTER: "/auth/register",
   INVEST_PROFILE: "/investProfile/investProfile",
-  WATCHLIST: "/watchList",
+  WATCHLIST: "/watchList/watchList",
   WALLET: "/wallet",
   TRADE_HISTORY: "/tradeHistory",
   MARKET_DATA: "/marketData",

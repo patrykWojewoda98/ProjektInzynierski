@@ -1,5 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ProjektIznynierski.Application.Commands.WalletInstrument.CreateWalletInstrument;
+using ProjektIznynierski.Application.Commands.WalletInstrument.DeleteWalletInstrument;
+using ProjektIznynierski.Application.Commands.WalletInstrument.UpdateWalletInstrument;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.WalletInstrument.GetAllWalletInstruments;
 using ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentById;
@@ -31,6 +34,42 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetWalletInstrumentByIdQuery(id));
             return Ok(result);
+        }
+
+        [HttpPost]
+        [SwaggerOperation(Summary = "Create a new Wallet Instrument", Description = "Creates a new Wallet Instrument with the provided details.")]
+        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateWalletInstrumentCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Update an existing Wallet Instrument", Description = "Updates an existing Wallet Instrument with the provided details.")]
+        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateWalletInstrumentCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("ID in the URL does not match the ID in the request body.");
+            }
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Delete a client", Description = "Deletes a specific Wallet Instrument by their ID.")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _mediator.Send(new DeleteWalletInstrumentCommand { Id = id });
+            return NoContent();
         }
     }
 }
