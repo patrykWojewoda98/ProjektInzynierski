@@ -11,6 +11,13 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
         }
 
+        public async Task<Wallet?> GetWalletByClientIdAsync(int clientId)
+        {
+            return await _dbContext.Wallets
+                .FirstOrDefaultAsync(w => w.ClientId == clientId);
+        }
+
+
         public async Task<List<WalletInstrument>> GetWalletInstrumentsByWalletIdAsync(int walletId)
         {
             return await _dbContext.WalletInstruments

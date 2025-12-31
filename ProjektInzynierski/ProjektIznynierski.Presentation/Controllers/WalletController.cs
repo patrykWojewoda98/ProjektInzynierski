@@ -36,6 +36,17 @@ namespace ProjektIznynierski.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("client/{clientId}")]
+        [SwaggerOperation(Summary = "Get Wallet by Client ID",Description = "Retrieves a wallet for the specified client ID. If the wallet does not exist, it will be created automatically.")]
+        [ProducesResponseType(typeof(WalletDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetWalletByClientId(int clientId)
+        {
+            var result = await _mediator.Send(
+                new GetWalletByClientIdQuery(clientId));
+
+            return Ok(result);
+        }
+
         [HttpPost]
         [SwaggerOperation(Summary = "Create a new Wallet", Description = "Creates a new Wallet with the provided details.")]
         [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.Created)]

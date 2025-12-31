@@ -4,29 +4,29 @@ using ProjektIznynierski.Domain.Abstractions;
 
 namespace ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentById
 {
-    internal class GetWalletInstrumentByIdQueryHandler : IRequestHandler<GetWalletInstrumentByIdQuery, WalletInstrumentDto>
+    internal class GetWalletInstrumentsByWalletIdQueryHandler: IRequestHandler<GetWalletInstrumentsByWalletIdQuery, List<WalletInstrumentDto>>
     {
-        private readonly IWalletInstrumentRepository _repository;
-        public GetWalletInstrumentByIdQueryHandler(IWalletInstrumentRepository repository)
+        private readonly IWalletRepository _walletRepository;
+
+        public GetWalletInstrumentsByWalletIdQueryHandler(IWalletRepository walletRepository)
         {
-            _repository = repository;
+            _walletRepository = walletRepository;
         }
 
-        public async Task<WalletInstrumentDto> Handle(GetWalletInstrumentByIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<WalletInstrumentDto>> Handle(
+            GetWalletInstrumentsByWalletIdQuery request,
+            CancellationToken cancellationToken)
         {
-            var entity = await _repository.GetByIdAsync(request.id, cancellationToken);
-            if (entity is null)
-            {
-                throw new Exception($"WalletInstrument with id {request.id} not found.");
-            }
+            var instruments = await _walletRepository
+                .GetWalletInstrumentsByWalletIdAsync(request.WalletId);
 
-            return new WalletInstrumentDto
+            return instruments.Select(wi => new WalletInstrumentDto
             {
-                Id = entity.Id,
-                WalletId = entity.WalletId,
-                InvestInstrumentId = entity.InvestInstrumentId,
-                Quantity = entity.Quantity
-            };
+                Id = wi.Id,
+                WalletId = wi.WalletId,
+                InvestInstrumentId = wi.InvestInstrumentId,
+                Quantity = wi.Quantity,
+            }).ToList();
         }
     }
 }

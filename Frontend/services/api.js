@@ -78,6 +78,20 @@ const ApiService = {
     }
   },
 
+  //Currency endpoints
+  async getCurrencyByID(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Currency/${id}`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw ["Client not found. Please check your ID."];
+      }
+      console.error("Error fetching client:", error);
+      throw ["An error occurred while fetching client data. Please try again."];
+    }
+  },
+
   // InvestProfile endpoints
   async createInvestProfile(profileDto) {
     try {
@@ -223,6 +237,19 @@ const ApiService = {
   },
   async deleteWatchListItem(id) {
     await axios.delete(`${API_BASE_URL}/WatchListItem/${id}`);
+  },
+
+  // Wallet endpoints
+  async getWalletByClientId(clientId) {
+    const res = await axios.get(`${API_BASE_URL}/Wallet/client/${clientId}`);
+    return res.data;
+  },
+
+  async getWalletInstrumentsByWalletId(walletId) {
+    const res = await axios.get(
+      `${API_BASE_URL}/WalletInstrument/wallet/${walletId}`
+    );
+    return res.data;
   },
 };
 

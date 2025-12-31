@@ -36,6 +36,17 @@ namespace ProjektIznynierski.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("wallet/{walletId}")]
+        [SwaggerOperation(Summary = "Get Wallet Instruments by Wallet ID",Description = "Retrieves all investment instruments assigned to the specified wallet.")]
+        [ProducesResponseType(typeof(IEnumerable<WalletInstrumentDto>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetByWalletId(int walletId)
+        {
+            var result = await _mediator.Send(
+                new GetWalletInstrumentsByWalletIdQuery(walletId));
+
+            return Ok(result);
+        }
+
         [HttpPost]
         [SwaggerOperation(Summary = "Create a new Wallet Instrument", Description = "Creates a new Wallet Instrument with the provided details.")]
         [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.Created)]
