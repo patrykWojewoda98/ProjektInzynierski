@@ -1,32 +1,35 @@
 ﻿using MediatR;
 using ProjektIznynierski.Application.Dtos;
+using ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentById;
 using ProjektIznynierski.Domain.Abstractions;
 
-namespace ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentById
+namespace ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentsByWalletId;
+
+internal class GetWalletInstrumentsByWalletIdQueryHandler
+    : IRequestHandler<GetWalletInstrumentsByWalletIdQuery, List<WalletInstrumentDto>>
 {
-    internal class GetWalletInstrumentByIdQueryHandler : IRequestHandler<GetWalletInstrumentByIdQuery, WalletInstrumentDto>
+    private readonly IWalletInstrumentRepository _repository;
+
+    public GetWalletInstrumentsByWalletIdQueryHandler(
+        IWalletInstrumentRepository repository)
     {
-        private readonly IWalletInstrumentRepository _repository;
-        public GetWalletInstrumentByIdQueryHandler(IWalletInstrumentRepository repository)
-        {
-            _repository = repository;
-        }
+        _repository = repository;
+    }
 
-        public async Task<WalletInstrumentDto> Handle(GetWalletInstrumentByIdQuery request, CancellationToken cancellationToken)
-        {
-            var entity = await _repository.GetByIdAsync(request.id, cancellationToken);
-            if (entity is null)
-            {
-                throw new Exception($"WalletInstrument with id {request.id} not found.");
-            }
+    public async Task<List<WalletInstrumentDto>> Handle(
+        GetWalletInstrumentsByWalletIdQuery request,
+        CancellationToken cancellationToken)
+    {
+        var entities = await _repository
+            .GetByWalletIdAsync(request.WalletId, cancellationToken);
 
-            return new WalletInstrumentDto
-            {
-                Id = entity.Id,
-                WalletId = entity.WalletId,
-                InvestInstrumentId = entity.InvestInstrumentId,
-                Quantity = entity.Quantity
-            };
-        }
+        return entities.Select(entity => new WalletInstrumentDto
+        {
+            Id = entity.Id,
+            WalletId = entity.WalletId,
+            InvestInstrumentId = entity.InvestInstrumentId,
+            Quantity = entity.Quantity,
+            CreatedAt = entity.CreatedAt
+        }).ToList();
     }
 }

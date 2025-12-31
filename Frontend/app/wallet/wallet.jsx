@@ -20,7 +20,7 @@ const WalletScreen = () => {
 
   const [wallet, setWallet] = useState(null);
   const [currency, setCurrency] = useState(null);
-  const [walletInstruments, setWalletInstruments] = useState([]);
+  const [investmentSummary, setInvestmentSummary] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const WalletScreen = () => {
       if (!user?.id) return;
 
       try {
-        // 1️⃣ GET OR CREATE WALLET
+        // 1️⃣ GET WALLET
         const walletResponse = await ApiService.getWalletByClientId(user.id);
         setWallet(walletResponse);
 
@@ -38,11 +38,11 @@ const WalletScreen = () => {
         );
         setCurrency(currencyResponse);
 
-        // 3️⃣ GET WALLET INSTRUMENTS
-        const instruments = await ApiService.getWalletInstrumentsByWalletId(
+        // 3️⃣ GET INVESTMENT SUMMARY
+        const summary = await ApiService.getWalletInvestmentSummary(
           walletResponse.id
         );
-        setWalletInstruments(instruments);
+        setInvestmentSummary(summary);
       } catch (error) {
         console.error("Wallet load error:", error);
       } finally {
@@ -77,28 +77,62 @@ const WalletScreen = () => {
         </Text>
       </View>
 
-      {/* WALLET INSTRUMENTS */}
+      {/* MY INVESTMENTS */}
       <Text style={[globalStyles.header, spacing.mb3]}>My Investments</Text>
 
-      {walletInstruments.length === 0 ? (
+      {investmentSummary.length === 0 ? (
         <Text style={globalStyles.text}>
-          You don't have any investment instruments yet.
+          You don't have any investments yet.
         </Text>
       ) : (
-        walletInstruments.map((wi) => (
-          <View key={wi.id} style={[globalStyles.card, spacing.mb3]}>
-            <Text style={globalStyles.cardTitle}>
-              Instrument ID: {wi.investInstrumentId}
-            </Text>
-            <Text style={globalStyles.text}>Quantity: {wi.quantity}</Text>
-            <Text style={globalStyles.textSmall}>
-              Bought at: {new Date(wi.createdAt).toLocaleDateString()}
+        investmentSummary.map((item) => (
+          <View
+            key={item.instrumentId}
+            style={[globalStyles.card, spacing.mb3]}
+          >
+            <Text style={globalStyles.cardTitle}>{item.instrumentName}</Text>
+
+            <Text style={globalStyles.text}>
+              Total quantity: {item.totalQuantity}
             </Text>
           </View>
         ))
       )}
 
-      {/* BACK BUTTON */}
+      {/* NAVIGATION */}
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          globalStyles.fullWidth,
+          spacing.py2,
+          spacing.mt1,
+        ]}
+        onPress={() =>
+          router.push({
+            pathname: ROUTES.INVEST_INSTRUMENT,
+          })
+        }
+      >
+        <Text style={globalStyles.buttonText}>Show all Invest Instruments</Text>
+      </TouchableOpacity>
+
+      {/* NAVIGATION */}
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          globalStyles.fullWidth,
+          spacing.py2,
+          spacing.mt1,
+        ]}
+        onPress={() =>
+          router.push({
+            pathname: ROUTES.WALLET_HISTORY,
+          })
+        }
+      >
+        <Text style={globalStyles.buttonText}>Show My Wallet History</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={[spacing.mt6]}
         onPress={() => router.push(ROUTES.MAIN_MENU)}

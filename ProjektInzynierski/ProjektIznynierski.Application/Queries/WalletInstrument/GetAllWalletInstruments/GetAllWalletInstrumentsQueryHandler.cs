@@ -22,7 +22,8 @@ namespace ProjektIznynierski.Application.Queries.WalletInstrument.GetAllWalletIn
                 Id = wi.Id,
                 WalletId = wi.WalletId,
                 InvestInstrumentId = wi.InvestInstrumentId,
-                Quantity = wi.Quantity
+                Quantity = wi.Quantity,
+                CreatedAt = wi.CreatedAt
             }).ToList();
         }
     }

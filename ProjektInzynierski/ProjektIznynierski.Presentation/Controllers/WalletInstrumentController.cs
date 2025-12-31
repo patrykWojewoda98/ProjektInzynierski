@@ -6,6 +6,7 @@ using ProjektIznynierski.Application.Commands.WalletInstrument.UpdateWalletInstr
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.WalletInstrument.GetAllWalletInstruments;
 using ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentById;
+using ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInvestmentSummary;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
@@ -43,6 +44,15 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(
                 new GetWalletInstrumentsByWalletIdQuery(walletId));
+
+            return Ok(result);
+        }
+
+        [HttpGet("{walletId}/investments-summary")]
+        public async Task<IActionResult> GetInvestmentSummary(int walletId)
+        {
+            var result = await _mediator.Send(
+                new GetWalletInvestmentSummaryQuery(walletId));
 
             return Ok(result);
         }

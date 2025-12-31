@@ -20,7 +20,8 @@ namespace ProjektIznynierski.Application.Commands.WalletInstrument.CreateWalletI
             {
                 WalletId = request.WalletId,
                 InvestInstrumentId = request.InvestInstrumentId,
-                Quantity = request.Quantity
+                Quantity = request.Quantity,
+                CreatedAt = DateTime.UtcNow
             };
             _repository.Add(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -30,7 +31,8 @@ namespace ProjektIznynierski.Application.Commands.WalletInstrument.CreateWalletI
                 Id = entity.Id,
                 WalletId = entity.WalletId,
                 InvestInstrumentId = entity.InvestInstrumentId,
-                Quantity = entity.Quantity
+                Quantity = entity.Quantity,
+                CreatedAt = entity.CreatedAt
             };
         }
     }

@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
+  Alert,
   Text,
   TouchableOpacity,
   View,
@@ -29,13 +30,34 @@ const InvestInstrument = () => {
   const [selectedSector, setSelectedSector] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
 
-  // ⭐ MAPA: investInstrumentId -> watchListItemId
+  const [quantities, setQuantities] = useState({});
   const [watchListMap, setWatchListMap] = useState({});
 
   const [loading, setLoading] = useState(true);
   const [watchListLoaded, setWatchListLoaded] = useState(false);
 
-  // ⭐ TOGGLE WATCHLIST (ADD / REMOVE)
+  const setQuantity = (instrumentId, value) => {
+    const qty = Math.max(1, Number(value) || 1);
+    setQuantities((prev) => ({
+      ...prev,
+      [instrumentId]: qty,
+    }));
+  };
+
+  const handleAddToWallet = async (instrumentId) => {
+    if (!user?.id) return;
+
+    try {
+      const wallet = await ApiService.getWalletByClientId(user.id);
+      const quantity = quantities[instrumentId] ?? 1;
+
+      await ApiService.addWalletInstrument(wallet.id, instrumentId, quantity);
+      Alert.alert("Info", "Instrument added to wallet successfully.");
+    } catch (err) {
+      console.error("Error adding to wallet:", err);
+    }
+  };
+
   const handleToggleWatchList = async (instrumentId) => {
     if (!user?.id) return;
 
@@ -43,7 +65,6 @@ const InvestInstrument = () => {
     const watchListItemId = watchListMap[instrumentKey];
 
     try {
-      // 🔴 REMOVE
       if (watchListItemId) {
         await ApiService.deleteWatchListItem(watchListItemId);
 
@@ -52,9 +73,7 @@ const InvestInstrument = () => {
           delete copy[instrumentKey];
           return copy;
         });
-      }
-      // 🟢 ADD
-      else {
+      } else {
         const created = await ApiService.addWatchListItem(
           user.id,
           instrumentKey
@@ -70,7 +89,6 @@ const InvestInstrument = () => {
     }
   };
 
-  // ⭐ LOAD WATCHLIST
   useEffect(() => {
     const loadWatchList = async () => {
       if (!user?.id) {
@@ -236,6 +254,72 @@ const InvestInstrument = () => {
             <Text style={globalStyles.textSmall}>
               Description: {i.description}
             </Text>
+            {/* QUANTITY + ADD TO WALLET */}
+            <View style={[spacing.mt2]}>
+              {/* Quantity row */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <Text style={globalStyles.text}>Quantity</Text>
+
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {/* MINUS */}
+                  <TouchableOpacity
+                    onPress={() =>
+                      setQuantity(i.id, (quantities[i.id] ?? 1) - 1)
+                    }
+                    style={{ padding: 6 }}
+                  >
+                    <Ionicons
+                      name="remove-circle-outline"
+                      size={26}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+
+                  {/* VALUE */}
+                  <Text
+                    style={[
+                      globalStyles.text,
+                      { minWidth: 30, textAlign: "center" },
+                    ]}
+                  >
+                    {quantities[i.id] ?? 1}
+                  </Text>
+
+                  {/* PLUS */}
+                  <TouchableOpacity
+                    onPress={() =>
+                      setQuantity(i.id, (quantities[i.id] ?? 1) + 1)
+                    }
+                    style={{ padding: 6 }}
+                  >
+                    <Ionicons
+                      name="add-circle-outline"
+                      size={26}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* ADD TO WALLET */}
+              <TouchableOpacity
+                style={[
+                  globalStyles.button,
+                  globalStyles.fullWidth,
+                  spacing.py2,
+                ]}
+                onPress={() => handleAddToWallet(i.id)}
+              >
+                <Text style={globalStyles.buttonText}>Add to Wallet</Text>
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
               style={[

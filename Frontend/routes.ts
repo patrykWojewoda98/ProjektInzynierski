@@ -6,7 +6,7 @@ export const ROUTES = {
   INVEST_PROFILE: "/investProfile/investProfile",
   WATCHLIST: "/watchList/watchList",
   WALLET: "/wallet/wallet",
-  TRADE_HISTORY: "/tradeHistory",
+  WALLET_HISTORY: "/walletHistory/walletHistory",
   MARKET_DATA: "/marketData",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
   FINANCIAL_REPORT: "/financialReport",

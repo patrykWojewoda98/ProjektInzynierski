@@ -6,5 +6,6 @@ namespace ProjektIznynierski.Application.Dtos
         public int WalletId { get; set; }
         public int InvestInstrumentId { get; set; }
         public decimal Quantity { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -35,7 +35,6 @@ const WatchList = () => {
     const watchListItemId = watchListMap[key];
 
     try {
-      // 🔴 REMOVE
       if (watchListItemId) {
         await ApiService.deleteWatchListItem(watchListItemId);
 
@@ -44,9 +43,11 @@ const WatchList = () => {
           delete copy[key];
           return copy;
         });
+
+        setInstruments((prev) => prev.filter((x) => x.id !== key));
       }
     } catch (err) {
-      console.error("Error removing from watchlist:", err);
+      console.error("Watchlist toggle error:", err);
     }
   };
 
@@ -114,7 +115,11 @@ const WatchList = () => {
               style={globalStyles.star}
               onPress={() => handleToggleWatchList(i.id)}
             >
-              <Ionicons name="star" size={26} color="white" />
+              <Ionicons
+                name={watchListMap[i.id] ? "star" : "star-outline"}
+                size={26}
+                color="white"
+              />
             </TouchableOpacity>
 
             <Text style={globalStyles.cardTitle}>Ticker: {i.ticker}</Text>

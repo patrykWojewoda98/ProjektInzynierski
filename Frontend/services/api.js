@@ -251,6 +251,21 @@ const ApiService = {
     );
     return res.data;
   },
+
+  async addWalletInstrument(walletId, investInstrumentId, quantity) {
+    const response = await axios.post(`${API_BASE_URL}/WalletInstrument`, {
+      walletId,
+      investInstrumentId,
+      quantity,
+    });
+    return response.data;
+  },
+  async getWalletInvestmentSummary(walletId) {
+    const res = await axios.get(
+      `${API_BASE_URL}/WalletInstrument/${walletId}/investments-summary`
+    );
+    return res.data;
+  },
 };
 
 export default ApiService;
