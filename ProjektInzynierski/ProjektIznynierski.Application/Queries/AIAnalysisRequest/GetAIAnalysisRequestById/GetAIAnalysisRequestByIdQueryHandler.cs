@@ -12,19 +12,25 @@ namespace ProjektIznynierski.Application.Queries.AIAnalysisRequest.GetAIAnalysis
             _repository = repository;
         }
 
-        public async Task<AIAnalysisRequestDto> Handle(GetAIAnalysisRequestByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AIAnalysisRequestDto> Handle(
+           GetAIAnalysisRequestByIdQuery request,
+           CancellationToken cancellationToken)
         {
-            var entity = await _repository.GetByIdAsync(request.id, cancellationToken);
+            var entity = await _repository.GetByIdAsync(request.id,cancellationToken);
+
             if (entity is null)
             {
-                throw new Exception($"AIAnalysisRequest with id {request.id} not found.");
+                throw new Exception(
+                    $"AIAnalysisRequest with id {request.id} not found.");
             }
 
             return new AIAnalysisRequestDto
             {
                 Id = entity.Id,
-                FinancialReportId = entity.FinancialReportId,
-                InvestProfileId = entity.InvestProfileId
+                InvestInstrumentId = entity.InvestInstrumentId,
+                ClientId = entity.ClientId,
+                AIAnalysisResultId = entity.AIAnalysisResultId,
+                CreatedAt = entity.CreatedAt
             };
         }
     }

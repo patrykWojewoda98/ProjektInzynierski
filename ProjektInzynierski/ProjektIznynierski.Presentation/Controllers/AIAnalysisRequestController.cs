@@ -6,9 +6,10 @@ using ProjektIznynierski.Application.Queries.AIAnalysisRequest.GetAIAnalysisRequ
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnalysisRequest;
-using ProjektIznynierski.Application.Commands.AIAnalysisRequest.UpdateAIAnalysisRequest;
+
 using ProjektIznynierski.Application.Commands.AIAnalysisRequest.DeleteAIAnalysisRequest;
 using ProjektInzynierski.Application.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ProjektIznynierski.Presentation.Controllers
 {
@@ -49,21 +50,6 @@ namespace ProjektIznynierski.Presentation.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        [HttpPut("{id}")]
-        [SwaggerOperation(Summary = "Update an existing Analysis Request", Description = "Updates an existing Analysis Request with the provided details.")]
-        [ProducesResponseType(typeof(AIAnalysisRequestDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateAIAnalysisRequestCommand command)
-        {
-            if (id != command.Id)
-            {
-                return BadRequest("ID in the URL does not match the ID in the request body.");
-            }
-
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
 
         [HttpDelete("{id}")]
         [SwaggerOperation(Summary = "Delete a Analysis Request", Description = "Deletes a specific client by their ID.")]
@@ -75,42 +61,5 @@ namespace ProjektIznynierski.Presentation.Controllers
             return NoContent();
         }
 
-
-       
-        [HttpPost("ask-ai")]
-        [SwaggerOperation(
-            Summary = "Ask AI a question",
-            Description = "Sends a message to OpenAI GPT model and returns its response."
-        )]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> AskAI([FromBody] AIMessageRequest request)
-        {
-            if (string.IsNullOrWhiteSpace(request.Message))
-                return BadRequest("Message cannot be empty.");
-
-            try
-            {
-                var aiResponse = await _chatGPTService.GetResponseAsync(request.Message);
-
-                return Ok(new
-                {
-                    prompt = request.Message,
-                    response = aiResponse
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    new { error = "Error while communicating with OpenAI API", details = ex.Message });
-            }
-        }
-    }
-    /// <summary>
-    /// DTO do wysy³ania wiadomoœci do ChatGPT
-    /// </summary>
-    public class AIMessageRequest
-    {
-        public string Message { get; set; } = string.Empty;
     }
 }

@@ -27,7 +27,6 @@ using ProjektIznynierski.Application.Commands.TradeHistory.UpdateTradeHistory;
 using ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProfile;
 using ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProfile;
 using ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnalysisRequest;
-using ProjektIznynierski.Application.Commands.AIAnalysisRequest.UpdateAIAnalysisRequest;
 using ProjektIznynierski.Application.Commands.AIAnalysisResult.CreateAIAnalysisResult;
 using ProjektIznynierski.Application.Commands.AIAnalysisResult.UpdateAIAnalysisResult;
 using ProjektIznynierski.Application.Commands.WatchList.CreateWatchList;
@@ -90,7 +89,6 @@ namespace ProjektIznynierski.Application
             services.AddScoped<IValidator<UpdateInvestProfileCommand>, UpdateInvestProfileCommandValidation>();
 
             services.AddScoped<IValidator<CreateAIAnalysisRequestCommand>, CreateAIAnalysisRequestCommandValidation>();
-            services.AddScoped<IValidator<UpdateAIAnalysisRequestCommand>, UpdateAIAnalysisRequestCommandValidation>();
 
             services.AddScoped<IValidator<CreateAIAnalysisResultCommand>, CreateAIAnalysisResultCommandValidation>();
             services.AddScoped<IValidator<UpdateAIAnalysisResultCommand>, UpdateAIAnalysisResultCommandValidation>();

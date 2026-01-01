@@ -16,9 +16,6 @@ namespace ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProf
             RuleFor(x => x.AcceptableRiskLevelId)
                 .GreaterThan(0).WithMessage("AcceptableRiskLevelId can't be 0 or less.");
 
-            RuleFor(x => x.InvestHorizonId)
-                .InclusiveBetween(0, 5).WithMessage("Horyzont inwestycyjny musi być poprawną wartością enum.");
-
             RuleFor(x => x.TargetReturn)
                 .GreaterThanOrEqualTo(0).When(x => x.TargetReturn.HasValue).WithMessage("Docelowy zwrot nie może być ujemny.");
 

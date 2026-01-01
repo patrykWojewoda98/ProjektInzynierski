@@ -17,5 +17,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                 .AnyAsync(x => x.RiskLevelScale == riskScale);
         }
 
+        public async Task<RiskLevel> GetMaxRiskLevel()
+        {
+            return await _dbContext.RiskLevels
+                .OrderByDescending(x => x.RiskLevelScale).FirstAsync();
+        }
+
     }
 }

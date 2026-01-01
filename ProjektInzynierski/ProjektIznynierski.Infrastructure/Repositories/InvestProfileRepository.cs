@@ -11,5 +11,10 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
         }
 
+        public async Task<InvestProfile?> GetByClientIdAsync(int clientId,CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.InvestProfiles.FirstOrDefaultAsync(ip => ip.ClientId == clientId, cancellationToken);
+        }
+
     }
 }

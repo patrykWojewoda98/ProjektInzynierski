@@ -20,8 +20,10 @@ namespace ProjektIznynierski.Application.Queries.AIAnalysisRequest.GetAllAIAnaly
             return aiAnalysisRequests.Select(a => new AIAnalysisRequestDto
             {
                 Id = a.Id,
-                FinancialReportId = a.FinancialReportId,
-                InvestProfileId = a.InvestProfileId
+                InvestInstrumentId = a.InvestInstrumentId,
+                ClientId = a.ClientId,
+                AIAnalysisResultId = a.AIAnalysisResultId,
+                CreatedAt = a.CreatedAt
             }).ToList();
         }
     }

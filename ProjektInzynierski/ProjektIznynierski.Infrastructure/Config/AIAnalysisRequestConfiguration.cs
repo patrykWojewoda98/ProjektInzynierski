@@ -8,25 +8,23 @@ namespace ProjektIznynierski.Infrastructure.Config
     {
         public override void Configure(EntityTypeBuilder<AIAnalysisRequest> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("AIAnalysisRequests");
 
-            builder.Property(r => r.FinancialReportId)
+            builder.Property(x => x.InvestInstrumentId)
                    .IsRequired();
 
-            builder.Property(r => r.InvestProfileId)
+            builder.Property(x => x.ClientId)
                    .IsRequired();
 
-            builder.HasOne<FinancialReport>()
-                   .WithMany()
-                   .HasForeignKey(r => r.FinancialReportId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            builder.Property(x => x.AIAnalysisResultId)
+                   .IsRequired(false);
 
-            builder.HasOne<InvestProfile>()
+            builder.HasOne(x => x.AIAnalysisResult)
                    .WithMany()
-                   .HasForeignKey(r => r.InvestProfileId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            base.Configure(builder);
+                   .HasForeignKey(x => x.AIAnalysisResultId)
+                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

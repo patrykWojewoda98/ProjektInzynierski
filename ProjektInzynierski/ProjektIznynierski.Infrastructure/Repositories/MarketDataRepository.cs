@@ -10,5 +10,12 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         public MarketDataRepository(ProjektInzynierskiDbContext dbContext) : base(dbContext)
         {
         }
+        public async Task<MarketData?> GetLatestByInvestInstrumentIdAsync(int investInstrumentId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.MarketDatas
+                .Where(md => md.InvestInstrumentId == investInstrumentId)
+                .OrderByDescending(md => md.Date)
+                .FirstOrDefaultAsync();
+        }
     }
 }

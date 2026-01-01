@@ -1,4 +1,5 @@
-﻿using ProjektIznynierski.Domain.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
 using ProjektIznynierski.Infrastructure.Context;
 
@@ -10,14 +11,21 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
             
         }
-        public Task<FinancialReport> GetFinancialReportByIdAsync(int id, CancellationToken cancellationToken = default)
+
+        public async Task<List<AIAnalysisRequest>> GetByClientIdAsync(int clientId,CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.AIAnalysisRequests.Where(x => x.ClientId == clientId).ToListAsync(cancellationToken);
         }
 
-        public Task<InvestProfile> GetInvestProfileByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<AIAnalysisRequest?> GetPendingByInstrumentAndClientAsync(int investInstrumentId,int clientId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _dbContext.AIAnalysisRequests
+                .Where(x =>
+                    x.ClientId == clientId &&
+                    x.InvestInstrumentId == investInstrumentId &&
+                    x.AIAnalysisResultId == null)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
     }
