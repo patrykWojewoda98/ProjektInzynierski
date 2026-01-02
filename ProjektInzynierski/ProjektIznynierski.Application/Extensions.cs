@@ -37,6 +37,8 @@ using ProjektIznynierski.Application.Commands.InvestHorizon.UpdateInvestHorizon;
 using ProjektIznynierski.Application.Commands.RiskLevel.CreateRiskLevel;
 using ProjektIznynierski.Application.Commands.RiskLevel.UpdateRiskLevel;
 using MediatR;
+using ProjektIznynierski.Application.Commands.Employee.AddEmployee;
+using ProjektIznynierski.Application.Commands.Employee.UpdateEmployee;
 
 namespace ProjektIznynierski.Application
 {
@@ -103,6 +105,9 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<CreateInvestmentTypeCommand>, CreateInvestmentTypeCommandValidation>();
             services.AddScoped<IValidator<UpdateInvestmentTypeCommand>, UpdateInvestmentTypeCommandValidation>();
+
+            services.AddScoped<IValidator<AddEmployeeCommand>, AddEmployeeCommandValidation>();
+            services.AddScoped<IValidator<UpdateEmployeeCommand>, UpdateEmployeeCommandValidation>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 

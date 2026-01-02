@@ -28,6 +28,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<RegionCode> RegionCodes { get; set; }
         public DbSet<RiskLevel> RiskLevels { get; set; }
         public DbSet<TradeType> TradeTypes { get; set; }
+        public DbSet<Employee> Employees { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }

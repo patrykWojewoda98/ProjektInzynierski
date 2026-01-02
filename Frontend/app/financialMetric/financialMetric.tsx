@@ -25,20 +25,16 @@ const FinancialMetric = () => {
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
 
-  // 🔹 POBRANIE CLIENT ID Z TOKENA
   useEffect(() => {
     const loadClientId = async () => {
       const token = await AsyncStorage.getItem("userToken");
       const decoded = decodeToken(token);
-      console.log("Decoded token:", decoded);
       setClientId(decoded?.id ? Number(decoded.id) : null);
-      console.log("Client ID set to:", decoded?.id);
     };
 
     loadClientId();
   }, []);
 
-  // 🔹 POBRANIE INSTRUMENTU + METRYK
   useEffect(() => {
     if (!id) return;
 
@@ -63,7 +59,6 @@ const FinancialMetric = () => {
     loadData();
   }, [id]);
 
-  // 🔹 OBSŁUGA AI ANALYSIS
   const handleAIAnalysis = async () => {
     if (!clientId) {
       alert("Client not authenticated.");
@@ -74,8 +69,8 @@ const FinancialMetric = () => {
       setAiLoading(true);
 
       const request = await ApiService.createAnalysisRequest(
-        Number(id), // investInstrumentId
-        Number(clientId) // clientId
+        Number(id),
+        Number(clientId)
       );
 
       if (request.aiAnalysisResultId) {
@@ -152,6 +147,29 @@ const FinancialMetric = () => {
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={globalStyles.buttonText}>AI Investment Insight</Text>
+        )}
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          globalStyles.fullWidth,
+          spacing.py2,
+          spacing.mt1,
+        ]}
+        onPress={() =>
+          router.push({
+            pathname: ROUTES.FINANCIAL_REPORT_BY_INSTRUMENT,
+            params: { id: id },
+          })
+        }
+      >
+        {aiLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={globalStyles.buttonText}>
+            See Financial Reports Data
+          </Text>
         )}
       </TouchableOpacity>
 

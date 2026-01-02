@@ -38,6 +38,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IInvestHorizonRepository, InvestHorizonRepository>();
             services.AddScoped<IRiskLevelRepository, RiskLevelRepository>();
             services.AddScoped<IInvestmentTypeRepository, InvestmentTypeRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
             services.AddScoped<IJwtTokenService, JwtService>();
             services.AddHttpClient<IChatGPTService, ChatGPTService>();
