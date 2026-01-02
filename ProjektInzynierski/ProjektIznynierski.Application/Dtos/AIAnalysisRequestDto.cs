@@ -11,8 +11,5 @@ namespace ProjektIznynierski.Application.Dtos
 
         public DateTime CreatedAt { get; set; }
 
-        //TYMCZASOWO
-        public string? Prompt { get; set; }
-        public string? AIResponse { get; set; }
     }
 }
