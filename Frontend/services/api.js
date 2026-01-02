@@ -25,6 +25,38 @@ const ApiService = {
 
     return json;
   },
+
+  //AI Requests endpoints
+  async createAnalysisRequest(investInstrumentId, clientId) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/AIAnalysisRequest`, {
+        investInstrumentId,
+        clientId,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating analysis request:", error);
+      throw ["An error occurred while creating the analysis request."];
+    }
+  },
+  async getAnalysisRequestsByClientId(clientId) {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/AIAnalysisRequest/my-requests/${clientId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching analysis requests:", error);
+      throw ["An error occurred while fetching analysis requests."];
+    }
+  },
+
+  //AI Analysis Result endpoints
+  async getAIAnalysisResultById(id) {
+    const res = await axios.get(`${API_BASE_URL}/AIAnalysisResult/${id}`);
+    return res.data;
+  },
+
   // Register endpoint
   async registerClient(clientData) {
     try {

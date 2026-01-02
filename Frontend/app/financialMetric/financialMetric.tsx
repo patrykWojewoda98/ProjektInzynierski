@@ -2,7 +2,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -12,6 +11,8 @@ import ApiService from "../../services/api";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
 import { ROUTES } from "../../routes";
+import { decodeToken } from "@/utils/decodeToken";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FinancialMetric = () => {
   const { id } = useLocalSearchParams();
@@ -19,8 +20,25 @@ const FinancialMetric = () => {
 
   const [metric, setMetric] = useState<any>(null);
   const [instrument, setInstrument] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [clientId, setClientId] = useState<number | null>(null);
 
+  const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // 🔹 POBRANIE CLIENT ID Z TOKENA
+  useEffect(() => {
+    const loadClientId = async () => {
+      const token = await AsyncStorage.getItem("userToken");
+      const decoded = decodeToken(token);
+      console.log("Decoded token:", decoded);
+      setClientId(decoded?.id ? Number(decoded.id) : null);
+      console.log("Client ID set to:", decoded?.id);
+    };
+
+    loadClientId();
+  }, []);
+
+  // 🔹 POBRANIE INSTRUMENTU + METRYK
   useEffect(() => {
     if (!id) return;
 
@@ -45,6 +63,37 @@ const FinancialMetric = () => {
     loadData();
   }, [id]);
 
+  // 🔹 OBSŁUGA AI ANALYSIS
+  const handleAIAnalysis = async () => {
+    if (!clientId) {
+      alert("Client not authenticated.");
+      return;
+    }
+
+    try {
+      setAiLoading(true);
+
+      const request = await ApiService.createAnalysisRequest(
+        Number(id), // investInstrumentId
+        Number(clientId) // clientId
+      );
+
+      if (request.aiAnalysisResultId) {
+        router.push({
+          pathname: ROUTES.AI_ANALYSIS_RESULT,
+          params: { id: request.aiAnalysisResultId },
+        });
+      } else {
+        alert("AI analysis is being processed. Please check later.");
+      }
+    } catch (e) {
+      console.error("AI request failed:", e);
+      alert("Failed to generate AI analysis.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
@@ -53,8 +102,8 @@ const FinancialMetric = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Financial Metrics</Text>
 
+      {/* INSTRUMENT */}
       <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {/* INSTRUMENT */}
         <Text style={[globalStyles.cardTitle, spacing.mb2]}>Instrument</Text>
 
         <Text style={globalStyles.text}>Name: {instrument?.name}</Text>
@@ -67,25 +116,17 @@ const FinancialMetric = () => {
         </Text>
       </View>
 
+      {/* METRICS */}
       <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {/* METRICS */}
         {metric && (
           <>
-            <View style={spacing.mt3} />
-
             <Text style={[globalStyles.cardTitle, spacing.mb2]}>
               Financial Ratios
             </Text>
 
-            <Text style={globalStyles.text}>
-              P/E (Price to Earnings): {metric.pe}
-            </Text>
-            <Text style={globalStyles.text}>
-              P/B (Price to Book): {metric.pb}
-            </Text>
-            <Text style={globalStyles.text}>
-              ROE (Return on Equity): {metric.roe}%
-            </Text>
+            <Text style={globalStyles.text}>P/E: {metric.pe}</Text>
+            <Text style={globalStyles.text}>P/B: {metric.pb}</Text>
+            <Text style={globalStyles.text}>ROE: {metric.roe}%</Text>
             <Text style={globalStyles.text}>
               Debt to Equity: {metric.debtToEquity}
             </Text>
@@ -95,35 +136,23 @@ const FinancialMetric = () => {
           </>
         )}
       </View>
-      <TouchableOpacity
-        style={[
-          globalStyles.button,
-          globalStyles.fullWidth,
-          globalStyles.buttonDisabled,
-          spacing.py2,
-        ]}
-      >
-        <Text style={globalStyles.buttonText}>AI Investment Insight</Text>
-      </TouchableOpacity>
 
+      {/* AI BUTTON */}
       <TouchableOpacity
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
-          globalStyles.buttonDisabled,
           spacing.py2,
-          spacing.mt1,
+          aiLoading && globalStyles.buttonDisabled,
         ]}
-        onPress={() =>
-          router.push({
-            pathname: ROUTES.FINANCIAL_REPORT_BY_INSTRUMENT,
-            params: { id: id },
-          })
-        }
+        disabled={aiLoading}
+        onPress={handleAIAnalysis}
       >
-        <Text style={globalStyles.buttonText}>
-          See All Financial Reports Details
-        </Text>
+        {aiLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={globalStyles.buttonText}>AI Investment Insight</Text>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity

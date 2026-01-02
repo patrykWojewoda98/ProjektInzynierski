@@ -15,4 +15,6 @@ export const ROUTES = {
   FINANCIAL_REPORT_BY_INSTRUMENT:
     "/financialReport/financialReportsByInstrument",
   CREATE_FINANCIAL_REPORT_BY_AI: "/financialReport/createFinancialReportByAI",
+  MY_AI_ANALYSIS_REQUESTS: "/aIRequest/myAIRequests",
+  AI_ANALYSIS_RESULT: "/aIAnalysisResult/aIAnalysisResult",
 } as const;

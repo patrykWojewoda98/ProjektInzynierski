@@ -65,6 +65,12 @@ const tiles = [
     icon: icons.FinancialMetric,
     route: ROUTES.FINANCIAL_METRIC_PREVIEW,
   },
+  {
+    key: "MyAIAnalysisRequests",
+    label: "My AI Analysis Requests",
+    icon: require("../assets/images/MyAIAnalysisRequests-Icon.png"),
+    route: ROUTES.MY_AI_ANALYSIS_REQUESTS,
+  },
 ];
 
 const MainMenu = () => {

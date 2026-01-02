@@ -10,6 +10,7 @@ using ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnalysis
 using ProjektIznynierski.Application.Commands.AIAnalysisRequest.DeleteAIAnalysisRequest;
 using ProjektInzynierski.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using ProjektIznynierski.Application.Queries.AIAnalysisRequest.GetAIAnalysisRequestsByClientId;
 
 namespace ProjektIznynierski.Presentation.Controllers
 {
@@ -37,6 +38,16 @@ namespace ProjektIznynierski.Presentation.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetAIAnalysisRequestByIdQuery(id));
+            return Ok(result);
+        }
+
+        [HttpGet("my-requests/{clientId}")]
+        [SwaggerOperation(Summary = "Get AI Analysis Requests by Client ID",Description = "Retrieves AI analysis requests for a specific client.")]
+        [ProducesResponseType(typeof(List<AIAnalysisRequestDto>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetByClientId(int clientId)
+        {
+            var result = await _mediator.Send(new GetAIAnalysisRequestsByClientIdQuery(clientId));
+
             return Ok(result);
         }
 
