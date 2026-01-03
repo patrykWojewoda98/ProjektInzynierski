@@ -107,7 +107,7 @@ const LoginScreen = () => {
         style={[globalStyles.logo, globalStyles.logoLarge]}
       />
 
-      <Text style={[globalStyles.header, spacing.mb5]}>Login</Text>
+      <Text style={[globalStyles.header, spacing.mb2]}>Login</Text>
 
       <View style={[globalStyles.section, globalStyles.formContainer]}>
         {/* EMAIL */}
@@ -160,6 +160,13 @@ const LoginScreen = () => {
             <Text style={globalStyles.link}>Register</Text>
           </TouchableOpacity>
         </View>
+      </View>
+
+      <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
+        <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={globalStyles.link}>Go back</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

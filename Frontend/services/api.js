@@ -26,6 +26,41 @@ const ApiService = {
     return json;
   },
 
+  async loginEmployee(data) {
+    const response = await fetch(`${API_BASE_URL}/auth/login-employee`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+      throw new Error(json?.message || "Login failed");
+    }
+    return json;
+  },
+
+  async verifyEmployee2FA(data) {
+    const response = await fetch(`${API_BASE_URL}/auth/verify-employee-2fa`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+      throw new Error(json?.message || "Invalid verification code");
+    }
+
+    if (json?.token) {
+      await AsyncStorage.setItem("employeeToken", json.token);
+    }
+
+    return json;
+  },
+
   //AI Requests endpoints
   async createAnalysisRequest(investInstrumentId, clientId) {
     try {

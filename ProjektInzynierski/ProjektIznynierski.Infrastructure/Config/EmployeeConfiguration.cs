@@ -38,6 +38,13 @@ namespace ProjektIznynierski.Infrastructure.Config
                 .HasDefaultValue(false)
                 .IsRequired();
 
+            builder.Property(e => e.TwoFactorCodeHash)
+                .HasMaxLength(255)
+                .IsRequired(false);
+
+            builder.Property(e => e.TwoFactorCodeExpiresAt)
+                .IsRequired(false);
+
             base.Configure(builder);
         }
     }

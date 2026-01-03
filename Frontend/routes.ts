@@ -2,6 +2,7 @@ export const ROUTES = {
   MAIN_MENU: "/mainMenu",
   COMING_SOON: "/ComingSoon",
   LOGIN: "/auth/login",
+  LOGIN_EMPLOYEE: "/auth/employee/employeeLoginScreen",
   REGISTER: "/auth/register",
   INVEST_PROFILE: "/investProfile/investProfile",
   WATCHLIST: "/watchList/watchList",
@@ -17,4 +18,8 @@ export const ROUTES = {
   CREATE_FINANCIAL_REPORT_BY_AI: "/financialReport/createFinancialReportByAI",
   MY_AI_ANALYSIS_REQUESTS: "/aIRequest/myAIRequests",
   AI_ANALYSIS_RESULT: "/aIAnalysisResult/aIAnalysisResult",
+
+  EMPLOYEE_2FA: "/auth/employee/employee2FAScreen",
+  EMPLOYEE_MAIN_MENU: "/employeeMainMenu",
+  EMPLOYEE_DASHBOARD: "/employee/employeeDashboard",
 } as const;

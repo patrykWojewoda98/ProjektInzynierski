@@ -328,6 +328,13 @@ const RegisterScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
+        <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={globalStyles.link}>Go back</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };

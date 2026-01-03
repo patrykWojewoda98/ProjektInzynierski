@@ -5,32 +5,32 @@ import { ROUTES } from "../routes";
 
 export const authGuard = async () => {
   try {
-    const token = await AsyncStorage.getItem("userToken");
+    const userToken = await AsyncStorage.getItem("userToken");
+    const employeeToken = await AsyncStorage.getItem("employeeToken");
 
-    //Brak tokenu → przekierowanie
-    if (!token) {
-      router.replace(ROUTES.LOGIN);
+    if (!userToken && !employeeToken) {
+      router.replace("/");
       return false;
     }
 
-    //Próba dekodowania
+    const token = employeeToken ?? userToken;
     const decoded = decodeToken(token);
+
     if (!decoded) {
-      await AsyncStorage.removeItem("userToken");
+      await AsyncStorage.multiRemove(["userToken", "employeeToken"]);
       router.replace(ROUTES.LOGIN);
       return false;
     }
 
-    //Sprawdzenie wygaśnięcia
     const now = Date.now() / 1000;
+
     if (decoded.exp && decoded.exp < now) {
       console.log("⚠️ Token expired");
-      await AsyncStorage.removeItem("userToken");
-      router.replace(ROUTES.LOGIN);
+      await AsyncStorage.multiRemove(["userToken", "employeeToken"]);
+      router.replace("/");
       return false;
     }
 
-    //Token ważny
     return true;
   } catch (error) {
     console.error("AuthGuard error:", error);

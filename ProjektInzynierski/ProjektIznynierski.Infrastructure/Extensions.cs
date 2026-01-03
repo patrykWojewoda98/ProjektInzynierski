@@ -44,6 +44,8 @@ namespace ProjektIznynierski.Infrastructure
             services.AddHttpClient<IChatGPTService, ChatGPTService>();
             services.AddScoped<IStrefaInwestorowClientService, StrefaInwestorowClientService>();   
             services.AddScoped<IAIAnalysisPromptBuilder, AIAnalysisPromptBuilder>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ITwoFactorCodeService, TwoFactorCodeService>();
 
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>

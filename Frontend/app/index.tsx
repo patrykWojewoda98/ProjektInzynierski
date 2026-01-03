@@ -12,6 +12,10 @@ export default function HomeScreen() {
     router.push({ pathname: ROUTES.LOGIN });
   };
 
+  const handleEmployeeLogin = () => {
+    router.push({ pathname: ROUTES.LOGIN_EMPLOYEE });
+  };
+
   const handleRegister = () => {
     router.push({ pathname: ROUTES.REGISTER });
   };
@@ -35,6 +39,16 @@ export default function HomeScreen() {
         >
           <Text style={[globalStyles.buttonText, { fontSize: 18 }]}>
             Log In
+          </Text>
+        </TouchableOpacity>
+
+        {/* LOG IN As Admininistrator */}
+        <TouchableOpacity
+          style={[globalStyles.button, { padding: 20, marginTop: 15 }]}
+          onPress={handleEmployeeLogin}
+        >
+          <Text style={[globalStyles.buttonText, { fontSize: 18 }]}>
+            Log In As Employee
           </Text>
         </TouchableOpacity>
 

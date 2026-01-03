@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { Slot, useRouter } from "expo-router";
 import React, { createContext, useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,50 +8,72 @@ import { decodeToken } from "../utils/decodeToken";
 
 export const AuthContext = createContext<any>({
   user: null,
-  setUser: (_u: any) => {},
+  userType: null, // "client" | "employee"
   token: "",
-  setToken: (_t: any) => {},
-  clientId: "",
-  setClientId: (_c: any) => {},
+  logout: () => {},
 });
 
 export default function RootLayout() {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string>("");
-  const [clientId, setClientId] = useState<string>("");
+  const [userType, setUserType] = useState<"client" | "employee" | null>(null);
 
   const router = useRouter();
-  const segments = useSegments();
 
-  // 🔹 Ładowanie użytkownika z tokenu (działa przy każdej zmianie ekranu)
+  // 🔹 Jednorazowe ładowanie auth przy starcie appki
   useEffect(() => {
-    const loadUserFromToken = async () => {
-      const storedToken = await AsyncStorage.getItem("userToken");
+    const loadAuth = async () => {
+      const clientToken = await AsyncStorage.getItem("userToken");
+      const employeeToken = await AsyncStorage.getItem("employeeToken");
 
-      if (storedToken) {
-        setToken(storedToken);
-        const decoded = decodeToken(storedToken);
-
-        if (decoded) {
+      // 🟢 EMPLOYEE ma priorytet
+      if (employeeToken) {
+        const decoded = decodeToken(employeeToken);
+        if (decoded && (!decoded.exp || decoded.exp > Date.now() / 1000)) {
+          setToken(employeeToken);
+          setUserType("employee");
           setUser({
-            name: decoded.name,
             id: decoded.id,
+            name: decoded.name,
+            isAdmin: decoded.isAdmin,
           });
+          return;
+        } else {
+          await AsyncStorage.removeItem("employeeToken");
         }
-      } else {
-        setToken("");
-        setUser(null);
       }
+
+      // 🟢 CLIENT
+      if (clientToken) {
+        const decoded = decodeToken(clientToken);
+        if (decoded && (!decoded.exp || decoded.exp > Date.now() / 1000)) {
+          setToken(clientToken);
+          setUserType("client");
+          setUser({
+            id: decoded.id,
+            name: decoded.name,
+          });
+          return;
+        } else {
+          await AsyncStorage.removeItem("userToken");
+        }
+      }
+
+      // 🔴 brak zalogowanego użytkownika
+      setUser(null);
+      setToken("");
+      setUserType(null);
     };
 
-    loadUserFromToken();
-  }, [segments]);
+    loadAuth();
+  }, []);
 
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem("userToken");
-    setToken("");
+  const logout = async () => {
+    await AsyncStorage.multiRemove(["userToken", "employeeToken"]);
     setUser(null);
-    router.replace("/auth/login");
+    setToken("");
+    setUserType(null);
+    router.replace("../index");
   };
 
   const Header = () => (
@@ -61,37 +83,30 @@ export default function RootLayout() {
           source={require("../assets/images/Logo.png")}
           style={globalStyles.logoSmall}
         />
-        {user?.name ? (
-          <Text
-            style={[
-              globalStyles.text,
-              { color: "white", marginLeft: 10, fontWeight: "600" },
-            ]}
-          >
+
+        {userType === "client" && user?.name && (
+          <Text style={[globalStyles.text, { color: "white", marginLeft: 10 }]}>
             Welcome, {user.name}
           </Text>
-        ) : null}
+        )}
+
+        {userType === "employee" && (
+          <Text style={[globalStyles.text, { color: "white", marginLeft: 10 }]}>
+            Welcome, {user.name}
+          </Text>
+        )}
       </View>
 
-      {/* 🔹 Pokaż przycisk Logout tylko, jeśli istnieje token */}
-      {token ? (
-        <Pressable
-          onPress={handleLogout}
-          style={({ pressed }) => [
-            globalStyles.buttonSmall,
-            pressed && globalStyles.buttonPressed,
-          ]}
-        >
+      {token && (
+        <Pressable onPress={logout} style={globalStyles.buttonSmall}>
           <Text style={globalStyles.buttonText}>Logout</Text>
         </Pressable>
-      ) : null}
+      )}
     </View>
   );
 
   return (
-    <AuthContext.Provider
-      value={{ user, setUser, token, setToken, clientId, setClientId }}
-    >
+    <AuthContext.Provider value={{ user, userType, token, logout }}>
       <SafeAreaView style={[globalStyles.container, globalStyles.flex1]}>
         <Header />
         <View style={[globalStyles.flex1, globalStyles.containerPadding]}>

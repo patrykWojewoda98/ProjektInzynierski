@@ -12,6 +12,7 @@ export const decodeToken = (token) => {
       id: decoded.id || decoded.sub || null,
       name: decoded.name || "",
       exp: decoded.exp,
+      isAdmin: decoded.isAdmin || false,
     };
   } catch (error) {
     console.log("Token decode error:", error);

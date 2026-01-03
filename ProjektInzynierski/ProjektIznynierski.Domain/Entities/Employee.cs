@@ -11,5 +11,8 @@
 
         public string Email { get; set; }
         public string PasswordHash { get; set; }
+
+        public string? TwoFactorCodeHash { get; set; }
+        public DateTime? TwoFactorCodeExpiresAt { get; set; }
     }
 }

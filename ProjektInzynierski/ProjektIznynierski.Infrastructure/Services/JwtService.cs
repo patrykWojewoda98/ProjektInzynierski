@@ -31,7 +31,6 @@ namespace ProjektIznynierski.Infrastructure.Services
                 ?? throw new InvalidOperationException("JWT_AUDIENCE environment variable is not set.");
         }
 
-
         public Task<string> GenerateToken(Client client)
         {
             var claims = new List<Claim>
@@ -53,5 +52,30 @@ namespace ProjektIznynierski.Infrastructure.Services
 
             return Task.FromResult(tokenHandler.WriteToken(token));
         }
+
+        public Task<string> GenerateEployeeToken(Employee employee)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("id", employee.Id.ToString()),
+                new Claim("name", employee.Name),
+                new Claim("isAdmin", employee.IsAdmin ? "true" : "false")
+            };
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(_expiryDuration),
+                Issuer = _issuer,
+                Audience = _audience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_secretKey)), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return Task.FromResult(tokenHandler.WriteToken(token));
+        }
+
+
     }
 }
