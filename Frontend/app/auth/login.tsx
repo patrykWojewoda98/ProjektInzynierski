@@ -45,7 +45,6 @@ const LoginScreen = () => {
           return;
         }
 
-        // ✅ Token ważny — przejdź od razu do Main Menu
         console.log("✅ Token valid — skipping login");
         router.replace(ROUTES.MAIN_MENU);
       } catch (error) {
@@ -72,12 +71,10 @@ const LoginScreen = () => {
         password: password,
       });
 
-      // Jeśli API zwraca wiadomość → pokazujemy ją
       if (response?.message) {
         Alert.alert("Info", response.message);
       }
 
-      // Jeśli jest token → logowanie OK
       if (response?.token) {
         router.replace(ROUTES.MAIN_MENU);
         return;
@@ -86,7 +83,6 @@ const LoginScreen = () => {
         router.reload();
       }, 200);
 
-      // Jeśli nie ma tokena → logowanie nieudane
       Alert.alert("Error", "Invalid email or/and password");
     } catch (error) {
       Alert.alert("Error", "Invalid email or/and password");

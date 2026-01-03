@@ -34,9 +34,8 @@ const EmployeeTwoFactorScreen = () => {
         code,
       });
 
-      // ✅ komunikat jak w loginie klienta
       if (response?.message) {
-        Alert.alert("Success", response.message);
+        Alert.alert(response.message);
       }
 
       // ✅ token już zapisany → można wejść

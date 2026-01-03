@@ -146,6 +146,15 @@ const ApiService = {
   },
 
   //Currency endpoints
+  async getAllCurrencies() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Currency`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching currencies:", error);
+      throw ["An error occurred while fetching currencies."];
+    }
+  },
   async getCurrencyByID(id) {
     try {
       const response = await axios.get(`${API_BASE_URL}/Currency/${id}`);
@@ -156,6 +165,28 @@ const ApiService = {
       }
       console.error("Error fetching client:", error);
       throw ["An error occurred while fetching client data. Please try again."];
+    }
+  },
+
+  async updateCurrency(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/Currency/${id}`, dto);
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+      console.error("Error updating currency:", error);
+      throw ["An error occurred while updating currency."];
+    }
+  },
+
+  async deleteCurrency(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/Currency/${id}`);
+    } catch (error) {
+      console.error("Error deleting currency:", error);
+      throw ["An error occurred while deleting currency."];
     }
   },
 

@@ -59,7 +59,6 @@ export default function RootLayout() {
         }
       }
 
-      // 🔴 brak zalogowanego użytkownika
       setUser(null);
       setToken("");
       setUserType(null);
@@ -73,7 +72,7 @@ export default function RootLayout() {
     setUser(null);
     setToken("");
     setUserType(null);
-    router.replace("../index");
+    router.replace("/");
   };
 
   const Header = () => (

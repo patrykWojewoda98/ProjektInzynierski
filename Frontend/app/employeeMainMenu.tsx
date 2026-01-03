@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles, spacing } from "../assets/styles/styles";
-import { authGuard } from "../utils/authGuard";
+import { employeeAuthGuard } from "../utils/employeeAuthGuard";
 import { ROUTES } from "../routes";
 
 const icons = {
@@ -12,6 +12,14 @@ const icons = {
   InvestInstrument: require("../assets/images/InvestInstrument-Icon.png"),
   FinancialReport: require("../assets/images/FinancialReport-Icon.png"),
   FinancialMetric: require("../assets/images/FinancialMetric-Icon.png"),
+  Sector: require("../assets/images/SectorIcon.png"),
+  RiskLevel: require("../assets/images/RiskLevelIcon.png"),
+  InvestmentType: require("../assets/images/InvestmentTypeIcon.png"),
+  InvestHorizon: require("../assets/images/InvestHorizonIcon.png"),
+  Employee: require("../assets/images/EmployeeIcon.png"),
+  Country: require("../assets/images/CountryIcon.png"),
+  Region: require("../assets/images/RegionIcon.png"),
+  Currency: require("../assets/images/CurrencyIcon.png"),
 };
 
 const tiles = [
@@ -19,38 +27,86 @@ const tiles = [
     key: "InvestProfile",
     label: "Edit Investment Profile",
     icon: icons.InvestProfile,
-    route: ROUTES.INVEST_PROFILE,
+    route: ROUTES.EDIT_INVEST_PROFILE,
   },
   {
     key: "Wallet",
     label: "Edit Wallet",
     icon: icons.Wallet,
-    route: ROUTES.WALLET,
+    route: ROUTES.EDIT_WALLET,
   },
-
   {
     key: "MarketData",
     label: "Edit Market Data",
     icon: icons.MarketData,
-    route: ROUTES.MARKET_DATA,
+    route: ROUTES.EDIT_MARKET_DATA,
   },
   {
     key: "InvestInstrument",
     label: "Edit Investment Instruments",
     icon: icons.InvestInstrument,
-    route: ROUTES.INVEST_INSTRUMENT,
+    route: ROUTES.EDIT_INVEST_INSTRUMENT,
   },
   {
     key: "FinancialReport",
     label: "Edit Financial Reports",
     icon: icons.FinancialReport,
-    route: ROUTES.FINANCIAL_REPORT,
+    route: ROUTES.EDIT_FINANCIAL_REPORT,
   },
   {
     key: "FinancialMetric",
     label: "Edit Financial Metrics",
     icon: icons.FinancialMetric,
-    route: ROUTES.FINANCIAL_METRIC_PREVIEW,
+    route: ROUTES.EDIT_FINANCIAL_METRIC_PREVIEW,
+  },
+
+  {
+    key: "Sector",
+    label: "Edit Sectors",
+    icon: icons.Sector,
+    route: ROUTES.EDIT_SECTOR,
+  },
+  {
+    key: "RiskLevel",
+    label: "Edit Risk Levels",
+    icon: icons.RiskLevel,
+    route: ROUTES.EDIT_RISK_LEVEL,
+  },
+  {
+    key: "InvestmentType",
+    label: "Edit Investment Types",
+    icon: icons.InvestmentType,
+    route: ROUTES.EDIT_INVESTMENT_TYPE,
+  },
+  {
+    key: "InvestHorizon",
+    label: "Edit Investment Horizons",
+    icon: icons.InvestHorizon,
+    route: ROUTES.EDIT_INVEST_HORIZON,
+  },
+  {
+    key: "Employee",
+    label: "Edit Employees",
+    icon: icons.Employee,
+    route: ROUTES.EDIT_EMPLOYEE,
+  },
+  {
+    key: "Country",
+    label: "Edit Countries",
+    icon: icons.Country,
+    route: ROUTES.EDIT_EMPLOYEE,
+  },
+  {
+    key: "Region",
+    label: "Edit Regions",
+    icon: icons.Region,
+    route: ROUTES.EDIT_REGION,
+  },
+  {
+    key: "Currency",
+    label: "Edit Currencies",
+    icon: icons.Currency,
+    route: ROUTES.CURRENCY,
   },
 ];
 
@@ -60,7 +116,7 @@ const EmployeeMainMenu = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isValid = await authGuard();
+      const isValid = await employeeAuthGuard();
       if (isValid) {
         setIsReady(true);
       }
