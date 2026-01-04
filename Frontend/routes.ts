@@ -9,6 +9,7 @@ export const ROUTES = {
   WALLET: "/wallet/wallet",
   REGION: "/regions/regionListScreen",
   REGION_CODE: "/regionCode/regionCodesListScreen",
+  COUNTRY: "/country/countryListScreen",
 
   WALLET_HISTORY: "/walletHistory/walletHistory",
   MARKET_DATA: "/marketData",
@@ -41,6 +42,8 @@ export const ROUTES = {
   EDIT_CURRENCY: "/currency/updateCurrencyScreen",
   EDIT_EMPLOYEE: "/Employee/editEmployee",
   EDIT_REGION_CODE: "/regionCode/updateRegionCodeScreen",
+  EDIT_COUNTRY: "/country/updateCountryScreen",
 
   ADD_REGION_CODE: "/regionCode/addRegionCodeScreen",
+  ADD_COUNTRY: "/country/createCountryScreen",
 } as const;

@@ -106,6 +106,59 @@ const ApiService = {
     }
   },
 
+  //Country endpoints
+  async getAllCountries() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Country`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      throw ["Failed to load countries."];
+    }
+  },
+
+  async getCountryById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Country/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching country:", error);
+      throw ["Failed to load country."];
+    }
+  },
+
+  async createCountry(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/Country`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating country:", error);
+      throw ["Failed to create country."];
+    }
+  },
+
+  async updateCountry(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/Country/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating country:", error);
+      throw ["Failed to update country."];
+    }
+  },
+
+  async deleteCountry(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/Country/${id}`);
+    } catch (error) {
+      console.error("Error deleting country:", error);
+      throw ["Failed to delete country."];
+    }
+  },
+
   // Region endpoints
   async getAllRegions() {
     try {

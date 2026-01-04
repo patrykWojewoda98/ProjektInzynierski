@@ -95,7 +95,7 @@ const tiles = [
     key: "Country",
     label: "Edit Countries",
     icon: icons.Country,
-    route: ROUTES.EDIT_EMPLOYEE,
+    route: ROUTES.COUNTRY,
   },
   {
     key: "Region",
