@@ -7,6 +7,9 @@ export const ROUTES = {
   INVEST_PROFILE: "/investProfile/investProfile",
   WATCHLIST: "/watchList/watchList",
   WALLET: "/wallet/wallet",
+  REGION: "/regions/regionListScreen",
+  REGION_CODE: "/regionCode/regionCodesListScreen",
+
   WALLET_HISTORY: "/walletHistory/walletHistory",
   MARKET_DATA: "/marketData",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
@@ -34,7 +37,10 @@ export const ROUTES = {
   EDIT_RISK_LEVEL: "/RiskLevel/editRiskLevel",
   EDIT_INVESTMENT_TYPE: "/InvestmentType/editInvestmentType",
   EDIT_INVEST_HORIZON: "/InvestHorizon/editInvestHorizon",
-  EDIT_REGION: "/Region/editRegion",
+  EDIT_REGION: "/regions/updateRegionScreen",
   EDIT_CURRENCY: "/currency/updateCurrencyScreen",
   EDIT_EMPLOYEE: "/Employee/editEmployee",
+  EDIT_REGION_CODE: "/regionCode/updateRegionCodeScreen",
+
+  ADD_REGION_CODE: "/regionCode/addRegionCodeScreen",
 } as const;

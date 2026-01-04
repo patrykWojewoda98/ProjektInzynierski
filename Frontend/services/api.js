@@ -107,30 +107,95 @@ const ApiService = {
   },
 
   // Region endpoints
-  async getRegions() {
+  async getAllRegions() {
     try {
-      const response = await axios.get(`${API_BASE_URL}/region`);
+      const response = await axios.get(`${API_BASE_URL}/Region`);
       return response.data;
     } catch (error) {
       console.error("Error fetching regions:", error);
-      throw error;
+      throw ["An error occurred while fetching regions."];
     }
   },
 
-  async getCountriesByRegion(regionId) {
+  async getRegionById(id) {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/Country/region/${regionId}`
-      );
-      const data = response.data;
-
-      return Array.isArray(data) ? data : [data];
+      const response = await axios.get(`${API_BASE_URL}/Region/${id}`);
+      return response.data;
     } catch (error) {
-      console.error("Error fetching countries:", error);
-      throw error;
+      console.error("Error fetching region:", error);
+      throw ["An error occurred while fetching region."];
     }
   },
 
+  async updateRegion(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/Region/${id}`, dto);
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+      console.error("Error updating region:", error);
+      throw ["An error occurred while updating region."];
+    }
+  },
+
+  async deleteRegion(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/Region/${id}`);
+    } catch (error) {
+      console.error("Error deleting region:", error);
+      throw ["An error occurred while deleting region."];
+    }
+  },
+
+  // RegionCode endpoints
+  async getAllRegionCodes() {
+    const res = await axios.get(`${API_BASE_URL}/RegionCode`);
+    return res.data;
+  },
+
+  async getRegionCodeById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/RegionCode/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching region code:", error);
+      throw ["Failed to fetch region code."];
+    }
+  },
+
+  async createRegionCode(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/RegionCode`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating region code:", error);
+      throw ["Failed to create region code."];
+    }
+  },
+
+  async updateRegionCode(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/RegionCode/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating region code:", error);
+      throw ["Failed to update region code."];
+    }
+  },
+
+  async deleteRegionCode(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/RegionCode/${id}`);
+    } catch (error) {
+      console.error("Error deleting region code:", error);
+      throw ["Failed to delete region code."];
+    }
+  },
   // Client endpoints
   async getClientById(id) {
     try {

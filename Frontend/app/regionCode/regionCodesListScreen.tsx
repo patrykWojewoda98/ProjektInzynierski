@@ -9,52 +9,49 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+
 import ApiService from "../../services/api";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
 import { ROUTES } from "../../routes";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
-const CurrencyListScreen = () => {
+const RegionCodesListScreen = () => {
   const router = useRouter();
-  const [currencies, setCurrencies] = useState<any[]>([]);
-  const [riskLevels, setRiskLevels] = useState<any[]>([]);
+
+  const [regionCodes, setRegionCodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
     const checkAuth = async () => {
-      const isValid = await employeeAuthGuard();
-      if (isValid) {
-        setIsReady(true);
-      }
+      const ok = await employeeAuthGuard();
+      if (ok) setIsReady(true);
     };
     checkAuth();
   }, []);
+
   useEffect(() => {
+    if (!isReady) return;
+
     const loadData = async () => {
       try {
-        const [currencyData, riskData] = await Promise.all([
-          ApiService.getAllCurrencies(),
-          ApiService.getRiskLevels(),
-        ]);
-        setCurrencies(currencyData);
-        setRiskLevels(riskData);
-      } catch (e) {
-        Alert.alert("Error", "Failed to load currencies.");
+        const data = await ApiService.getAllRegionCodes();
+        setRegionCodes(data);
+      } catch {
+        Alert.alert("Error", "Failed to load region codes.");
       } finally {
         setLoading(false);
       }
     };
+
     loadData();
-  }, []);
-  const getRiskDescription = (riskLevelId) => {
-    const risk = riskLevels.find((r) => r.id === riskLevelId);
-    return risk?.description ?? "N/A";
-  };
-  const handleDelete = (id) => {
+  }, [isReady]);
+
+  const handleDelete = (id: number) => {
     Alert.alert(
       "Confirm delete",
-      "Are you sure you want to delete this currency?",
+      "Are you sure you want to delete this region code?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -62,50 +59,52 @@ const CurrencyListScreen = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              await ApiService.deleteCurrency(id);
-              setCurrencies((prev) => prev.filter((c) => c.id !== id));
-            } catch (e) {
-              Alert.alert("Error", "Failed to delete currency.");
+              await ApiService.deleteRegionCode(id);
+              setRegionCodes((prev) => prev.filter((r) => r.id !== id));
+            } catch {
+              Alert.alert("Error", "Failed to delete region code.");
             }
           },
         },
       ]
     );
   };
-  if (loading) {
+
+  if (!isReady || loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Text style={[globalStyles.header, spacing.mb4]}>Currencies</Text>
+      <Text style={[globalStyles.header, spacing.mb3]}>Region Codes</Text>
 
-      {currencies.map((currency) => (
-        <View key={currency.id} style={[globalStyles.card, spacing.mb3]}>
+      {/* ➕ ADD */}
+      <TouchableOpacity
+        style={[globalStyles.button, spacing.mb4]}
+        onPress={() => router.push(ROUTES.ADD_REGION_CODE)}
+      >
+        <Text style={globalStyles.buttonText}>Add new Region Code</Text>
+      </TouchableOpacity>
+
+      {regionCodes.map((code) => (
+        <View key={code.id} style={[globalStyles.card, spacing.mb3]}>
           <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <View>
-              <Text style={globalStyles.cardTitle}>
-                {currency.name} ({currency.code})
-              </Text>
-
-              <Text style={globalStyles.textSmall}>
-                Risk level: {getRiskDescription(currency.currencyRiskLevelId)}
-              </Text>
-            </View>
+            <Text style={globalStyles.cardTitle}>{code.code}</Text>
 
             <View style={globalStyles.row}>
               <TouchableOpacity
                 style={spacing.mr3}
                 onPress={() =>
                   router.push({
-                    pathname: ROUTES.EDIT_CURRENCY,
-                    params: { id: currency.id },
+                    pathname: ROUTES.EDIT_REGION_CODE,
+                    params: { id: code.id },
                   })
                 }
               >
                 <Ionicons name="pencil" size={22} color={COLORS.primary} />
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handleDelete(currency.id)}>
+              <TouchableOpacity onPress={() => handleDelete(code.id)}>
                 <Ionicons name="trash" size={22} color={COLORS.error} />
               </TouchableOpacity>
             </View>
@@ -113,9 +112,9 @@ const CurrencyListScreen = () => {
         </View>
       ))}
 
+      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
-
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={globalStyles.link}>Go back</Text>
         </TouchableOpacity>
@@ -123,4 +122,5 @@ const CurrencyListScreen = () => {
     </ScrollView>
   );
 };
-export default CurrencyListScreen;
+
+export default RegionCodesListScreen;

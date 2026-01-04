@@ -20,6 +20,7 @@ const icons = {
   Country: require("../assets/images/CountryIcon.png"),
   Region: require("../assets/images/RegionIcon.png"),
   Currency: require("../assets/images/CurrencyIcon.png"),
+  RegionCode: require("../assets/images/RegionCodeIcon.png"),
 };
 
 const tiles = [
@@ -100,13 +101,19 @@ const tiles = [
     key: "Region",
     label: "Edit Regions",
     icon: icons.Region,
-    route: ROUTES.EDIT_REGION,
+    route: ROUTES.REGION,
   },
   {
     key: "Currency",
     label: "Edit Currencies",
     icon: icons.Currency,
     route: ROUTES.CURRENCY,
+  },
+  {
+    key: "RegionCode",
+    label: "Edit Region Codes",
+    icon: icons.Region,
+    route: ROUTES.REGION_CODE,
   },
 ];
 

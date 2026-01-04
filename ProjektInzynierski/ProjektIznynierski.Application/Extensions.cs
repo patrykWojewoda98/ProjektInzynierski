@@ -39,6 +39,8 @@ using ProjektIznynierski.Application.Commands.RiskLevel.UpdateRiskLevel;
 using MediatR;
 using ProjektIznynierski.Application.Commands.Employee.AddEmployee;
 using ProjektIznynierski.Application.Commands.Employee.UpdateEmployee;
+using ProjektIznynierski.Application.Commands.RegionCode.CreateRegionCode;
+using ProjektIznynierski.Application.Commands.RegionCode.UpdateRegionCode;
 
 namespace ProjektIznynierski.Application
 {
@@ -108,6 +110,9 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<AddEmployeeCommand>, AddEmployeeCommandValidation>();
             services.AddScoped<IValidator<UpdateEmployeeCommand>, UpdateEmployeeCommandValidation>();
+
+            services.AddScoped<IValidator<CreateRegionCodeCommand>, CreateRegionCodeCommandValidator>();
+            services.AddScoped<IValidator<UpdateRegionCodeCommand>, UpdateRegionCodeCommandValidator>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 
