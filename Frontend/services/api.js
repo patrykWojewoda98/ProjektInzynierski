@@ -159,6 +159,59 @@ const ApiService = {
     }
   },
 
+  //Employee endpoints
+  async getAllEmployees() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Employee`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      throw ["Failed to load employees."];
+    }
+  },
+
+  async getEmployeeById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Employee/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching employee:", error);
+      throw ["Failed to load employee."];
+    }
+  },
+
+  async createEmployee(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/Employee`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating employee:", error);
+      throw ["Failed to create employee."];
+    }
+  },
+
+  async updateEmployee(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/Employee/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      throw ["Failed to update employee."];
+    }
+  },
+
+  async deleteEmployee(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/Employee/${id}`);
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      throw ["Failed to delete employee."];
+    }
+  },
+
   // Region endpoints
   async getAllRegions() {
     try {

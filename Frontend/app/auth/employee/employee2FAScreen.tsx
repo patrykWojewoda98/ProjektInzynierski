@@ -49,33 +49,35 @@ const EmployeeTwoFactorScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.centerContainer}>
-      <Text style={[globalStyles.header, spacing.mb4]}>
-        Two-Factor Verification
-      </Text>
+      <View style={globalStyles.formContainer}>
+        <Text style={[globalStyles.header, spacing.mb4]}>
+          Two-Factor Verification
+        </Text>
 
-      <Text style={[globalStyles.text, spacing.mb3]}>
-        Enter the 6-digit code sent to your email
-      </Text>
+        <Text style={[globalStyles.text, spacing.mb3]}>
+          Enter the 6-digit code sent to your email
+        </Text>
 
-      <TextInput
-        style={[globalStyles.input, spacing.mb4]}
-        keyboardType="number-pad"
-        maxLength={6}
-        value={code}
-        onChangeText={setCode}
-      />
+        <TextInput
+          style={[globalStyles.input, spacing.mb4]}
+          keyboardType="number-pad"
+          maxLength={6}
+          value={code}
+          onChangeText={setCode}
+        />
 
-      <TouchableOpacity
-        style={globalStyles.button}
-        onPress={handleVerify}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={globalStyles.buttonText}>Verify</Text>
-        )}
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={globalStyles.button}
+          onPress={handleVerify}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={globalStyles.buttonText}>Verify</Text>
+          )}
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };

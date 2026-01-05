@@ -89,7 +89,7 @@ const tiles = [
     key: "Employee",
     label: "Edit Employees",
     icon: icons.Employee,
-    route: ROUTES.EDIT_EMPLOYEE,
+    route: ROUTES.EMPLOYEE,
   },
   {
     key: "Country",
