@@ -46,7 +46,7 @@ const tiles = [
     key: "InvestInstrument",
     label: "Edit Investment Instruments",
     icon: icons.InvestInstrument,
-    route: ROUTES.EDIT_INVEST_INSTRUMENT,
+    route: ROUTES.INVEST_INSTRUMENT_EDIT_LIST,
   },
   {
     key: "FinancialReport",
@@ -65,13 +65,13 @@ const tiles = [
     key: "Sector",
     label: "Edit Sectors",
     icon: icons.Sector,
-    route: ROUTES.EDIT_SECTOR,
+    route: ROUTES.SECTOR,
   },
   {
     key: "RiskLevel",
     label: "Edit Risk Levels",
     icon: icons.RiskLevel,
-    route: ROUTES.EDIT_RISK_LEVEL,
+    route: ROUTES.RISK_LEVEL,
   },
   {
     key: "InvestmentType",

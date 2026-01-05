@@ -459,6 +459,47 @@ const ApiService = {
       throw ["Failed to load risk levels"];
     }
   },
+  async getRiskLevelById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/RiskLevel/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching risk level:", error);
+      throw ["Failed to load risk level."];
+    }
+  },
+
+  async createRiskLevel(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/RiskLevel`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating risk level:", error);
+      throw ["Failed to create risk level."];
+    }
+  },
+
+  async updateRiskLevel(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/RiskLevel/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating risk level:", error);
+      throw ["Failed to update risk level."];
+    }
+  },
+
+  async deleteRiskLevel(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/RiskLevel/${id}`);
+    } catch (error) {
+      console.error("Error deleting risk level:", error);
+      throw ["Failed to delete risk level."];
+    }
+  },
 
   // InvestHorizon endpoints
   async getInvestHorizons() {
@@ -547,6 +588,47 @@ const ApiService = {
       throw error;
     }
   },
+  async getSectorById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Sector/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching sector:", error);
+      throw ["Failed to load sector."];
+    }
+  },
+
+  async createSector(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/Sector`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating sector:", error);
+      throw ["Failed to create sector."];
+    }
+  },
+
+  async updateSector(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/Sector/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating sector:", error);
+      throw ["Failed to update sector."];
+    }
+  },
+
+  async deleteSector(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/Sector/${id}`);
+    } catch (error) {
+      console.error("Error deleting sector:", error);
+      throw ["Failed to delete sector."];
+    }
+  },
 
   // InvestInstrument endpoints
   async getInvestInstruments() {
@@ -578,6 +660,39 @@ const ApiService = {
       `${API_BASE_URL}/InvestInstrument/sector/${sectorId}`
     );
     return res.data;
+  },
+
+  async createInvestInstrument(dto) {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvestInstrument`,
+        dto
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating instrument:", error);
+      throw ["Failed to create investment instrument."];
+    }
+  },
+
+  async updateInvestInstrument(id, dto) {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/InvestInstrument/${id}`,
+        {
+          id,
+          ...dto,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating instrument:", error);
+      throw ["Failed to update investment instrument."];
+    }
+  },
+
+  async deleteInvestInstrument(id) {
+    await axios.delete(`${API_BASE_URL}/InvestInstrument/${id}`);
   },
 
   // WatchListItem endpoints

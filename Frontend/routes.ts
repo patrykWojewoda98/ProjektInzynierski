@@ -13,10 +13,13 @@ export const ROUTES = {
   EMPLOYEE: "/auth/employee/employeeListScreen",
   INVEST_HORIZON: "/investHorizon/investHorizonListScreen",
   INVESTMENT_TYPE: "/investmentType/investmentTypeListScreen",
+  SECTOR: "/sector/sectorListScreen",
+  RISK_LEVEL: "/riskLevel/riskLevelListScreen",
 
   WALLET_HISTORY: "/walletHistory/walletHistory",
   MARKET_DATA: "/marketData",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
+  INVEST_INSTRUMENT_EDIT_LIST: "/investInstrument/investInstrumentListScreen",
   FINANCIAL_REPORT: "/financialReport",
   FINANCIAL_METRIC: "/financialMetric/financialMetric",
   FINANCIAL_METRIC_PREVIEW: "/financialMetric/financialMetricPreview",
@@ -31,14 +34,13 @@ export const ROUTES = {
   EMPLOYEE_DASHBOARD: "/employee/employeeDashboard",
 
   CURRENCY: "/currency/currencyListScreen",
+
   EDIT_INVEST_PROFILE: "/investProfile/editInvestProfile",
   EDIT_WALLET: "/wallet/editWallet",
   EDIT_MARKET_DATA: "/marketData/editMarketData",
-  EDIT_INVEST_INSTRUMENT: "/investInstrument/editInvestInstrument",
   EDIT_FINANCIAL_REPORT: "/financialReport/editFinancialReport",
   EDIT_FINANCIAL_METRIC_PREVIEW: "/financialMetric/editFinancialMetricPreview",
-  EDIT_SECTOR: "/Sector/editSector",
-  EDIT_RISK_LEVEL: "/RiskLevel/editRiskLevel",
+  EDIT_RISK_LEVEL: "/riskLevel/updateRiskLevelScreen",
   EDIT_REGION: "/regions/updateRegionScreen",
   EDIT_CURRENCY: "/currency/updateCurrencyScreen",
   EDIT_REGION_CODE: "/regionCode/updateRegionCodeScreen",
@@ -46,6 +48,8 @@ export const ROUTES = {
   EDIT_EMPLOYEE: "/auth/employee/updateEmployeeScreen",
   EDIT_INVEST_HORIZON: "/investHorizon/updateInvestHorizonScreen",
   EDIT_INVESTMENT_TYPE: "/investmentType/updateInvestmentTypeScreen",
+  EDIT_SECTOR: "/sector/updateSectorScreen",
+  EDIT_INVEST_INSTRUMENT: "/investInstrument/updateInvestInstrumentScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",
@@ -53,4 +57,7 @@ export const ROUTES = {
   ADD_COUNTRY: "/country/createCountryScreen",
   ADD_EMPLOYEE: "/auth/employee/addEmployeeScreen",
   ADD_INVESTMENT_TYPE: "/investmentType/addInvestmentTypeScreen",
+  ADD_SECTOR: "/sector/addSectorScreen",
+  ADD_RISK_LEVEL: "/riskLevel/addRiskLevelScreen",
+  ADD_INVEST_INSTRUMENT: "/investInstrument/createInvestInstrumentScreen",
 } as const;

@@ -263,6 +263,18 @@ export const globalStyles = StyleSheet.create({
     elevation: 3,
   },
 
+  cardWithLongText: {
+    backgroundColor: COLORS.darkGrey,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    width: "100%", // ← KLUCZOWE
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
   cardTitle: {
     color: COLORS.whiteHeader,
     fontSize: 18,
@@ -271,6 +283,13 @@ export const globalStyles = StyleSheet.create({
   },
 
   textSmall: {
+    color: COLORS.textGrey,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  textLong: {
+    flexWrap: "wrap",
+    flexShrink: 1,
     color: COLORS.textGrey,
     fontSize: 14,
     lineHeight: 20,
