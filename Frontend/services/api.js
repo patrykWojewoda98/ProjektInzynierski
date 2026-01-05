@@ -400,6 +400,55 @@ const ApiService = {
     return response.data;
   },
 
+  // InvestmentType endpoints
+  async getAllInvestmentTypes() {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/InvestmentType`);
+      return res.data;
+    } catch (e) {
+      console.error("Error fetching investment types:", e);
+      throw ["Failed to load investment types."];
+    }
+  },
+
+  async getInvestmentTypeById(id) {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/InvestmentType/${id}`);
+      return res.data;
+    } catch {
+      throw ["Failed to load investment type."];
+    }
+  },
+
+  async createInvestmentType(dto) {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/InvestmentType`, dto);
+      return res.data;
+    } catch {
+      throw ["Failed to create investment type."];
+    }
+  },
+
+  async updateInvestmentType(id, dto) {
+    try {
+      const res = await axios.put(`${API_BASE_URL}/InvestmentType/${id}`, {
+        id,
+        ...dto,
+      });
+      return res.data;
+    } catch {
+      throw ["Failed to update investment type."];
+    }
+  },
+
+  async deleteInvestmentType(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/InvestmentType/${id}`);
+    } catch {
+      throw ["Failed to delete investment type."];
+    }
+  },
+
   // RiskLevel endpoints
   async getRiskLevels() {
     try {
@@ -419,6 +468,48 @@ const ApiService = {
     } catch (error) {
       console.error("Error fetching invest horizons:", error);
       throw error;
+    }
+  },
+
+  async getInvestHorizonById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/InvestHorizon/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching invest horizon:", error);
+      throw ["Failed to load investment horizon."];
+    }
+  },
+
+  async createInvestHorizon(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/InvestHorizon`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating invest horizon:", error);
+      throw ["Failed to create investment horizon."];
+    }
+  },
+
+  async updateInvestHorizon(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/InvestHorizon/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating invest horizon:", error);
+      throw ["Failed to update investment horizon."];
+    }
+  },
+
+  async deleteInvestHorizon(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/InvestHorizon/${id}`);
+    } catch (error) {
+      console.error("Error deleting invest horizon:", error);
+      throw ["Failed to delete investment horizon."];
     }
   },
 

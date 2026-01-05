@@ -34,7 +34,17 @@ namespace ProjektIznynierski.Presentation.Controllers
             return Ok(result);
         }
 
-        
+
+        [HttpGet("{id}")]
+        [SwaggerOperation(Summary = "Get Investment Type by ID", Description = "Retrieves a specific Investment Type by their ID.")]
+        [ProducesResponseType(typeof(InvestmentTypeDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(new GetInvestmentTypeByIdQuery(id));
+            return Ok(result);
+        }
+
 
         [HttpPost]
         [SwaggerOperation(
@@ -45,7 +55,7 @@ namespace ProjektIznynierski.Presentation.Controllers
         public async Task<IActionResult> Create([FromBody] CreateInvestmentTypeCommand command)
         {
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetInvestmentTypeByIdQuery), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]

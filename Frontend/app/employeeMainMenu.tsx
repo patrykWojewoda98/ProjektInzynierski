@@ -77,13 +77,13 @@ const tiles = [
     key: "InvestmentType",
     label: "Edit Investment Types",
     icon: icons.InvestmentType,
-    route: ROUTES.EDIT_INVESTMENT_TYPE,
+    route: ROUTES.INVESTMENT_TYPE,
   },
   {
     key: "InvestHorizon",
     label: "Edit Investment Horizons",
     icon: icons.InvestHorizon,
-    route: ROUTES.EDIT_INVEST_HORIZON,
+    route: ROUTES.INVEST_HORIZON,
   },
   {
     key: "Employee",

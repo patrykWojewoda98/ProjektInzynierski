@@ -29,7 +29,7 @@ namespace ProjektIznynierski.Presentation.Controllers
 
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Get InvestHorizon by ID", Description = "Retrieves a specific InvestHorizon by their ID.")]
-        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(InvestHorizonDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
@@ -39,7 +39,7 @@ namespace ProjektIznynierski.Presentation.Controllers
 
         [HttpPost]
         [SwaggerOperation(Summary = "Create a new InvestHorizon", Description = "Creates a new InvestHorizon with the provided details.")]
-        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(InvestHorizonDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Create([FromBody] AddInvestHorizonCommand command)
         {
@@ -49,7 +49,7 @@ namespace ProjektIznynierski.Presentation.Controllers
 
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Update an existing InvestHorizon", Description = "Updates an existing InvestHorizon with the provided details.")]
-        [ProducesResponseType(typeof(ClientDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(InvestHorizonDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateInvestHorizonCommand command)
