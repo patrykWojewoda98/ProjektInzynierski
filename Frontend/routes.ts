@@ -56,6 +56,7 @@ export const ROUTES = {
   EDIT_SECTOR: "/sector/updateSectorScreen",
   EDIT_INVEST_INSTRUMENT: "/investInstrument/updateInvestInstrumentScreen",
   EDIT_FINANCIAL_METRIC: "/financialMetric/editFinancialMetricScreen",
+  EDIT_FINANCIAL_METRIC_LIST: "/financialMetric/editFinancialMetricListScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",

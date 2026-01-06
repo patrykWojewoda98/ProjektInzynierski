@@ -27,8 +27,10 @@ const EditFinancialMetricListScreen = () => {
   const router = useRouter();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [instrumentsLoaded, setInstrumentsLoaded] = useState(false);
   const getInstrumentName = (id) =>
     instruments.find((i) => i.id === id)?.name ?? "Unknown instrument";
+
   const selectedInstrument =
     selectedInstrumentId === "all"
       ? null
@@ -66,14 +68,16 @@ const EditFinancialMetricListScreen = () => {
     const loadInstruments = async () => {
       const data = await ApiService.getInvestInstruments();
       setInstruments(data);
+      setInstrumentsLoaded(true);
     };
     loadInstruments();
   }, []);
 
   // 📥 LOAD REPORTS
   useEffect(() => {
+    if (!instrumentsLoaded) return;
     loadReports();
-  }, [selectedInstrumentId]);
+  }, [selectedInstrumentId, instrumentsLoaded]);
 
   const handleImportReports = async () => {
     if (!selectedInstrument) {

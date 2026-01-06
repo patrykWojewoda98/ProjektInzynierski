@@ -52,13 +52,13 @@ const tiles = [
     key: "FinancialReport",
     label: "Edit Financial Reports",
     icon: icons.FinancialReport,
-    route: ROUTES.EDIT_FINANCIAL_REPORT,
+    route: ROUTES.EDIT_FINANCIAL_REPORT_LIST,
   },
   {
     key: "FinancialMetric",
     label: "Edit Financial Metrics",
     icon: icons.FinancialMetric,
-    route: ROUTES.EDIT_FINANCIAL_METRIC_PREVIEW,
+    route: ROUTES.EDIT_FINANCIAL_METRIC_LIST,
   },
 
   {

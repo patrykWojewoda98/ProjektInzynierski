@@ -21,6 +21,7 @@ const CreateCountryScreen = () => {
 
   const [name, setName] = useState("");
   const [isoCode, setIsoCode] = useState("");
+
   const [regionId, setRegionId] = useState<number | null>(null);
   const [currencyId, setCurrencyId] = useState<number | null>(null);
   const [riskLevelId, setRiskLevelId] = useState<number | null>(null);
@@ -33,35 +34,42 @@ const CreateCountryScreen = () => {
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
+  // 🔐 AUTH
   useEffect(() => {
-    const check = async () => {
+    const checkAuth = async () => {
       const ok = await employeeAuthGuard();
       if (ok) setIsReady(true);
     };
-    check();
+    checkAuth();
   }, []);
 
+  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
-    const load = async () => {
-      const [r, c, rl] = await Promise.all([
-        ApiService.getAllRegions(),
-        ApiService.getAllCurrencies(),
-        ApiService.getRiskLevels(),
-      ]);
-      setRegions(r);
-      setCurrencies(c);
-      setRiskLevels(rl);
-      setLoading(false);
+    const loadData = async () => {
+      try {
+        const [r, c, rl] = await Promise.all([
+          ApiService.getAllRegions(),
+          ApiService.getAllCurrencies(),
+          ApiService.getRiskLevels(),
+        ]);
+
+        setRegions(r);
+        setCurrencies(c);
+        setRiskLevels(rl);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    load();
+    loadData();
   }, [isReady]);
 
+  // 💾 SAVE
   const handleSave = async () => {
     if (!name || !isoCode || !regionId || !currencyId || !riskLevelId) {
-      Alert.alert("Validation error", "All fields required.");
+      Alert.alert("Validation error", "All fields are required.");
       return;
     }
 
@@ -69,14 +77,14 @@ const CreateCountryScreen = () => {
 
     try {
       await ApiService.createCountry({
-        name,
-        isoCode,
+        name: name.trim(),
+        isoCode: isoCode.trim().toUpperCase(),
         regionId,
         currencyId,
         countryRiskLevelId: riskLevelId,
       });
 
-      Alert.alert("Success", "Country created.");
+      Alert.alert("Success", "Country created successfully.");
       router.back();
     } catch {
       Alert.alert("Error", "Failed to create country.");
@@ -93,7 +101,8 @@ const CreateCountryScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Add Country</Text>
 
-      <View style={globalStyles.card}>
+      <View style={[globalStyles.card, globalStyles.fullWidth]}>
+        {/* NAME */}
         <Text style={globalStyles.label}>Name</Text>
         <TextInput
           style={globalStyles.input}
@@ -101,56 +110,70 @@ const CreateCountryScreen = () => {
           onChangeText={setName}
         />
 
+        {/* ISO CODE */}
         <Text style={globalStyles.label}>ISO Code</Text>
         <TextInput
           style={globalStyles.input}
           value={isoCode}
-          onChangeText={setIsoCode}
+          onChangeText={(text) => setIsoCode(text.toUpperCase())}
+          maxLength={2}
+          autoCapitalize="characters"
         />
 
+        {/* REGION */}
         <Text style={globalStyles.label}>Region</Text>
         <Picker
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
           selectedValue={regionId}
           onValueChange={setRegionId}
+          style={globalStyles.pickerText}
+          dropdownIconColor={COLORS.textGrey}
         >
+          <Picker.Item label="Select region" value={null} />
           {regions.map((r) => (
             <Picker.Item key={r.id} label={r.name} value={r.id} />
           ))}
         </Picker>
 
+        {/* CURRENCY */}
         <Text style={globalStyles.label}>Currency</Text>
         <Picker
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
           selectedValue={currencyId}
           onValueChange={setCurrencyId}
+          style={globalStyles.pickerText}
+          dropdownIconColor={COLORS.textGrey}
         >
+          <Picker.Item label="Select currency" value={null} />
           {currencies.map((c) => (
             <Picker.Item key={c.id} label={c.name} value={c.id} />
           ))}
         </Picker>
 
+        {/* RISK LEVEL */}
         <Text style={globalStyles.label}>Risk Level</Text>
         <Picker
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
           selectedValue={riskLevelId}
           onValueChange={setRiskLevelId}
+          style={globalStyles.pickerText}
+          dropdownIconColor={COLORS.textGrey}
         >
+          <Picker.Item label="Select risk level" value={null} />
           {riskLevels.map((r) => (
             <Picker.Item key={r.id} label={r.description} value={r.id} />
           ))}
         </Picker>
       </View>
 
+      {/* SAVE */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mt4]}
         onPress={handleSave}
         disabled={saving}
       >
-        <Text style={globalStyles.buttonText}>Save</Text>
+        {saving ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={globalStyles.buttonText}>Save</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );
