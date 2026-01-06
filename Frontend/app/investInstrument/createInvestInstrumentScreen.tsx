@@ -16,6 +16,7 @@ import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
 import { ROUTES } from "../../routes";
+import { parseApiError } from "../../utils/apiErrorParser";
 
 const CreateInvestInstrumentScreen = () => {
   const router = useRouter();
@@ -81,7 +82,6 @@ const CreateInvestInstrumentScreen = () => {
     load();
   }, [isReady]);
 
-  // 💾 CREATE
   const handleCreate = async () => {
     if (
       !name.trim() ||
@@ -114,8 +114,10 @@ const CreateInvestInstrumentScreen = () => {
 
       Alert.alert("Success", "Instrument created successfully.");
       router.replace(ROUTES.INVEST_INSTRUMENT_EDIT_LIST);
-    } catch {
-      Alert.alert("Error", "Create failed.");
+    } catch (error) {
+      const messages = parseApiError(error);
+
+      Alert.alert("Save failed", messages.join("\n"));
     } finally {
       setSaving(false);
     }

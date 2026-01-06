@@ -62,10 +62,9 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(i => i.FinancialMetric)
-                   .WithOne()
-                   .HasForeignKey<InvestInstrument>(i => i.FinancialMetricId)
-                   .IsRequired(false)
-                   .OnDelete(DeleteBehavior.SetNull);
+       .WithOne(f => f.InvestmentInstrument)
+       .HasForeignKey<FinancialMetric>(f => f.InvestmentInstrumentId)
+       .OnDelete(DeleteBehavior.Cascade);
 
             base.Configure(builder);
         }

@@ -113,7 +113,7 @@ const FinancialMetric = () => {
 
       {/* METRICS */}
       <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {metric && (
+        {metric ? (
           <>
             <Text style={[globalStyles.cardTitle, spacing.mb2]}>
               Financial Ratios
@@ -129,6 +129,10 @@ const FinancialMetric = () => {
               Dividend Yield: {metric.dividendYield}%
             </Text>
           </>
+        ) : (
+          <Text style={[globalStyles.cardTitle, spacing.mb2]}>
+            Financial Ratios – no data available
+          </Text>
         )}
       </View>
 

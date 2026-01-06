@@ -1,5 +1,7 @@
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ProjektIznynierski.Application.Commands.FinancialMetric.CreateFinancialMetric;
 using ProjektIznynierski.Application.Commands.InvestInstrument.CreateInvestInstrument;
 using ProjektIznynierski.Application.Commands.InvestInstrument.DeleteInvestInstrument;
 using ProjektIznynierski.Application.Commands.InvestInstrument.UpdateInvestInstrument;
@@ -72,6 +74,24 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPost("{instrumentId}/FinancialMetric")]
+        [SwaggerOperation(Summary = "Create financial metric for investment instrument",Description = "Creates and assigns a financial metric to the given investment instrument.")]
+        [ProducesResponseType(typeof(FinancialMetricDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CreateFinancialMetric(int instrumentId,[FromBody] CreateFinancialMetricAndAssignToInstrumentCommand command)
+        {
+            command = command with { InvestInstrumentId = instrumentId };   
+            var result = await _mediator.Send(command);
+
+            return CreatedAtAction(
+                nameof(FinancialMetricController.GetById),
+                "FinancialMetric",
+                new { id = result.Id },
+                result
+            );
         }
 
         [HttpPut("{id}")]

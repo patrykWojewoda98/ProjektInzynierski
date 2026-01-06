@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace ProjektIznynierski.Application.Commands.FinancialMetric.CreateFinancialMetric
 {
-    public class CreateFinancialMetricCommandValidation : AbstractValidator<CreateFinancialMetricCommand>
+    public class CreateFinancialMetricAndAssignToInstrumentCommandValidation : AbstractValidator<CreateFinancialMetricAndAssignToInstrumentCommand>
     {
-        public CreateFinancialMetricCommandValidation()
+        public CreateFinancialMetricAndAssignToInstrumentCommandValidation()
         {
             RuleFor(x => x.PE).GreaterThanOrEqualTo(0).When(x => x.PE.HasValue).WithMessage("Wskaźnik P/E nie może być ujemny.");
             RuleFor(x => x.PB).GreaterThanOrEqualTo(0).When(x => x.PB.HasValue).WithMessage("Wskaźnik P/B nie może być ujemny.");

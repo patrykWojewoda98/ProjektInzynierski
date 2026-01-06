@@ -39,7 +39,12 @@ export const ROUTES = {
   EDIT_WALLET: "/wallet/editWallet",
   EDIT_MARKET_DATA: "/marketData/editMarketData",
   EDIT_FINANCIAL_REPORT: "/financialReport/editFinancialReport",
+  EDIT_FINANCIAL_REPORT_LIST: "/financialReport/editFinancialMetricListScreen",
+
+  //chyba do usuniecia
   EDIT_FINANCIAL_METRIC_PREVIEW: "/financialMetric/editFinancialMetricPreview",
+  //chyba do usuniecia
+
   EDIT_RISK_LEVEL: "/riskLevel/updateRiskLevelScreen",
   EDIT_REGION: "/regions/updateRegionScreen",
   EDIT_CURRENCY: "/currency/updateCurrencyScreen",
@@ -50,6 +55,7 @@ export const ROUTES = {
   EDIT_INVESTMENT_TYPE: "/investmentType/updateInvestmentTypeScreen",
   EDIT_SECTOR: "/sector/updateSectorScreen",
   EDIT_INVEST_INSTRUMENT: "/investInstrument/updateInvestInstrumentScreen",
+  EDIT_FINANCIAL_METRIC: "/financialMetric/editFinancialMetricScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",
@@ -60,4 +66,6 @@ export const ROUTES = {
   ADD_SECTOR: "/sector/addSectorScreen",
   ADD_RISK_LEVEL: "/riskLevel/addRiskLevelScreen",
   ADD_INVEST_INSTRUMENT: "/investInstrument/createInvestInstrumentScreen",
+  ADD_FINANCIAL_METRIC: "/financialMetric/addFinancialMetricScreen",
+  ADD_FINANCIAL_REPORT: "/financialReport/addFinancialReportScreen",
 } as const;

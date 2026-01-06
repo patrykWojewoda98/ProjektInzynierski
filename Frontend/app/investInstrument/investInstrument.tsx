@@ -122,10 +122,11 @@ const InvestInstrument = () => {
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const [r, s, t] = await Promise.all([
-          ApiService.getRegions(),
+        const [r, s, i, t] = await Promise.all([
+          ApiService.getAllRegions(),
           ApiService.getSectors(),
           ApiService.getInvestInstruments(),
+          ApiService.getAllInvestmentTypes(),
         ]);
 
         setRegions(r);
@@ -160,7 +161,6 @@ const InvestInstrument = () => {
     loadInstruments();
   }, [selectedRegion, selectedSector, selectedType]);
 
-  // ⏳ WAIT UNTIL EVERYTHING IS READY
   if (loading || !watchListLoaded) {
     return <ActivityIndicator color={COLORS.primary} />;
   }

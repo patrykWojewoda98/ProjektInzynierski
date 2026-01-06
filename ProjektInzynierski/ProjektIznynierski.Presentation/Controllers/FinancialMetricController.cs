@@ -39,16 +39,6 @@ namespace ProjektIznynierski.Presentation.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        [SwaggerOperation(Summary = "Create a new Financial Metric", Description = "Creates a new Financial Metric with the provided details.")]
-        [ProducesResponseType(typeof(FinancialMetricDto), (int)HttpStatusCode.Created)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateFinancialMetricCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
-
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Update an existing Financial Metric", Description = "Updates an existing Financial Metric with the provided details.")]
         [ProducesResponseType(typeof(FinancialMetricDto), (int)HttpStatusCode.OK)]

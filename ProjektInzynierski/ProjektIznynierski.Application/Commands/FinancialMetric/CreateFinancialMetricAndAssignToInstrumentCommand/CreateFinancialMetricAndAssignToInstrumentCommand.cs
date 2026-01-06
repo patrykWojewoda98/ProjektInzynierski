@@ -3,8 +3,10 @@ using ProjektIznynierski.Application.Dtos;
 
 namespace ProjektIznynierski.Application.Commands.FinancialMetric.CreateFinancialMetric
 {
-    public class CreateFinancialMetricCommand : IRequest<FinancialMetricDto>
+    public record CreateFinancialMetricAndAssignToInstrumentCommand : IRequest<FinancialMetricDto>
     {
+        public int InvestInstrumentId { get; init; }
+
         public decimal? PE { get; set; }
         public decimal? PB { get; set; }
         public decimal? ROE { get; set; }

@@ -30,6 +30,10 @@ namespace ProjektIznynierski.Infrastructure.Config
                    .HasColumnType("decimal(18,4)")
                    .IsRequired(false);
 
+            builder.HasOne(f => f.InvestmentInstrument)
+       .WithOne(i => i.FinancialMetric)
+       .HasForeignKey<FinancialMetric>(f => f.InvestmentInstrumentId);
+
             base.Configure(builder);
         }
     }

@@ -564,6 +564,41 @@ const ApiService = {
       throw error;
     }
   },
+  async createFinancialMetricForInstrument(instrumentId, dto) {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/InvestInstrument/${instrumentId}/FinancialMetric`,
+        dto
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating financial metric:", error);
+      throw error;
+    }
+  },
+  async updateFinancialMetric(id, dto) {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/FinancialMetric/${id}`,
+        {
+          id,
+          ...dto,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating financial metric:", error);
+      throw error;
+    }
+  },
+  async deleteFinancialMetric(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/FinancialMetric/${id}`);
+    } catch (error) {
+      console.error("Error deleting financial metric:", error);
+      throw error;
+    }
+  },
 
   // FinancialReport endpoints
   async getFinancialReportsByInvestInstrumentId(instrumentId) {
@@ -574,6 +609,39 @@ const ApiService = {
       return response.data;
     } catch (error) {
       console.error("Error fetching financial reports:", error);
+      throw error;
+    }
+  },
+
+  getFinancialReports() {
+    return axios.get(`${API_BASE_URL}/FinancialReport`).then((r) => r.data);
+  },
+
+  getFinancialReportById(id) {
+    return axios
+      .get(`${API_BASE_URL}/FinancialReport/${id}`)
+      .then((res) => res.data);
+  },
+  createFinancialReport(dto) {
+    return axios.post(`${API_BASE_URL}/FinancialReport`, dto);
+  },
+  updateFinancialReport(id, dto) {
+    return axios.put(`${API_BASE_URL}/FinancialReport/${id}`, dto);
+  },
+
+  deleteFinancialReport(id) {
+    return axios.delete(`${API_BASE_URL}/FinancialReport/${id}`);
+  },
+
+  async importFinancialReportsByIsin(isin: string) {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/FinancialReport/import`,
+        { isin }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error importing financial reports:", error);
       throw error;
     }
   },
@@ -670,8 +738,7 @@ const ApiService = {
       );
       return response.data;
     } catch (error) {
-      console.error("Error creating instrument:", error);
-      throw ["Failed to create investment instrument."];
+      throw error;
     }
   },
 

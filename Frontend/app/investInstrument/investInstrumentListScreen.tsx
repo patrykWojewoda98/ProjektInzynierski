@@ -177,11 +177,19 @@ const InvestmentInstrumentListScreen = () => {
       {/* LIST */}
       <View style={[spacing.mt3, globalStyles.fullWidth]}>
         {items.map((i) => (
-          <View key={i.id} style={[globalStyles.card, spacing.mb4]}>
+          <View
+            key={i.id}
+            style={[globalStyles.card, spacing.mb4, { width: "100%" }]}
+          >
             <Text style={globalStyles.cardTitle}>{i.ticker}</Text>
             <Text style={globalStyles.text}>{i.name}</Text>
-
-            <View style={[globalStyles.row, spacing.mt2]}>
+            <View
+              style={[
+                globalStyles.row,
+                spacing.mt2,
+                { justifyContent: "center" },
+              ]}
+            >
               <TouchableOpacity
                 style={spacing.mr4}
                 onPress={() =>
@@ -198,9 +206,77 @@ const InvestmentInstrumentListScreen = () => {
                 <Ionicons name="trash" size={22} color={COLORS.error} />
               </TouchableOpacity>
             </View>
+
+            <View
+              style={[spacing.mt2, { width: "100%", alignItems: "center" }]}
+            >
+              <TouchableOpacity
+                style={[
+                  globalStyles.button,
+                  { width: "100%", alignSelf: "center" },
+                ]}
+                onPress={async () => {
+                  const instrument = await ApiService.getInvestInstrumentById(
+                    i.id
+                  );
+
+                  router.push({
+                    pathname: instrument.financialMetricId
+                      ? ROUTES.EDIT_FINANCIAL_METRIC
+                      : ROUTES.ADD_FINANCIAL_METRIC,
+                    params: {
+                      instrumentId: i.id,
+                      metricId: instrument.financialMetricId ?? null,
+                    },
+                  });
+                }}
+              >
+                <Text
+                  style={[
+                    globalStyles.buttonText,
+                    { fontSize: 18, textAlign: "center" },
+                  ]}
+                >
+                  {i.financialMetricId
+                    ? "Edit Financial Metric"
+                    : "Add Financial Metric"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={[spacing.mt2, { width: "100%", alignItems: "center" }]}
+            >
+              <TouchableOpacity
+                style={[
+                  globalStyles.button,
+                  {
+                    width: "100%",
+                    alignSelf: "center",
+                    backgroundColor: COLORS.primary,
+                  },
+                ]}
+                onPress={() =>
+                  router.push({
+                    pathname: ROUTES.EDIT_FINANCIAL_REPORT_LIST,
+                    params: { instrumentId: i.id },
+                  })
+                }
+              >
+                <Text
+                  style={[
+                    globalStyles.buttonText,
+                    { fontSize: 18, textAlign: "center" },
+                  ]}
+                >
+                  Financial Reports
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </View>
+
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

@@ -7,5 +7,7 @@
         public decimal? ROE { get; set; } // Return on Equity
         public decimal? DebtToEquity { get; set; }
         public decimal? DividendYield { get; set; }
+        public int InvestmentInstrumentId { get; set; }
+        public InvestInstrument InvestmentInstrument { get; set; }
     }
 }

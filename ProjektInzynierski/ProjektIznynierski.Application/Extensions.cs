@@ -66,7 +66,7 @@ namespace ProjektIznynierski.Application
             services.AddScoped<IValidator<CreateSectorCommand>, CreateSectorCommandValidation>();
             services.AddScoped<IValidator<UpdateSectorCommand>, UpdateSectorCommandValidation>();
 
-            services.AddScoped<IValidator<CreateFinancialMetricCommand>, CreateFinancialMetricCommandValidation>();
+            services.AddScoped<IValidator<CreateFinancialMetricAndAssignToInstrumentCommand>, CreateFinancialMetricAndAssignToInstrumentCommandValidation>();
             services.AddScoped<IValidator<UpdateFinancialMetricCommand>, UpdateFinancialMetricCommandValidation>();
 
             services.AddScoped<IValidator<CreateFinancialReportCommand>, CreateFinancialReportCommandValidation>();
