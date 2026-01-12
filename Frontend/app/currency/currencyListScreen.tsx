@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,12 +9,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const CurrencyListScreen = () => {
@@ -78,6 +78,13 @@ const CurrencyListScreen = () => {
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Currencies</Text>
+
+      <TouchableOpacity
+        style={[globalStyles.button, spacing.mb4]}
+        onPress={() => router.push(ROUTES.ADD_CURRENCY)}
+      >
+        <Text style={globalStyles.buttonText}>Add new Currency</Text>
+      </TouchableOpacity>
 
       {currencies.map((currency) => (
         <View key={currency.id} style={[globalStyles.card, spacing.mb3]}>

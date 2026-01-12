@@ -62,6 +62,7 @@ export const ROUTES = {
   ADD_REGION: "/regions/addRegionScreen",
   ADD_REGION_CODE: "/regionCode/addRegionCodeScreen",
   ADD_COUNTRY: "/country/createCountryScreen",
+  ADD_CURRENCY: "/currency/addCurrencyScreen",
   ADD_EMPLOYEE: "/auth/employee/addEmployeeScreen",
   ADD_INVESTMENT_TYPE: "/investmentType/addInvestmentTypeScreen",
   ADD_SECTOR: "/sector/addSectorScreen",

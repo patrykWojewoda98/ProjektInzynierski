@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,21 +17,17 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
-const UpdateRegionScreen = () => {
-  const { id } = useLocalSearchParams();
+const AddCurrencyScreen = () => {
   const router = useRouter();
 
   const [name, setName] = useState("");
-  const [regionCodeId, setRegionCodeId] = useState<number | null>(null);
   const [riskLevelId, setRiskLevelId] = useState<number | null>(null);
-
   const [riskLevels, setRiskLevels] = useState<any[]>([]);
-  const [regionCodes, setRegionCodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
+  // 🔐 AUTH GUARD
   useEffect(() => {
     const checkAuth = async () => {
       const ok = await employeeAuthGuard();
@@ -40,54 +36,43 @@ const UpdateRegionScreen = () => {
     checkAuth();
   }, []);
 
-  // 📥 LOAD
+  // 📥 LOAD RISK LEVELS
   useEffect(() => {
-    if (!id || !isReady) return;
+    if (!isReady) return;
 
-    const loadData = async () => {
+    const load = async () => {
       try {
-        const [region, risks, codes] = await Promise.all([
-          ApiService.getRegionById(Number(id)),
-          ApiService.getRiskLevels(),
-          ApiService.getAllRegionCodes(),
-        ]);
-
-        setName(region.name);
-        setRiskLevelId(region.regionRiskLevelId);
-        setRegionCodeId(region.regionCodeId ?? null);
-        setRiskLevels(risks);
-        setRegionCodes(codes);
+        const data = await ApiService.getRiskLevels();
+        setRiskLevels(data);
       } catch {
-        Alert.alert("Error", "Failed to load region.");
+        Alert.alert("Error", "Failed to load risk levels.");
         router.back();
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
-  }, [id, isReady]);
+    load();
+  }, [isReady]);
 
   const handleSave = async () => {
     if (!name.trim() || riskLevelId === null) {
-      Alert.alert("Validation error", "Name and risk level are required.");
+      Alert.alert("Validation error", "All fields are required.");
       return;
     }
 
     setSaving(true);
 
     try {
-      await ApiService.updateRegion(Number(id), {
-        id: Number(id),
+      await ApiService.createCurrency({
         name,
-        regionCodeId,
-        regionRiskLevelId: riskLevelId,
+        currencyRiskLevelId: riskLevelId,
       });
 
-      Alert.alert("Success", "Region updated successfully.");
-      router.replace(ROUTES.REGION);
+      Alert.alert("Success", "Currency created successfully.");
+      router.replace(ROUTES.CURRENCY);
     } catch {
-      Alert.alert("Error", "Failed to update region.");
+      Alert.alert("Error", "Failed to create currency.");
     } finally {
       setSaving(false);
     }
@@ -99,34 +84,20 @@ const UpdateRegionScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Text style={[globalStyles.header, spacing.mb4]}>Edit Region</Text>
+      <Text style={[globalStyles.header, spacing.mb4]}>Add Currency</Text>
 
+      {/* NAME */}
       <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        <Text style={globalStyles.label}>Region Name</Text>
+        <Text style={globalStyles.label}>Currency Name</Text>
         <TextInput
-          style={[globalStyles.input, spacing.mb3]}
+          style={[globalStyles.input, spacing.mb2]}
           value={name}
           onChangeText={setName}
+          placeholder="e.g. USD"
         />
       </View>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        <Text style={globalStyles.label}>Region Code</Text>
-        <View style={globalStyles.pickerWrapper}>
-          <Picker
-            selectedValue={regionCodeId}
-            onValueChange={(v) => setRegionCodeId(v)}
-            style={globalStyles.pickerText}
-            dropdownIconColor={COLORS.textGrey}
-          >
-            <Picker.Item label="— No code —" value={null} />
-            {regionCodes.map((c) => (
-              <Picker.Item key={c.id} label={c.code} value={c.id} />
-            ))}
-          </Picker>
-        </View>
-      </View>
-
+      {/* RISK LEVEL */}
       <View style={[globalStyles.card, globalStyles.fullWidth]}>
         <Text style={globalStyles.label}>Risk Level</Text>
         <View style={globalStyles.pickerWrapper}>
@@ -136,6 +107,7 @@ const UpdateRegionScreen = () => {
             style={globalStyles.pickerText}
             dropdownIconColor={COLORS.textGrey}
           >
+            <Picker.Item label="-- Select risk level --" value={null} />
             {riskLevels.map((r) => (
               <Picker.Item key={r.id} label={r.description} value={r.id} />
             ))}
@@ -143,22 +115,24 @@ const UpdateRegionScreen = () => {
         </View>
       </View>
 
+      {/* SAVE */}
       <TouchableOpacity
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
           saving && globalStyles.buttonDisabled,
         ]}
-        onPress={handleSave}
         disabled={saving}
+        onPress={handleSave}
       >
         {saving ? (
           <ActivityIndicator color={COLORS.whiteHeader} />
         ) : (
-          <Text style={globalStyles.buttonText}>Save Changes</Text>
+          <Text style={globalStyles.buttonText}>Create Currency</Text>
         )}
       </TouchableOpacity>
 
+      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>
@@ -169,4 +143,4 @@ const UpdateRegionScreen = () => {
   );
 };
 
-export default UpdateRegionScreen;
+export default AddCurrencyScreen;

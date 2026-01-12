@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,21 +17,20 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
-const UpdateRegionScreen = () => {
-  const { id } = useLocalSearchParams();
+const AddRegionScreen = () => {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [regionCodeId, setRegionCodeId] = useState<number | null>(null);
   const [riskLevelId, setRiskLevelId] = useState<number | null>(null);
 
-  const [riskLevels, setRiskLevels] = useState<any[]>([]);
   const [regionCodes, setRegionCodes] = useState<any[]>([]);
+  const [riskLevels, setRiskLevels] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
     const checkAuth = async () => {
       const ok = await employeeAuthGuard();
@@ -40,36 +39,30 @@ const UpdateRegionScreen = () => {
     checkAuth();
   }, []);
 
-  // 📥 LOAD
   useEffect(() => {
-    if (!id || !isReady) return;
+    if (!isReady) return;
 
     const loadData = async () => {
       try {
-        const [region, risks, codes] = await Promise.all([
-          ApiService.getRegionById(Number(id)),
-          ApiService.getRiskLevels(),
+        const [codes, risks] = await Promise.all([
           ApiService.getAllRegionCodes(),
+          ApiService.getRiskLevels(),
         ]);
 
-        setName(region.name);
-        setRiskLevelId(region.regionRiskLevelId);
-        setRegionCodeId(region.regionCodeId ?? null);
-        setRiskLevels(risks);
         setRegionCodes(codes);
+        setRiskLevels(risks);
       } catch {
-        Alert.alert("Error", "Failed to load region.");
-        router.back();
+        Alert.alert("Error", "Failed to load dictionaries.");
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, [id, isReady]);
+  }, [isReady]);
 
   const handleSave = async () => {
-    if (!name.trim() || riskLevelId === null) {
+    if (!name.trim() || !riskLevelId) {
       Alert.alert("Validation error", "Name and risk level are required.");
       return;
     }
@@ -77,17 +70,16 @@ const UpdateRegionScreen = () => {
     setSaving(true);
 
     try {
-      await ApiService.updateRegion(Number(id), {
-        id: Number(id),
+      await ApiService.createRegion({
         name,
         regionCodeId,
         regionRiskLevelId: riskLevelId,
       });
 
-      Alert.alert("Success", "Region updated successfully.");
+      Alert.alert("Success", "Region created successfully.");
       router.replace(ROUTES.REGION);
     } catch {
-      Alert.alert("Error", "Failed to update region.");
+      Alert.alert("Error", "Failed to create region.");
     } finally {
       setSaving(false);
     }
@@ -99,43 +91,45 @@ const UpdateRegionScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Text style={[globalStyles.header, spacing.mb4]}>Edit Region</Text>
+      <Text style={[globalStyles.header, spacing.mb4]}>Add Region</Text>
 
       <View style={[globalStyles.card, globalStyles.fullWidth]}>
+        {/* NAME */}
         <Text style={globalStyles.label}>Region Name</Text>
         <TextInput
           style={[globalStyles.input, spacing.mb3]}
           value={name}
           onChangeText={setName}
+          placeholder="Region name"
+          placeholderTextColor={COLORS.placeholderGrey}
         />
-      </View>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
+        {/* REGION CODE */}
         <Text style={globalStyles.label}>Region Code</Text>
-        <View style={globalStyles.pickerWrapper}>
+        <View style={[globalStyles.pickerWrapper, spacing.mb3]}>
           <Picker
             selectedValue={regionCodeId}
-            onValueChange={(v) => setRegionCodeId(v)}
             style={globalStyles.pickerText}
             dropdownIconColor={COLORS.textGrey}
+            onValueChange={(v) => setRegionCodeId(v)}
           >
-            <Picker.Item label="— No code —" value={null} />
+            <Picker.Item label="-- No code --" value={null} />
             {regionCodes.map((c) => (
               <Picker.Item key={c.id} label={c.code} value={c.id} />
             ))}
           </Picker>
         </View>
-      </View>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
+        {/* RISK LEVEL */}
         <Text style={globalStyles.label}>Risk Level</Text>
-        <View style={globalStyles.pickerWrapper}>
+        <View style={[globalStyles.pickerWrapper, spacing.mb4]}>
           <Picker
             selectedValue={riskLevelId}
-            onValueChange={(v) => setRiskLevelId(v)}
             style={globalStyles.pickerText}
             dropdownIconColor={COLORS.textGrey}
+            onValueChange={(v) => setRiskLevelId(v)}
           >
+            <Picker.Item label="-- Choose risk level --" value={null} />
             {riskLevels.map((r) => (
               <Picker.Item key={r.id} label={r.description} value={r.id} />
             ))}
@@ -143,22 +137,24 @@ const UpdateRegionScreen = () => {
         </View>
       </View>
 
+      {/* SAVE */}
       <TouchableOpacity
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
           saving && globalStyles.buttonDisabled,
         ]}
-        onPress={handleSave}
         disabled={saving}
+        onPress={handleSave}
       >
         {saving ? (
           <ActivityIndicator color={COLORS.whiteHeader} />
         ) : (
-          <Text style={globalStyles.buttonText}>Save Changes</Text>
+          <Text style={globalStyles.buttonText}>Save</Text>
         )}
       </TouchableOpacity>
 
+      {/* BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>
@@ -169,4 +165,4 @@ const UpdateRegionScreen = () => {
   );
 };
 
-export default UpdateRegionScreen;
+export default AddRegionScreen;

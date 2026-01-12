@@ -233,6 +233,24 @@ const ApiService = {
     }
   },
 
+  async createRegion(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/Region`, {
+        name: dto.name,
+        regionCodeId: dto.regionCodeId, // może być null
+        regionRiskLevelId: dto.regionRiskLevelId, // wymagane
+      });
+
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+
+      console.error("Error creating region:", error);
+      throw ["An error occurred while creating region."];
+    }
+  },
   async updateRegion(id, dto) {
     try {
       const response = await axios.put(`${API_BASE_URL}/Region/${id}`, dto);
@@ -336,6 +354,24 @@ const ApiService = {
       }
       console.error("Error fetching client:", error);
       throw ["An error occurred while fetching client data. Please try again."];
+    }
+  },
+
+  async createCurrency(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/Currency`, {
+        name: dto.name,
+        currencyRiskLevelId: dto.currencyRiskLevelId,
+      });
+
+      return response.data;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+
+      console.error("Error creating currency:", error);
+      throw ["An error occurred while creating currency."];
     }
   },
 

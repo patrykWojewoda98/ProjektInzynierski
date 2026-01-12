@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,13 +9,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const RegionListScreen = () => {
@@ -43,7 +43,7 @@ const RegionListScreen = () => {
         const [regionsData, risks, codes] = await Promise.all([
           ApiService.getAllRegions(),
           ApiService.getRiskLevels(),
-          ApiService.getRegionCodes(),
+          ApiService.getAllRegionCodes(),
         ]);
 
         setRegions(regionsData);
@@ -90,6 +90,13 @@ const RegionListScreen = () => {
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Regions</Text>
+
+      <TouchableOpacity
+        style={[globalStyles.button, spacing.mb4]}
+        onPress={() => router.push(ROUTES.ADD_REGION)}
+      >
+        <Text style={globalStyles.buttonText}>Add new Region</Text>
+      </TouchableOpacity>
 
       {regions.map((region) => (
         <View key={region.id} style={[globalStyles.card, spacing.mb3]}>
