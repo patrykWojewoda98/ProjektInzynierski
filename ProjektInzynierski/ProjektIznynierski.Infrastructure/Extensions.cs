@@ -47,6 +47,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IAIAnalysisPromptBuilder, AIAnalysisPromptBuilder>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITwoFactorCodeService, TwoFactorCodeService>();
+            services.AddScoped<IYahooFinanceService, YahooFinanceService>();
 
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>

@@ -8,5 +8,6 @@ namespace ProjektIznynierski.Domain.Abstractions
         Task<List<InvestInstrument>> GetBySectorIdAsync(int id, CancellationToken cancellationToken = default);
         Task<List<InvestInstrument>> GetByTypeIdAsync(int id, CancellationToken cancellationToken = default);
         Task<InvestInstrument?> GetByIsinAsync(string isin, CancellationToken ct);
+        Task<InvestInstrument?> GetByTickerAsync(string Ticker, CancellationToken ct);
     }
 }

@@ -10,6 +10,16 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         public MarketDataRepository(ProjektInzynierskiDbContext dbContext) : base(dbContext)
         {
         }
+
+        public async Task<bool> ExistsAsync(int investInstrumentId,DateTime date, CancellationToken ct)
+        {
+            return await _dbContext.MarketDatas.AnyAsync(
+                md =>
+                    md.InvestInstrumentId == investInstrumentId &&
+                    md.Date.Date == date.Date,
+                ct);
+        }
+
         public async Task<MarketData?> GetLatestByInvestInstrumentIdAsync(int investInstrumentId, CancellationToken cancellationToken)
         {
             return await _dbContext.MarketDatas

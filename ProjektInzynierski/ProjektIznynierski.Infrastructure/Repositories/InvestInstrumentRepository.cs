@@ -37,5 +37,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
             return await _dbContext.Set<InvestInstrument>()
                 .SingleOrDefaultAsync(i => i.Isin == isin, ct);
         }
+
+        public async Task<InvestInstrument?> GetByTickerAsync(string Ticker, CancellationToken ct)
+        {
+            return await _dbContext.Set<InvestInstrument>()
+                .SingleOrDefaultAsync(i => i.Ticker == Ticker, ct);
+        }
     }
 }
