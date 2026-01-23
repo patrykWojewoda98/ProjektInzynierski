@@ -6,6 +6,7 @@ namespace ProjektIznynierski.Domain.Abstractions
     {
         Task<MarketData?> GetLatestByInvestInstrumentIdAsync(int investInstrumentId, CancellationToken cancellationToken);
         Task<bool> ExistsAsync(int investInstrumentId, DateTime date, CancellationToken ct);
+        Task<List<MarketData>> GetByInvestInstrumentIdAsync(int investInstrumentId, CancellationToken cancellationToken);
 
     }
 }

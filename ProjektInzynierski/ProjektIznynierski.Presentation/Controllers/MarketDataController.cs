@@ -6,6 +6,7 @@ using ProjektIznynierski.Application.Commands.MarketData.UpdateMarketData;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.MarketData.GetAllMarketData;
 using ProjektIznynierski.Application.Queries.MarketData.GetMarketDataById;
+using ProjektIznynierski.Application.Queries.MarketData.GetMarketDataByInvestInstrumentId;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
@@ -33,6 +34,15 @@ namespace ProjektIznynierski.Presentation.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetMarketDataByIdQuery(id));
+            return Ok(result);
+        }
+
+        [HttpGet("invest-instrument/{investInstrumentID:int}")]
+        [SwaggerOperation(Summary = "Get Market Data by instruments by Invest Instrument ID")]
+        [ProducesResponseType(typeof(IEnumerable<InvestInstrumentDto>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetByRegionId(int investInstrumentID)
+        {
+            var result = await _mediator.Send(new GetMarketDataByInvestInstrumentIdQuery(investInstrumentID));
             return Ok(result);
         }
 

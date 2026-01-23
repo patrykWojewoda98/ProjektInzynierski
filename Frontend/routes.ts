@@ -37,7 +37,7 @@ export const ROUTES = {
 
   EDIT_INVEST_PROFILE: "/investProfile/editInvestProfile",
   EDIT_WALLET: "/wallet/editWallet",
-  EDIT_MARKET_DATA: "/marketData/editMarketData",
+
   EDIT_FINANCIAL_REPORT: "/financialReport/editFinancialReport",
   EDIT_FINANCIAL_REPORT_LIST: "/financialReport/editFinancialMetricListScreen",
 
@@ -57,6 +57,8 @@ export const ROUTES = {
   EDIT_INVEST_INSTRUMENT: "/investInstrument/updateInvestInstrumentScreen",
   EDIT_FINANCIAL_METRIC: "/financialMetric/editFinancialMetricScreen",
   EDIT_FINANCIAL_METRIC_LIST: "/financialMetric/editFinancialMetricListScreen",
+  EDIT_MARKET_DATA_LIST: "/marketData/editMarketDataListScreen",
+  EDIT_MARKET_DATA: "/marketData/editMarketDataScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",

@@ -1,7 +1,27 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 
-const API_BASE_URL = "http://10.0.2.2:5036/api";
+const getApiBaseUrl = () => {
+  if (Platform.OS === "web") {
+    return "http://localhost:5036/api";
+  }
+
+  if (Platform.OS === "android") {
+    return "http://10.0.2.2:5036/api";
+  }
+
+  const host = Constants.expoConfig?.hostUri?.split(":")[0];
+
+  if (!host) {
+    return "http://localhost:5036/api";
+  }
+
+  return `http://${host}:5036/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const ApiService = {
   // Authentication endpoints
@@ -534,6 +554,88 @@ const ApiService = {
     } catch (error) {
       console.error("Error deleting risk level:", error);
       throw ["Failed to delete risk level."];
+    }
+  },
+
+  //MarketData endpoints
+  async getAllMarketData() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/MarketData`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching market data:", error);
+      throw ["Failed to fetch market data."];
+    }
+  },
+
+  async getMarketDataById(id) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/MarketData/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching market data by id:", error);
+      throw ["Failed to fetch market data."];
+    }
+  },
+
+  async getMarketDataByInstrumentId(instrumentId) {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/MarketData/invest-instrument/${instrumentId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching market data for instrument:", error);
+      throw ["Failed to fetch market data for selected instrument."];
+    }
+  },
+
+  async createMarketData(dto) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/MarketData`, dto);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating market data:", error);
+      throw ["Failed to create market data."];
+    }
+  },
+
+  async updateMarketData(id, dto) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/MarketData/${id}`, {
+        id,
+        ...dto,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating market data:", error);
+      throw ["Failed to update market data."];
+    }
+  },
+
+  async deleteMarketData(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/MarketData/${id}`);
+    } catch (error) {
+      console.error("Error deleting market data:", error);
+      throw ["Failed to delete market data."];
+    }
+  },
+
+  async importMarketDataByTicker(ticker) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/MarketData/import`, {
+        ticker,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error importing market data:", error);
+
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors;
+      }
+
+      throw ["Failed to import market data for given ticker."];
     }
   },
 
