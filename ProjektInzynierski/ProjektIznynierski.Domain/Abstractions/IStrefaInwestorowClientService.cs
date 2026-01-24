@@ -5,5 +5,6 @@ namespace ProjektIznynierski.Domain.Abstractions
     public interface IStrefaInwestorowClientService
     {
         Task<List<FinancialReportSnapshot>> GetFinancialReportsAsync(string isin, CancellationToken ct);
+        Task<FinancialIndicatorsSnapshot> GetFinancialIndicatorsAsync(string isin, CancellationToken ct);
     }
 }

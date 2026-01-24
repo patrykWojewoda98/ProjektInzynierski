@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,13 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const InvestHorizonListScreen = () => {
@@ -48,21 +49,18 @@ const InvestHorizonListScreen = () => {
   }, [isReady]);
 
   const handleDelete = (id: number) => {
-    Alert.alert("Confirm delete", "Delete this investment horizon?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await ApiService.deleteInvestHorizon(id);
-            setHorizons((p) => p.filter((h) => h.id !== id));
-          } catch {
-            Alert.alert("Error", "Failed to delete investment horizon.");
-          }
-        },
+    confirmAction({
+      title: "Confirm action",
+      message: "Are you sure you want to delete this investment horizon?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteInvestHorizon(id);
+          setHorizons((p) => p.filter((h) => h.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete investment horizon.");
+        }
       },
-    ]);
+    });
   };
 
   if (!isReady || loading) {

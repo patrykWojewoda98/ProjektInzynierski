@@ -23,7 +23,9 @@ const EditMarketDataScreen = () => {
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
+  const [investInstrumentId, setInvestInstrumentId] = useState<number | null>(
+    null,
+  );
   const [date, setDate] = useState("");
   const [openPrice, setOpenPrice] = useState("");
   const [closePrice, setClosePrice] = useState("");
@@ -47,7 +49,7 @@ const EditMarketDataScreen = () => {
     const load = async () => {
       try {
         const data = await ApiService.getMarketDataById(Number(id));
-
+        setInvestInstrumentId(data.investInstrumentId);
         setDate(data.date.split("T")[0]);
         setOpenPrice(String(data.openPrice));
         setClosePrice(String(data.closePrice));
@@ -82,6 +84,7 @@ const EditMarketDataScreen = () => {
 
     try {
       await ApiService.updateMarketData(Number(id), {
+        investInstrumentId: investInstrumentId!,
         date,
         openPrice: Number(openPrice),
         closePrice: Number(closePrice),
@@ -91,7 +94,7 @@ const EditMarketDataScreen = () => {
       });
 
       Alert.alert("Success", "Market data updated successfully.");
-      router.replace(ROUTES.MARKET_DATA);
+      router.replace(ROUTES.EDIT_MARKET_DATA_LIST);
     } catch {
       Alert.alert("Error", "Failed to update market data.");
     } finally {

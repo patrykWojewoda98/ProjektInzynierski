@@ -9,5 +9,6 @@ namespace ProjektIznynierski.Domain.Abstractions
         Task<List<InvestInstrument>> GetByTypeIdAsync(int id, CancellationToken cancellationToken = default);
         Task<InvestInstrument?> GetByIsinAsync(string isin, CancellationToken ct);
         Task<InvestInstrument?> GetByTickerAsync(string Ticker, CancellationToken ct);
+        Task<InvestInstrument>GetByFinacialMetricIdAsync(int id, CancellationToken ct);
     }
 }

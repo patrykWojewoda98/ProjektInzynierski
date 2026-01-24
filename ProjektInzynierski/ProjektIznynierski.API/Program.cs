@@ -2,6 +2,7 @@ using ProjektIznynierski.Infrastructure;
 using ProjektIznynierski.Application;
 using ProjektIznynierski.Presentation;
 using DotNetEnv;
+using ProjektIznynierski.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,6 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
-
 app.UseCors("AllowAllOrigins");
 // Configure the HTTP request pipeline.
 app.UsePresentation();

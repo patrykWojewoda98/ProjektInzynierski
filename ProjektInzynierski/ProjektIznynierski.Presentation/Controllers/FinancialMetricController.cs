@@ -1,10 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ProjektIznynierski.Application.Commands.Country.CreateCountry;
-using ProjektIznynierski.Application.Commands.Country.DeleteCountry;
-using ProjektIznynierski.Application.Commands.Country.UpdateCountry;
 using ProjektIznynierski.Application.Commands.FinancialMetric.CreateFinancialMetric;
 using ProjektIznynierski.Application.Commands.FinancialMetric.DeleteFinancialMetric;
+using ProjektIznynierski.Application.Commands.FinancialMetric.ImportFinancialIndicators;
 using ProjektIznynierski.Application.Commands.FinancialMetric.UpdateFinancialMetric;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.FinancialMetric.GetAllFinancialMetrics;
@@ -37,6 +35,25 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetFinancialMetricByIdQuery(id));
             return Ok(result);
+        }
+        [HttpPost()]
+        [SwaggerOperation( Summary = "Create Financial Metric and assign to Invest Instrument", Description = "Creates a Financial Metric and assigns it to the selected Invest Instrument.")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> CreateAndAssign([FromBody] CreateFinancialMetricAndAssignToInstrumentCommand command)
+        {
+            var metricId = await _mediator.Send(command);
+            return Ok(metricId);
+        }
+
+        [HttpPost("import")]
+        [SwaggerOperation(Summary = "Import financial indicators",Description = "Imports financial indicators from Strefa Inwestorów and creates or updates the Financial Metric.")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Import([FromBody] ImportFinancialMetricCommand command)
+        {
+            var metricId = await _mediator.Send(command);
+            return Ok(metricId);
         }
 
         [HttpPut("{id}")]

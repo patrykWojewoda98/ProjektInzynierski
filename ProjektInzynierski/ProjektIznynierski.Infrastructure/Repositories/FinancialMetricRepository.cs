@@ -11,5 +11,11 @@ namespace ProjektIznynierski.Infrastructure.Repositories
         {
             
         }
+
+        public async Task<FinancialMetric?> GetByInvestInstrumentIdAsync(int investInstrumentId,CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Set<FinancialMetric>()
+                 .SingleOrDefaultAsync(fm => fm.InvestmentInstrumentId == investInstrumentId, cancellationToken);
+        }
     }
 }

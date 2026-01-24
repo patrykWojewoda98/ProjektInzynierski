@@ -1,4 +1,6 @@
-import { useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -8,61 +10,35 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+
+import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
-import { COLORS } from "../../assets/Constants/colors";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { confirmAction } from "../../utils/confirmAction";
 
 const EditFinancialMetricListScreen = () => {
   const { instrumentId } = useLocalSearchParams();
-
-  const [instruments, setInstruments] = useState([]);
-  const [selectedInstrumentId, setSelectedInstrumentId] = useState(
-    instrumentId ? Number(instrumentId) : "all"
-  );
-
   const router = useRouter();
-  const [reports, setReports] = useState([]);
+
+  const [instruments, setInstruments] = useState<any[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState(false);
-  const getInstrumentName = (id) =>
-    instruments.find((i) => i.id === id)?.name ?? "Unknown instrument";
+
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState<
+    number | "all"
+  >(instrumentId ? Number(instrumentId) : "all");
 
   const selectedInstrument =
     selectedInstrumentId === "all"
       ? null
       : instruments.find((i) => i.id === selectedInstrumentId);
 
-  const [importing, setImporting] = useState(false);
+  const getInstrumentName = (id: number) =>
+    instruments.find((i) => i.id === id)?.name ?? "Unknown instrument";
 
-  const handleDeleteReport = async (id) => {
-    try {
-      await ApiService.deleteFinancialReport(id);
-      setReports((prev) => prev.filter((r) => r.id !== id));
-    } catch {
-      Alert.alert("Error", "Failed to delete financial report.");
-    }
-  };
-  const loadReports = async () => {
-    setLoading(true);
-
-    try {
-      let data;
-      if (selectedInstrumentId === "all") {
-        data = await ApiService.getFinancialReports();
-      } else {
-        data = await ApiService.getFinancialReportsByInvestInstrumentId(
-          selectedInstrumentId
-        );
-      }
-      setReports(data);
-    } finally {
-      setLoading(false);
-    }
-  };
   // 📥 LOAD INSTRUMENTS
   useEffect(() => {
     const loadInstruments = async () => {
@@ -70,6 +46,7 @@ const EditFinancialMetricListScreen = () => {
       setInstruments(data);
       setInstrumentsLoaded(true);
     };
+
     loadInstruments();
   }, []);
 
@@ -79,11 +56,42 @@ const EditFinancialMetricListScreen = () => {
     loadReports();
   }, [selectedInstrumentId, instrumentsLoaded]);
 
+  const loadReports = async () => {
+    setLoading(true);
+    try {
+      const data =
+        selectedInstrumentId === "all"
+          ? await ApiService.getFinancialReports()
+          : await ApiService.getFinancialReportsByInvestInstrumentId(
+              selectedInstrumentId,
+            );
+
+      setReports(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteReport = (id: number) => {
+    confirmAction({
+      title: "Confirm delete",
+      message: "Delete this financial report?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteFinancialReport(id);
+          setReports((prev) => prev.filter((r) => r.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete financial report.");
+        }
+      },
+    });
+  };
+
   const handleImportReports = async () => {
     if (!selectedInstrument) {
       Alert.alert(
         "Select instrument",
-        "Please select an investment instrument."
+        "Please select an investment instrument.",
       );
       return;
     }
@@ -97,14 +105,12 @@ const EditFinancialMetricListScreen = () => {
 
     try {
       await ApiService.importFinancialReportsByIsin(selectedInstrument.isin);
-
       Alert.alert("Success", "Financial reports imported successfully.");
-
-      await loadReports(); // ⬅️ patrz PROBLEM 2
+      await loadReports();
     } catch (error: any) {
       Alert.alert(
         "Import failed",
-        error?.response?.data ?? "Failed to import reports."
+        error?.response?.data ?? "Failed to import reports.",
       );
     } finally {
       setImporting(false);
@@ -137,14 +143,14 @@ const EditFinancialMetricListScreen = () => {
       {/* ❌ NO REPORTS */}
       {!loading && reports.length === 0 && (
         <View style={[globalStyles.card, globalStyles.fullWidth]}>
-          <Text
-            style={[globalStyles.title, spacing.mb3, { textAlign: "center" }]}
-          >
+          <Text style={[globalStyles.title, { textAlign: "center" }]}>
             No financial reports available.
           </Text>
         </View>
       )}
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
+
+      {/* 🔘 ACTION BUTTONS */}
+      <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mb4]}>
         <TouchableOpacity
           style={[
             globalStyles.button,
@@ -164,12 +170,12 @@ const EditFinancialMetricListScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[globalStyles.button, { backgroundColor: COLORS.primary }]}
+          style={globalStyles.button}
           onPress={() => {
             if (selectedInstrumentId === "all") {
               Alert.alert(
                 "Select instrument",
-                "Please select an investment instrument first."
+                "Please select an investment instrument first.",
               );
               return;
             }
@@ -185,31 +191,26 @@ const EditFinancialMetricListScreen = () => {
       </View>
 
       {/* 📄 REPORT LIST */}
-      {/* 📄 REPORT LIST */}
       {!loading &&
         reports.map((r) => (
           <View
             key={r.id}
             style={[globalStyles.card, globalStyles.fullWidth, spacing.mb4]}
           >
-            {/* 🔹 INSTRUMENT NAME */}
-            <Text style={[globalStyles.cardTitle, spacing.mb1]}>
+            <Text style={globalStyles.cardTitle}>
               {getInstrumentName(r.investInstrumentId)}
             </Text>
 
-            {/* 🔹 PERIOD */}
-            <Text style={[globalStyles.cardTitle, spacing.mb2]}>
+            <Text style={[globalStyles.text, spacing.mb2]}>
               Period: {r.period}
             </Text>
 
-            {/* 🔹 DATA */}
             <Text style={globalStyles.text}>Revenue: {r.revenue}</Text>
             <Text style={globalStyles.text}>Net Income: {r.netIncome}</Text>
             <Text style={globalStyles.text}>EPS: {r.eps}</Text>
             <Text style={globalStyles.text}>Assets: {r.assets}</Text>
             <Text style={globalStyles.text}>Liabilities: {r.liabilities}</Text>
 
-            {/* 🔹 ACTIONS */}
             <View
               style={[
                 globalStyles.row,
@@ -229,22 +230,7 @@ const EditFinancialMetricListScreen = () => {
                 <Ionicons name="pencil" size={22} color={COLORS.primary} />
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() =>
-                  Alert.alert(
-                    "Confirm delete",
-                    "Delete this financial report?",
-                    [
-                      { text: "Cancel", style: "cancel" },
-                      {
-                        text: "Delete",
-                        style: "destructive",
-                        onPress: () => handleDeleteReport(r.id),
-                      },
-                    ]
-                  )
-                }
-              >
+              <TouchableOpacity onPress={() => handleDeleteReport(r.id)}>
                 <Ionicons name="trash" size={22} color={COLORS.error} />
               </TouchableOpacity>
             </View>

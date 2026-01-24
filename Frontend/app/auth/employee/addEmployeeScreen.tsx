@@ -1,20 +1,21 @@
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Switch,
 } from "react-native";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../../services/api";
-import { globalStyles, spacing } from "../../../assets/styles/styles";
 import { COLORS } from "../../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../../assets/styles/styles";
+import ApiService from "../../../services/api";
 import { employeeAuthGuard } from "../../../utils/employeeAuthGuard";
+import { showValidationErrors } from "../../../utils/showValidationErrors";
 
 const AddEmployeeScreen = () => {
   const router = useRouter();
@@ -36,11 +37,6 @@ const AddEmployeeScreen = () => {
   }, []);
 
   const handleSave = async () => {
-    if (!name || !email || !password) {
-      Alert.alert("Validation error", "Required fields missing.");
-      return;
-    }
-
     try {
       await ApiService.createEmployee({
         name,
@@ -53,8 +49,8 @@ const AddEmployeeScreen = () => {
 
       Alert.alert("Success", "Employee created.");
       router.back();
-    } catch {
-      Alert.alert("Error", "Failed to create employee.");
+    } catch (error) {
+      Alert.alert("Validation error", showValidationErrors(error));
     }
   };
 
@@ -66,7 +62,7 @@ const AddEmployeeScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Add Employee</Text>
 
-      <View style={[globalStyles.card]}>
+      <View style={globalStyles.card}>
         <Text style={globalStyles.label}>Name</Text>
         <TextInput
           style={globalStyles.input}
@@ -109,7 +105,10 @@ const AddEmployeeScreen = () => {
         </View>
       </View>
 
-      <TouchableOpacity style={globalStyles.button} onPress={handleSave}>
+      <TouchableOpacity
+        style={[globalStyles.button, spacing.mt4]}
+        onPress={handleSave}
+      >
         <Text style={globalStyles.buttonText}>Create</Text>
       </TouchableOpacity>
     </ScrollView>

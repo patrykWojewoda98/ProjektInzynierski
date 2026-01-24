@@ -17,7 +17,6 @@ export const ROUTES = {
   RISK_LEVEL: "/riskLevel/riskLevelListScreen",
 
   WALLET_HISTORY: "/walletHistory/walletHistory",
-  MARKET_DATA: "/marketData",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
   INVEST_INSTRUMENT_EDIT_LIST: "/investInstrument/investInstrumentListScreen",
   FINANCIAL_REPORT: "/financialReport",

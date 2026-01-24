@@ -14,6 +14,7 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const RegionListScreen = () => {
@@ -66,21 +67,18 @@ const RegionListScreen = () => {
     regionCodes.find((c) => c.id === id)?.code ?? "—";
 
   const handleDelete = (id: number) => {
-    Alert.alert("Confirm delete", "Delete this region?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await ApiService.deleteRegion(id);
-            setRegions((prev) => prev.filter((r) => r.id !== id));
-          } catch {
-            Alert.alert("Error", "Failed to delete region.");
-          }
-        },
+    confirmAction({
+      title: "Confirm delete",
+      message: "Delete this region?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteRegion(id);
+          setRegions((prev) => prev.filter((r) => r.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete region.");
+        }
       },
-    ]);
+    });
   };
 
   if (!isReady || loading) {
@@ -91,6 +89,7 @@ const RegionListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Regions</Text>
 
+      {/* ➕ ADD */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mb4]}
         onPress={() => router.push(ROUTES.ADD_REGION)}
@@ -98,6 +97,7 @@ const RegionListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new Region</Text>
       </TouchableOpacity>
 
+      {/* 📄 LIST */}
       {regions.map((region) => (
         <View key={region.id} style={[globalStyles.card, spacing.mb3]}>
           <View style={[globalStyles.row, globalStyles.spaceBetween]}>
@@ -134,6 +134,7 @@ const RegionListScreen = () => {
         </View>
       ))}
 
+      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

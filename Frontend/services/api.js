@@ -105,12 +105,22 @@ const ApiService = {
       throw ["An error occurred while fetching analysis requests."];
     }
   },
+  async deleteAIAnalysisRequest(id) {
+    try {
+      await axios.delete(`${API_BASE_URL}/AIAnalysisRequest/${id}`);
+    } catch (error) {
+      console.error("Error deleting analysis request:", error);
+      throw ["An error occurred while deleting the analysis request."];
+    }
+  },
 
   //AI Analysis Result endpoints
   async getAIAnalysisResultById(id) {
     const res = await axios.get(`${API_BASE_URL}/AIAnalysisResult/${id}`);
     return res.data;
   },
+
+
 
   // Register endpoint
   async registerClient(clientData) {
@@ -737,6 +747,22 @@ const ApiService = {
       throw error;
     }
   },
+
+  async importFinancialMetric(dto) {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/FinancialMetric/import`,
+      dto
+    );
+    return response.data; // zwraca metricId
+  } catch (error) {
+    console.error(
+      "Error importing financial metric automatically:",
+      error
+    );
+    throw error;
+  }
+},
 
   // FinancialReport endpoints
   async getFinancialReportsByInvestInstrumentId(instrumentId) {

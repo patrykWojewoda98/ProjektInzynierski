@@ -153,5 +153,109 @@ namespace ProjektIznynierski.Application.Services.Sources
 
             Debug.WriteLine("===============================================");
         }
+
+        public async Task<FinancialIndicatorsSnapshot> GetFinancialIndicatorsAsync(string isin,CancellationToken ct)
+        {
+            var url = $"https://strefainwestorow.pl/notowania/spolki/{isin}/wskazniki-finansowe";
+            var htmlDoc = new HtmlWeb().Load(url);
+
+            var rows = htmlDoc
+                .QuerySelectorAll("table.table-indicators tbody tr");
+
+            var indicators = new FinancialIndicatorsSnapshot();
+
+            foreach (var row in rows)
+            {
+                var cells = row.QuerySelectorAll("td").ToList();
+                if (cells.Count != 2)
+                    continue;
+
+                var name = cells[0].InnerText.Trim();
+                var valueText = cells[1].InnerText.Trim();
+
+                var value = ParseIndicatorValue(valueText);
+
+                switch (name)
+                {
+                    case "C/Z":
+                        indicators.PE = value;
+                        break;
+
+                    case "C/WK":
+                        indicators.PB = value;
+                        break;
+
+                    case "ROE":
+                        indicators.ROE = value;
+                        break;
+
+                    case "C/ZO":
+                        indicators.DebtToEquity = value;
+                        break;
+                }
+            }
+            var latestDividendYield = await GetLatestDividendYieldAsync(isin);
+
+            if (latestDividendYield.HasValue)
+            {
+                indicators.DividendYield = latestDividendYield;
+            }
+
+            Debug.WriteLine("==== FINANCIAL Metric ====");
+            Debug.WriteLine($"PE: {indicators.PE}");
+            Debug.WriteLine($"PB: {indicators.PB}");
+            Debug.WriteLine($"ROE: {indicators.ROE}");
+            Debug.WriteLine($"DebtToEquity: {indicators.DebtToEquity}");
+            Debug.WriteLine($"DividendYield: {indicators.DividendYield}");
+
+            return indicators;
+        }
+
+        private async Task<decimal?> GetLatestDividendYieldAsync(string isin)
+        {
+            var url = $"https://strefainwestorow.pl/notowania/spolki/{isin}/dywidendy";
+            var htmlDoc = new HtmlWeb().Load(url);
+
+            var firstRow = htmlDoc
+                .QuerySelector("table.table-dividends-mobile tbody tr");
+
+            if (firstRow == null)
+                return null;
+
+            var dividendDiv = firstRow
+                .QuerySelectorAll("div.mb-1")
+                .FirstOrDefault(d =>
+                    d.InnerText.Contains("Stopa dywidendy:", StringComparison.OrdinalIgnoreCase));
+
+            if (dividendDiv == null)
+                return null;
+
+            var text = HtmlEntity.DeEntitize(dividendDiv.InnerText)
+                .Replace("Stopa dywidendy:", "")
+                .Trim();
+
+            return ParseIndicatorValue(text);
+        }
+
+        private static decimal? ParseIndicatorValue(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text) || text == "-")
+                return null;
+
+            var cleaned = text
+                .Replace("%", "")
+                .Replace("&nbsp;", "")
+                .Replace(" ", "")
+                .Replace(",", ".")
+                .Trim();
+
+            return decimal.TryParse(
+                cleaned,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out var value)
+                ? value
+                : null;
+        }
     }
 }

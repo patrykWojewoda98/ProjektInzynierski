@@ -10,10 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const EditMarketDataListScreen = () => {
@@ -36,52 +38,6 @@ const EditMarketDataListScreen = () => {
   const [countryId, setCountryId] = useState<number | null>(null);
   const [typeId, setTypeId] = useState<number | null>(null);
   const [instrumentId, setInstrumentId] = useState<number | null>(null);
-
-  const handleImportLatest = async () => {
-    if (!instrumentId) return;
-
-    setImporting(true);
-
-    try {
-      const instrument = instruments.find((i) => i.id === instrumentId);
-
-      if (!instrument?.ticker) {
-        Alert.alert("Error", "Instrument ticker not found.");
-        return;
-      }
-
-      await ApiService.importMarketDataByTicker(instrument.ticker);
-
-      const refreshed = await ApiService.getMarketDataByInstrumentId(
-        instrumentId
-      );
-      setMarketData(refreshed);
-
-      Alert.alert("Success", "Latest market data imported.");
-    } catch {
-      Alert.alert("Error", "Failed to import market data.");
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const handleDeleteMarketData = (id: number) => {
-    Alert.alert("Confirm delete", "Delete this market data record?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await ApiService.deleteMarketData(id);
-            setMarketData((p) => p.filter((x) => x.id !== id));
-          } catch {
-            Alert.alert("Error", "Failed to delete market data.");
-          }
-        },
-      },
-    ]);
-  };
 
   // 🔐 AUTH
   useEffect(() => {
@@ -152,6 +108,49 @@ const EditMarketDataListScreen = () => {
     loadMarketData();
   }, [instrumentId]);
 
+  // ⬇️ IMPORT
+  const handleImportLatest = async () => {
+    if (!instrumentId) return;
+
+    setImporting(true);
+
+    try {
+      const instrument = instruments.find((i) => i.id === instrumentId);
+
+      if (!instrument?.ticker) {
+        Alert.alert("Error", "Instrument ticker not found.");
+        return;
+      }
+
+      await ApiService.importMarketDataByTicker(instrument.ticker);
+
+      const refreshed =
+        await ApiService.getMarketDataByInstrumentId(instrumentId);
+
+      setMarketData(refreshed);
+      Alert.alert("Success", "Latest market data imported.");
+    } catch {
+      Alert.alert("Error", "Failed to import market data.");
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleDeleteMarketData = (id: number) => {
+    confirmAction({
+      title: "Confirm delete",
+      message: "Delete this market data record?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteMarketData(id);
+          setMarketData((p) => p.filter((x) => x.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete market data.");
+        }
+      },
+    });
+  };
+
   if (!isReady || loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
@@ -161,7 +160,7 @@ const EditMarketDataListScreen = () => {
     value: number | null,
     setValue: (v: number | null) => void,
     data: any[],
-    labelKey = "name"
+    labelKey = "name",
   ) => (
     <View style={[globalStyles.card, globalStyles.fullWidth]}>
       <Text style={globalStyles.label}>{label}</Text>
@@ -181,11 +180,6 @@ const EditMarketDataListScreen = () => {
     </View>
   );
 
-  const formatDate = (iso: string) => iso.split("T")[0];
-
-  const changeColor = (value: number) =>
-    value > 0 ? COLORS.success : value < 0 ? COLORS.error : COLORS.textGrey;
-
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Market Data</Text>
@@ -199,38 +193,43 @@ const EditMarketDataListScreen = () => {
         instrumentId,
         setInstrumentId,
         filteredInstruments,
-        "ticker"
+        "ticker",
       )}
 
       {instrumentId && (
         <>
-          <Text style={[globalStyles.header, spacing.mt4, spacing.mb2]}>
-            Market Data
-          </Text>
-          <View style={[spacing.mt3, spacing.mb3]}>
+          <View style={spacing.mt3}>
             <TouchableOpacity
-              style={globalStyles.button}
+              style={[
+                globalStyles.button,
+                importing && globalStyles.buttonDisabled,
+              ]}
+              disabled={importing}
               onPress={handleImportLatest}
             >
-              <Text style={globalStyles.buttonText}>
-                Import latest market data
-              </Text>
+              {importing ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={globalStyles.buttonText}>
+                  Import latest market data
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
+
           {marketData.map((m) => {
             const dailyColor =
               m.dailyChange > 0
                 ? COLORS.success
                 : m.dailyChange < 0
-                ? COLORS.error
-                : COLORS.textGrey;
+                  ? COLORS.error
+                  : COLORS.textGrey;
 
             return (
               <View
                 key={m.id}
                 style={[globalStyles.card, globalStyles.fullWidth, spacing.mb3]}
               >
-                {/* HEADER */}
                 <View
                   style={[
                     globalStyles.row,
@@ -267,7 +266,6 @@ const EditMarketDataListScreen = () => {
                   </View>
                 </View>
 
-                {/* DETAILS */}
                 <Text style={globalStyles.textSmall}>Open: {m.openPrice}</Text>
                 <Text style={globalStyles.textSmall}>
                   Close: {m.closePrice}
@@ -279,7 +277,6 @@ const EditMarketDataListScreen = () => {
                 <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
                   Daily change: {m.dailyChange}
                 </Text>
-
                 <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
                   Daily change %: {m.dailyChangePercent}%
                 </Text>

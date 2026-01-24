@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,13 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const RegionCodesListScreen = () => {
@@ -23,6 +24,7 @@ const RegionCodesListScreen = () => {
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
+  // 🔐 AUTH
   useEffect(() => {
     const checkAuth = async () => {
       const ok = await employeeAuthGuard();
@@ -31,6 +33,7 @@ const RegionCodesListScreen = () => {
     checkAuth();
   }, []);
 
+  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
@@ -49,25 +52,18 @@ const RegionCodesListScreen = () => {
   }, [isReady]);
 
   const handleDelete = (id: number) => {
-    Alert.alert(
-      "Confirm delete",
-      "Are you sure you want to delete this region code?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await ApiService.deleteRegionCode(id);
-              setRegionCodes((prev) => prev.filter((r) => r.id !== id));
-            } catch {
-              Alert.alert("Error", "Failed to delete region code.");
-            }
-          },
-        },
-      ]
-    );
+    confirmAction({
+      title: "Confirm delete",
+      message: "Are you sure you want to delete this region code?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteRegionCode(id);
+          setRegionCodes((prev) => prev.filter((r) => r.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete region code.");
+        }
+      },
+    });
   };
 
   if (!isReady || loading) {
@@ -86,6 +82,7 @@ const RegionCodesListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new Region Code</Text>
       </TouchableOpacity>
 
+      {/* 📄 LIST */}
       {regionCodes.map((code) => (
         <View key={code.id} style={[globalStyles.card, spacing.mb3]}>
           <View style={[globalStyles.row, globalStyles.spaceBetween]}>

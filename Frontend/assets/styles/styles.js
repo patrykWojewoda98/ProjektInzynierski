@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { COLORS } from "../Constants/colors";
 
 // Utility function to generate spacing styles
@@ -299,6 +299,18 @@ export const globalStyles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 10,
+  },
+
+  //Web
+  webTwoColumnWrapper: {
+    width: "100%",
+    flexDirection: Platform.OS === "web" ? "row" : "column",
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
+    justifyContent: "space-between",
+  },
+
+  webTwoColumnCard: {
+    width: Platform.OS === "web" ? "48%" : "100%",
   },
 });
 

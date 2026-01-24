@@ -13,6 +13,7 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const CurrencyListScreen = () => {
@@ -51,27 +52,21 @@ const CurrencyListScreen = () => {
     const risk = riskLevels.find((r) => r.id === riskLevelId);
     return risk?.description ?? "N/A";
   };
-  const handleDelete = (id) => {
-    Alert.alert(
-      "Confirm delete",
-      "Are you sure you want to delete this currency?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await ApiService.deleteCurrency(id);
-              setCurrencies((prev) => prev.filter((c) => c.id !== id));
-            } catch (e) {
-              Alert.alert("Error", "Failed to delete currency.");
-            }
-          },
-        },
-      ]
-    );
+  const handleDelete = (id: number) => {
+    confirmAction({
+      title: "Confirm action",
+      message: "Are you sure you want to continue?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteCurrency(id);
+          setCurrencies((prev) => prev.filter((c) => c.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete currency.");
+        }
+      },
+    });
   };
+
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }

@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,14 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
+import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const InvestmentTypeListScreen = () => {
   const router = useRouter();
@@ -36,17 +37,18 @@ const InvestmentTypeListScreen = () => {
   }, [ready]);
 
   const handleDelete = (id: number) => {
-    Alert.alert("Confirm", "Delete this investment type?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
+    confirmAction({
+      title: "Confirm action",
+      message: "Are you sure you want to delete this investment type?",
+      onConfirm: async () => {
+        try {
           await ApiService.deleteInvestmentType(id);
           setItems((p) => p.filter((x) => x.id !== id));
-        },
+        } catch {
+          Alert.alert("Error", "Failed to delete investment type.");
+        }
       },
-    ]);
+    });
   };
 
   if (!ready || loading) {

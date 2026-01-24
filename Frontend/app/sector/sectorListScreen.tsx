@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,21 +9,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const SectorListScreen = () => {
   const router = useRouter();
+
   const [sectors, setSectors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
+  // 🔐 AUTH
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -30,6 +33,7 @@ const SectorListScreen = () => {
     check();
   }, []);
 
+  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
@@ -48,21 +52,18 @@ const SectorListScreen = () => {
   }, [isReady]);
 
   const handleDelete = (id: number) => {
-    Alert.alert("Confirm delete", "Delete this sector?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await ApiService.deleteSector(id);
-            setSectors((p) => p.filter((s) => s.id !== id));
-          } catch {
-            Alert.alert("Error", "Failed to delete sector.");
-          }
-        },
+    confirmAction({
+      title: "Confirm delete",
+      message: "Delete this sector?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteSector(id);
+          setSectors((p) => p.filter((s) => s.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete sector.");
+        }
       },
-    ]);
+    });
   };
 
   if (!isReady || loading) {
@@ -81,6 +82,7 @@ const SectorListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new sector</Text>
       </TouchableOpacity>
 
+      {/* 📄 LIST */}
       {sectors.map((s) => (
         <View key={s.id} style={[globalStyles.cardWithLongText, spacing.mb3]}>
           <View style={[globalStyles.row, globalStyles.spaceBetween]}>
@@ -112,6 +114,7 @@ const SectorListScreen = () => {
         </View>
       ))}
 
+      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

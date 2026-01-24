@@ -9,22 +9,33 @@ namespace ProjektIznynierski.Application.Commands.Employee.AddEmployee
         {
             RuleFor(x => x.Name)
                 .NotEmpty()
-                .MaximumLength(150);
+                .WithMessage("Name is required.")
+                .MaximumLength(150)
+                .WithMessage("Name cannot be longer than 150 characters.");
 
             RuleFor(x => x.Email)
                 .NotEmpty()
-                .EmailAddress();
+                .WithMessage("Email is required.")
+                .EmailAddress()
+                .WithMessage("Email must be a valid email address.");
 
             RuleFor(x => x.Pesel)
                 .NotEmpty()
-                .Length(11);
+                .WithMessage("PESEL is required.")
+                .Length(11)
+                .WithMessage("PESEL must contain exactly 11 digits.");
 
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty()
-                .MaximumLength(20);
+                .WithMessage("Phone number is required.")
+                .MaximumLength(20)
+                .WithMessage("Phone number cannot be longer than 20 characters.");
 
             RuleFor(x => x.Password)
-                .MinimumLength(6);
+                .NotEmpty()
+                .WithMessage("Password is required.")
+                .MinimumLength(6)
+                .WithMessage("Password must be at least 6 characters long.");
         }
     }
 }

@@ -1,18 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import { confirmAction } from "@/utils/confirmAction";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
-
-import { AuthContext } from "../_layout";
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { AuthContext } from "../_layout";
 
 const MyAIRequests = () => {
   const router = useRouter();
@@ -20,6 +22,7 @@ const MyAIRequests = () => {
 
   const [requests, setRequests] = useState([]);
   const [instrumentNames, setInstrumentNames] = useState({});
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +31,7 @@ const MyAIRequests = () => {
 
       try {
         const aiRequests = await ApiService.getAnalysisRequestsByClientId(
-          user.id
+          user.id,
         );
         setRequests(aiRequests);
 
@@ -36,12 +39,13 @@ const MyAIRequests = () => {
           ...new Set(aiRequests.map((r) => r.investInstrumentId)),
         ];
 
-        const namesMap = {};
+        const namesMap: Record<number, string> = {};
+
         await Promise.all(
           uniqueInstrumentIds.map(async (id) => {
             const instrument = await ApiService.getInvestInstrumentById(id);
             namesMap[id] = instrument.name;
-          })
+          }),
         );
 
         setInstrumentNames(namesMap);
@@ -54,6 +58,19 @@ const MyAIRequests = () => {
 
     loadData();
   }, [user]);
+
+  const handleDeleteRequest = (id) => {
+    confirmAction({
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteAIAnalysisRequest(id);
+          setRequests((prev) => prev.filter((r) => r.id !== id));
+        } catch {
+          Alert.alert("Error", "Something went wrong.");
+        }
+      },
+    });
+  };
 
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
@@ -73,10 +90,24 @@ const MyAIRequests = () => {
         <View style={globalStyles.fullWidth}>
           {requests.map((req) => (
             <View key={req.id} style={[globalStyles.card, spacing.mb3]}>
-              <Text style={globalStyles.cardTitle}>
-                {instrumentNames[req.investInstrumentId] ?? "Loading..."}
-              </Text>
+              {/* HEADER */}
+              <View
+                style={[
+                  globalStyles.row,
+                  globalStyles.spaceBetween,
+                  spacing.mb1,
+                ]}
+              >
+                <Text style={globalStyles.cardTitle}>
+                  {instrumentNames[req.investInstrumentId] ?? "Loading..."}
+                </Text>
 
+                <TouchableOpacity onPress={() => handleDeleteRequest(req.id)}>
+                  <Ionicons name="trash" size={20} color={COLORS.error} />
+                </TouchableOpacity>
+              </View>
+
+              {/* DETAILS */}
               <Text style={globalStyles.textSmall}>
                 Created at: {new Date(req.createdAt).toLocaleDateString()}
               </Text>

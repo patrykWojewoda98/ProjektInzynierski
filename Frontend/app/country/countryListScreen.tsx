@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,13 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const CountryListScreen = () => {
@@ -51,21 +52,18 @@ const CountryListScreen = () => {
   }, [isReady]);
 
   const handleDelete = (id: number) => {
-    Alert.alert("Confirm delete", "Delete this country?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await ApiService.deleteCountry(id);
-            setCountries((p) => p.filter((c) => c.id !== id));
-          } catch {
-            Alert.alert("Error", "Failed to delete country.");
-          }
-        },
+    confirmAction({
+      title: "Confirm action",
+      message: "Are you sure you want to continue?",
+      onConfirm: async () => {
+        try {
+          await ApiService.deleteCountry(id);
+          setCountries((prev) => prev.filter((c) => c.id !== id));
+        } catch {
+          Alert.alert("Error", "Failed to delete country.");
+        }
       },
-    ]);
+    });
   };
 
   if (!isReady || loading) {
