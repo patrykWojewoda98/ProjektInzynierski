@@ -32,5 +32,6 @@ namespace ProjektIznynierski.Domain.Entities
 
         public ICollection<MarketData> MarketData { get; set; } = new List<MarketData>();
         public ICollection<FinancialReport> FinancialReports { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

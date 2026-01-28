@@ -14,8 +14,8 @@ import {
 } from "react-native";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import ApiService from "../../services/api";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
 
 const RegisterScreen = () => {
   const router = useRouter();
@@ -44,7 +44,7 @@ const RegisterScreen = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        const data = await ApiService.getRegions();
+        const data = await ApiService.getAllRegions();
         setRegions(data);
       } catch {
         setErrors(["Failed to load regions. Please try again."]);

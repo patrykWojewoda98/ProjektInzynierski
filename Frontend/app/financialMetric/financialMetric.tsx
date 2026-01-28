@@ -1,18 +1,19 @@
+import { decodeToken } from "@/utils/decodeToken";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
-import { decodeToken } from "@/utils/decodeToken";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import ApiService from "../../services/api";
 
 const FinancialMetric = () => {
   const { id } = useLocalSearchParams();
@@ -24,6 +25,9 @@ const FinancialMetric = () => {
 
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [commentLoading, setCommentLoading] = useState(false);
 
   useEffect(() => {
     const loadClientId = async () => {
@@ -41,13 +45,13 @@ const FinancialMetric = () => {
     const loadData = async () => {
       try {
         const instrumentData = await ApiService.getInvestInstrumentById(
-          Number(id)
+          Number(id),
         );
         setInstrument(instrumentData);
 
         if (instrumentData?.financialMetricId) {
           const metricData = await ApiService.getFinancialMetricById(
-            instrumentData.financialMetricId
+            instrumentData.financialMetricId,
           );
           setMetric(metricData);
         }
@@ -58,6 +62,59 @@ const FinancialMetric = () => {
 
     loadData();
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const loadComments = async () => {
+      try {
+        const data = await ApiService.getCommentsByInvestInstrumentId(
+          Number(id),
+        );
+
+        // sort: newest -> oldest
+        const sorted = data.sort(
+          (a: any, b: any) =>
+            new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime(),
+        );
+
+        setComments(sorted);
+      } catch (e) {
+        console.error("Failed to load comments", e);
+      }
+    };
+
+    loadComments();
+  }, [id]);
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      setCommentLoading(true);
+
+      await ApiService.createComment({
+        content: newComment,
+        clientId: clientId,
+        investInstrumentId: Number(id),
+      });
+
+      setNewComment("");
+
+      // reload comments
+      const data = await ApiService.getCommentsByInvestInstrumentId(Number(id));
+      const sorted = data.sort(
+        (a: any, b: any) =>
+          new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime(),
+      );
+      setComments(sorted);
+    } catch (e) {
+      console.error("Add comment failed", e);
+      alert("Failed to add comment.");
+    } finally {
+      setCommentLoading(false);
+    }
+  };
 
   const handleAIAnalysis = async () => {
     if (!clientId) {
@@ -70,7 +127,7 @@ const FinancialMetric = () => {
 
       const request = await ApiService.createAnalysisRequest(
         Number(id),
-        Number(clientId)
+        Number(clientId),
       );
 
       if (request.aiAnalysisResultId) {
@@ -136,7 +193,69 @@ const FinancialMetric = () => {
         )}
       </View>
 
-      {/* AI BUTTON */}
+      <View style={[globalStyles.card, globalStyles.fullWidth]}>
+        <Text style={[globalStyles.cardTitle, spacing.mb2]}>Comments</Text>
+
+        {comments.length === 0 ? (
+          <Text style={globalStyles.textSmall}>No comments yet.</Text>
+        ) : (
+          comments.map((c) => {
+            const isMine = c.clientId === clientId;
+
+            return (
+              <View
+                key={c.id}
+                style={[
+                  spacing.mb2,
+                  isMine
+                    ? globalStyles.commentBubbleMine
+                    : globalStyles.commentBubbleOther,
+                ]}
+              >
+                <View style={[globalStyles.row, globalStyles.spaceBetween]}>
+                  <Text style={globalStyles.textSmall}>{c.clientName}</Text>
+                  <Text style={globalStyles.textSmall}>
+                    {new Date(c.dateTime).toLocaleString()}
+                  </Text>
+                </View>
+
+                <Text style={[globalStyles.text, spacing.mt1]}>
+                  {c.content}
+                </Text>
+              </View>
+            );
+          })
+        )}
+
+        {/* ADD COMMENT */}
+        <View style={[globalStyles.row, spacing.mt2]}>
+          <TextInput
+            style={[
+              globalStyles.input,
+              globalStyles.flex1,
+              spacing.mr1,
+              globalStyles.commentInputWrapper,
+            ]}
+            placeholder="Write a comment..."
+            placeholderTextColor={COLORS.textGrey}
+            value={newComment}
+            onChangeText={setNewComment}
+          />
+
+          <TouchableOpacity
+            style={[globalStyles.button, globalStyles.buttonSmall]}
+            onPress={handleAddComment}
+            disabled={commentLoading}
+          >
+            {commentLoading ? (
+              <ActivityIndicator color={COLORS.whiteHeader} />
+            ) : (
+              <Text style={globalStyles.buttonText}>Add</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <TouchableOpacity
         style={[
           globalStyles.button,

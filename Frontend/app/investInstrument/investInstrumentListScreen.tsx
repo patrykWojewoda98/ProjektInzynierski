@@ -1,5 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,26 +10,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
+import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
-import { globalStyles, spacing } from "../../assets/styles/styles";
-import { COLORS } from "../../assets/Constants/colors";
-import { ROUTES } from "../../routes";
 
 const InvestmentInstrumentListScreen = () => {
   const router = useRouter();
 
-  const [regions, setRegions] = useState([]);
-  const [sectors, setSectors] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [items, setItems] = useState([]);
+  const [regions, setRegions] = useState<any[]>([]);
+  const [sectors, setSectors] = useState<any[]>([]);
+  const [types, setTypes] = useState<any[]>([]);
+  const [allItems, setAllItems] = useState<any[]>([]);
 
-  const [regionId, setRegionId] = useState(null);
-  const [sectorId, setSectorId] = useState(null);
-  const [typeId, setTypeId] = useState(null);
+  const [regionId, setRegionId] = useState<number>(0);
+  const [sectorId, setSectorId] = useState<number>(0);
+  const [typeId, setTypeId] = useState<number>(0);
 
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
@@ -36,53 +36,50 @@ const InvestmentInstrumentListScreen = () => {
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
+      setIsReady(!!ok);
+      if (!ok) setLoading(false);
     };
     check();
   }, []);
 
-  // 📥 FILTERS
-  useEffect(() => {
-    if (!isReady) return;
-
-    const load = async () => {
-      const [r, s, t] = await Promise.all([
-        ApiService.getAllRegions(),
-        ApiService.getSectors(),
-        ApiService.getAllInvestmentTypes(),
-      ]);
-      setRegions(r);
-      setSectors(s);
-      setTypes(t);
-    };
-
-    load();
-  }, [isReady]);
-
-  // 📥 INSTRUMENTS
+  // 📥 LOAD FILTERS + INSTRUMENTS
   useEffect(() => {
     if (!isReady) return;
 
     const load = async () => {
       setLoading(true);
+      try {
+        const [r, s, t, i] = await Promise.all([
+          ApiService.getAllRegions(),
+          ApiService.getSectors(),
+          ApiService.getAllInvestmentTypes(),
+          ApiService.getInvestInstruments(),
+        ]);
 
-      let data;
-      if (regionId)
-        data = await ApiService.getInvestInstrumentsByRegion(regionId);
-      else if (sectorId)
-        data = await ApiService.getInvestInstrumentsBySector(sectorId);
-      else if (typeId)
-        data = await ApiService.getInvestInstrumentsByType(typeId);
-      else data = await ApiService.getInvestInstruments();
-
-      setItems(data);
-      setLoading(false);
+        setRegions(r);
+        setSectors(s);
+        setTypes(t);
+        setAllItems(i);
+      } finally {
+        setLoading(false);
+      }
     };
 
     load();
-  }, [regionId, sectorId, typeId, isReady]);
+  }, [isReady]);
 
-  const handleDelete = (id) => {
+  // 🔎 FILTER ITEMS (FRONTEND)
+  const items = useMemo(() => {
+    let data = allItems;
+
+    if (regionId > 0) data = data.filter((i) => i.regionId === regionId);
+    if (sectorId > 0) data = data.filter((i) => i.sectorId === sectorId);
+    if (typeId > 0) data = data.filter((i) => i.investmentTypeId === typeId);
+
+    return data;
+  }, [regionId, sectorId, typeId, allItems]);
+
+  const handleDelete = (id: number) => {
     Alert.alert("Confirm delete", "Delete this instrument?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -90,7 +87,7 @@ const InvestmentInstrumentListScreen = () => {
         style: "destructive",
         onPress: async () => {
           await ApiService.deleteInvestInstrument(id);
-          setItems((p) => p.filter((x) => x.id !== id));
+          setAllItems((p) => p.filter((x) => x.id !== id));
         },
       },
     ]);
@@ -99,6 +96,31 @@ const InvestmentInstrumentListScreen = () => {
   if (!isReady || loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
+
+  const renderPicker = (
+    label: string,
+    value: number,
+    setValue: (v: number) => void,
+    data: any[],
+    labelKey = "name",
+  ) => (
+    <>
+      <Text style={globalStyles.label}>{label}</Text>
+      <View style={globalStyles.pickerWrapper}>
+        <Picker
+          selectedValue={value}
+          style={globalStyles.pickerText}
+          dropdownIconColor={COLORS.textGrey}
+          onValueChange={(v) => setValue(Number(v))}
+        >
+          <Picker.Item label="All" value={0} />
+          {data.map((x) => (
+            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+          ))}
+        </Picker>
+      </View>
+    </>
+  );
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
@@ -114,65 +136,9 @@ const InvestmentInstrumentListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new instrument</Text>
       </TouchableOpacity>
 
-      {/* REGION */}
-      <Text style={globalStyles.label}>Region</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={regionId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => {
-            setRegionId(v);
-            setSectorId(null);
-            setTypeId(null);
-          }}
-        >
-          <Picker.Item label="All regions" value={null} />
-          {regions.map((r) => (
-            <Picker.Item key={r.id} label={r.name} value={r.id} />
-          ))}
-        </Picker>
-      </View>
-
-      {/* SECTOR */}
-      <Text style={globalStyles.label}>Sector</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={sectorId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => {
-            setSectorId(v);
-            setRegionId(null);
-            setTypeId(null);
-          }}
-        >
-          <Picker.Item label="All sectors" value={null} />
-          {sectors.map((s) => (
-            <Picker.Item key={s.id} label={s.name} value={s.id} />
-          ))}
-        </Picker>
-      </View>
-
-      {/* TYPE */}
-      <Text style={globalStyles.label}>Type</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={typeId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => {
-            setTypeId(v);
-            setRegionId(null);
-            setSectorId(null);
-          }}
-        >
-          <Picker.Item label="All types" value={null} />
-          {types.map((t) => (
-            <Picker.Item key={t.id} label={t.typeName} value={t.id} />
-          ))}
-        </Picker>
-      </View>
+      {renderPicker("Region", regionId, setRegionId, regions)}
+      {renderPicker("Sector", sectorId, setSectorId, sectors)}
+      {renderPicker("Type", typeId, setTypeId, types, "typeName")}
 
       {/* LIST */}
       <View style={[spacing.mt3, globalStyles.fullWidth]}>
@@ -183,6 +149,7 @@ const InvestmentInstrumentListScreen = () => {
           >
             <Text style={globalStyles.cardTitle}>{i.ticker}</Text>
             <Text style={globalStyles.text}>{i.name}</Text>
+
             <View
               style={[
                 globalStyles.row,
@@ -211,13 +178,10 @@ const InvestmentInstrumentListScreen = () => {
               style={[spacing.mt2, { width: "100%", alignItems: "center" }]}
             >
               <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  { width: "100%", alignSelf: "center" },
-                ]}
+                style={[globalStyles.button, { width: "100%" }]}
                 onPress={async () => {
                   const instrument = await ApiService.getInvestInstrumentById(
-                    i.id
+                    i.id,
                   );
 
                   router.push({
@@ -226,7 +190,7 @@ const InvestmentInstrumentListScreen = () => {
                       : ROUTES.ADD_FINANCIAL_METRIC,
                     params: {
                       instrumentId: i.id,
-                      metricId: instrument.financialMetricId ?? null,
+                      metricId: instrument.financialMetricId ?? 0,
                     },
                   });
                 }}
@@ -252,7 +216,6 @@ const InvestmentInstrumentListScreen = () => {
                   globalStyles.button,
                   {
                     width: "100%",
-                    alignSelf: "center",
                     backgroundColor: COLORS.primary,
                   },
                 ]}

@@ -15,6 +15,7 @@ export const ROUTES = {
   INVESTMENT_TYPE: "/investmentType/investmentTypeListScreen",
   SECTOR: "/sector/sectorListScreen",
   RISK_LEVEL: "/riskLevel/riskLevelListScreen",
+  MARKET_DATA: "/marketData/marketDataListScreen",
 
   WALLET_HISTORY: "/walletHistory/walletHistory",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
@@ -58,6 +59,8 @@ export const ROUTES = {
   EDIT_FINANCIAL_METRIC_LIST: "/financialMetric/editFinancialMetricListScreen",
   EDIT_MARKET_DATA_LIST: "/marketData/editMarketDataListScreen",
   EDIT_MARKET_DATA: "/marketData/editMarketDataScreen",
+  COMMENT_MODERATION: "/comment/commentModerationScreen",
+  EDIT_COMMENT: "/comment/editCommentScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",

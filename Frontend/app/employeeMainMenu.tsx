@@ -21,6 +21,7 @@ const icons = {
   Region: require("../assets/images/RegionIcon.png"),
   Currency: require("../assets/images/CurrencyIcon.png"),
   RegionCode: require("../assets/images/RegionCodeIcon.png"),
+  Comment: require("../assets/images/CommentIcon.jpeg"),
 };
 
 const tiles = [
@@ -114,6 +115,12 @@ const tiles = [
     label: "Edit Region Codes",
     icon: icons.Region,
     route: ROUTES.REGION_CODE,
+  },
+  {
+    key: "Comment",
+    label: "Moderate Comments",
+    icon: icons.Comment,
+    route: ROUTES.COMMENT_MODERATION,
   },
 ];
 

@@ -122,19 +122,64 @@ const ApiService = {
 
 
 
-  // Register endpoint
+  // Client endpoints
   async registerClient(clientData) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Client`, clientData);
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-      console.error("Registration error:", error);
-      throw ["An error occurred during registration. Please try again."];
+  try {
+    const response = await axios.post(`${API_BASE_URL}/Client`, clientData);
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.errors) {
+      throw error.response.data.errors;
     }
-  },
+    console.error("Registration error:", error);
+    throw ["An error occurred during registration. Please try again."];
+  }
+},
+
+async getAllClients() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Client`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    throw ["Failed to load clients."];
+  }
+},
+
+async getClientById(id) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Client/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching client:", error);
+    throw ["Failed to load client."];
+  }
+},
+
+async updateClient(id, dto) {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/Client/${id}`, {
+      id,
+      ...dto,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.errors) {
+      throw error.response.data.errors;
+    }
+    console.error("Error updating client:", error);
+    throw ["Failed to update client."];
+  }
+},
+
+async deleteClient(id) {
+  try {
+    await axios.delete(`${API_BASE_URL}/Client/${id}`);
+  } catch (error) {
+    console.error("Error deleting client:", error);
+    throw ["Failed to delete client."];
+  }
+},
 
   //Country endpoints
   async getAllCountries() {
@@ -154,6 +199,15 @@ const ApiService = {
     } catch (error) {
       console.error("Error fetching country:", error);
       throw ["Failed to load country."];
+    }
+  },
+  async getCountriesByRegion(regionId) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Country/region/${regionId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching countries by region:", error);
+      throw ["Failed to load countries for the selected region."];
     }
   },
 
@@ -188,6 +242,83 @@ const ApiService = {
       throw ["Failed to delete country."];
     }
   },
+
+  // Comment endpoints
+async getAllComments() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Comment`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    throw ["Failed to load comments."];
+  }
+},
+
+async getCommentById(id) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Comment/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching comment:", error);
+    throw ["Failed to load comment."];
+  }
+},
+
+async getCommentsByClientId(clientId) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/Comment/client/${clientId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching client comments:", error);
+    throw ["Failed to load client comments."];
+  }
+},
+
+async getCommentsByInvestInstrumentId(instrumentId) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/Comment/instrument/${instrumentId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching instrument comments:", error);
+    throw ["Failed to load comments for this instrument."];
+  }
+},
+
+async createComment(dto) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/Comment`, dto);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    throw ["Failed to add comment."];
+  }
+},
+
+async updateComment(id, dto) {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/Comment/${id}`, {
+      id,
+      ...dto,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    throw ["Failed to update comment."];
+  }
+},
+
+async deleteComment(id) {
+  try {
+    await axios.delete(`${API_BASE_URL}/Comment/${id}`);
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw ["Failed to delete comment."];
+  }
+},
 
   //Employee endpoints
   async getAllEmployees() {

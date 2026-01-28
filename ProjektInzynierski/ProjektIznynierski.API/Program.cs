@@ -2,7 +2,7 @@ using ProjektIznynierski.Infrastructure;
 using ProjektIznynierski.Application;
 using ProjektIznynierski.Presentation;
 using DotNetEnv;
-using ProjektIznynierski.API.Middlewares;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

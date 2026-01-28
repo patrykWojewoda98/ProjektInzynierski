@@ -312,6 +312,27 @@ export const globalStyles = StyleSheet.create({
   webTwoColumnCard: {
     width: Platform.OS === "web" ? "48%" : "100%",
   },
+  commentBubbleMine: {
+    backgroundColor: COLORS.commentMine,
+    borderRadius: 16,
+    padding: 12,
+    maxWidth: "75%",
+    alignSelf: "flex-start",
+  },
+
+  commentBubbleOther: {
+    backgroundColor: COLORS.commentOther,
+    borderRadius: 16,
+    padding: 12,
+    maxWidth: "75%",
+    alignSelf: "flex-end",
+  },
+
+  commentInputWrapper: {
+    backgroundColor: COLORS.commentMine,
+    borderRadius: 12,
+    padding: 8,
+  },
 });
 
 // Export individual spacing utilities

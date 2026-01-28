@@ -18,6 +18,7 @@
 
         public ICollection<AIAnalysisResult>? AIAnalysisResults { get; set; } = new List<AIAnalysisResult>();
         public ICollection<WatchList>? WatchLists { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 
 }

@@ -20,4 +20,8 @@ export const COLORS = {
   error: "#F44336",
   warning: "#FFC107",
   info: "#2196F3",
+
+  commentMine: "#2B2B2B",
+  commentOther: "#1F6F3D",
+  commentInputBackground: "#1E1E1E",
 };

@@ -1,42 +1,42 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  ScrollView,
   Alert,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import ApiService from "../../services/api";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
 import { AuthContext } from "../_layout";
 
 const InvestInstrument = () => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
-  const [regions, setRegions] = useState([]);
-  const [sectors, setSectors] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [instruments, setInstruments] = useState([]);
+  const [regions, setRegions] = useState<any[]>([]);
+  const [sectors, setSectors] = useState<any[]>([]);
+  const [types, setTypes] = useState<any[]>([]);
+  const [allInstruments, setAllInstruments] = useState<any[]>([]);
 
-  const [selectedRegion, setSelectedRegion] = useState(null);
-  const [selectedSector, setSelectedSector] = useState(null);
-  const [selectedType, setSelectedType] = useState(null);
+  const [selectedRegion, setSelectedRegion] = useState<number>(0);
+  const [selectedSector, setSelectedSector] = useState<number>(0);
+  const [selectedType, setSelectedType] = useState<number>(0);
 
-  const [quantities, setQuantities] = useState({});
-  const [watchListMap, setWatchListMap] = useState({});
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [watchListMap, setWatchListMap] = useState<Record<number, number>>({});
 
   const [loading, setLoading] = useState(true);
   const [watchListLoaded, setWatchListLoaded] = useState(false);
 
-  const setQuantity = (instrumentId, value) => {
+  const setQuantity = (instrumentId: number, value: number) => {
     const qty = Math.max(1, Number(value) || 1);
     setQuantities((prev) => ({
       ...prev,
@@ -44,7 +44,7 @@ const InvestInstrument = () => {
     }));
   };
 
-  const handleAddToWallet = async (instrumentId) => {
+  const handleAddToWallet = async (instrumentId: number) => {
     if (!user?.id) return;
 
     try {
@@ -58,11 +58,10 @@ const InvestInstrument = () => {
     }
   };
 
-  const handleToggleWatchList = async (instrumentId) => {
+  const handleToggleWatchList = async (instrumentId: number) => {
     if (!user?.id) return;
 
-    const instrumentKey = Number(instrumentId);
-    const watchListItemId = watchListMap[instrumentKey];
+    const watchListItemId = watchListMap[instrumentId];
 
     try {
       if (watchListItemId) {
@@ -70,18 +69,18 @@ const InvestInstrument = () => {
 
         setWatchListMap((prev) => {
           const copy = { ...prev };
-          delete copy[instrumentKey];
+          delete copy[instrumentId];
           return copy;
         });
       } else {
         const created = await ApiService.addWatchListItem(
           user.id,
-          instrumentKey
+          instrumentId,
         );
 
         setWatchListMap((prev) => ({
           ...prev,
-          [instrumentKey]: created.id,
+          [instrumentId]: created.id,
         }));
       }
     } catch (err) {
@@ -89,6 +88,7 @@ const InvestInstrument = () => {
     }
   };
 
+  // ⭐ LOAD WATCHLIST
   useEffect(() => {
     const loadWatchList = async () => {
       if (!user?.id) {
@@ -98,17 +98,15 @@ const InvestInstrument = () => {
 
       try {
         const raw = await ApiService.getWatchListItemsByClientId(user.id);
-
         const arr = Array.isArray(raw) ? raw : [raw];
 
-        const map = {};
+        const map: Record<number, number> = {};
         arr.forEach((x) => {
           map[Number(x.investInstrumentId)] = x.id;
         });
 
         setWatchListMap(map);
-      } catch (err) {
-        console.error("Error loading watchlist:", err);
+      } catch {
         setWatchListMap({});
       } finally {
         setWatchListLoaded(true);
@@ -118,52 +116,71 @@ const InvestInstrument = () => {
     loadWatchList();
   }, [user]);
 
-  // 🔹 LOAD FILTERS
+  // 🔹 LOAD FILTERS + INSTRUMENTS
   useEffect(() => {
-    const loadFilters = async () => {
+    const load = async () => {
       try {
-        const [r, s, i, t] = await Promise.all([
+        const [r, s, t, i] = await Promise.all([
           ApiService.getAllRegions(),
           ApiService.getSectors(),
-          ApiService.getInvestInstruments(),
           ApiService.getAllInvestmentTypes(),
+          ApiService.getInvestInstruments(),
         ]);
 
         setRegions(r);
         setSectors(s);
         setTypes(t);
+        setAllInstruments(i);
       } finally {
         setLoading(false);
       }
     };
 
-    loadFilters();
+    load();
   }, []);
 
-  // 🔹 LOAD INSTRUMENTS
-  useEffect(() => {
-    const loadInstruments = async () => {
-      let data = [];
+  // 🔎 FILTER INSTRUMENTS (FRONTEND)
+  const filteredInstruments = useMemo(() => {
+    let data = allInstruments;
 
-      if (selectedRegion) {
-        data = await ApiService.getInvestInstrumentsByRegion(selectedRegion);
-      } else if (selectedSector) {
-        data = await ApiService.getInvestInstrumentsBySector(selectedSector);
-      } else if (selectedType) {
-        data = await ApiService.getInvestInstrumentsByType(selectedType);
-      } else {
-        data = await ApiService.getInvestInstruments();
-      }
+    if (selectedRegion > 0)
+      data = data.filter((i) => i.regionId === selectedRegion);
+    if (selectedSector > 0)
+      data = data.filter((i) => i.sectorId === selectedSector);
+    if (selectedType > 0)
+      data = data.filter((i) => i.investmentTypeId === selectedType);
 
-      setInstruments(data);
-    };
-
-    loadInstruments();
-  }, [selectedRegion, selectedSector, selectedType]);
+    return data;
+  }, [selectedRegion, selectedSector, selectedType, allInstruments]);
 
   if (loading || !watchListLoaded) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
+
+  const renderPicker = (
+    label: string,
+    value: number,
+    setValue: (v: number) => void,
+    data: any[],
+    labelKey = "name",
+  ) => (
+    <>
+      <Text style={globalStyles.label}>{label}</Text>
+      <View style={globalStyles.pickerWrapper}>
+        <Picker
+          selectedValue={value}
+          style={globalStyles.pickerText}
+          dropdownIconColor={COLORS.textGrey}
+          onValueChange={(v) => setValue(Number(v))}
+        >
+          <Picker.Item label="All" value={0} />
+          {data.map((x) => (
+            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+          ))}
+        </Picker>
+      </View>
+    </>
+  );
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
@@ -171,69 +188,12 @@ const InvestInstrument = () => {
         Investment Instruments
       </Text>
 
-      {/* REGION */}
-      <Text style={globalStyles.label}>Region</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={selectedRegion}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => {
-            setSelectedRegion(v);
-            setSelectedSector(null);
-            setSelectedType(null);
-          }}
-        >
-          <Picker.Item label="All regions" value={null} />
-          {regions.map((r) => (
-            <Picker.Item key={r.id} label={r.name} value={r.id} />
-          ))}
-        </Picker>
-      </View>
+      {renderPicker("Region", selectedRegion, setSelectedRegion, regions)}
+      {renderPicker("Sector", selectedSector, setSelectedSector, sectors)}
+      {renderPicker("Type", selectedType, setSelectedType, types, "typeName")}
 
-      {/* SECTOR */}
-      <Text style={globalStyles.label}>Sector</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={selectedSector}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => {
-            setSelectedSector(v);
-            setSelectedRegion(null);
-            setSelectedType(null);
-          }}
-        >
-          <Picker.Item label="All sectors" value={null} />
-          {sectors.map((s) => (
-            <Picker.Item key={s.id} label={s.name} value={s.id} />
-          ))}
-        </Picker>
-      </View>
-
-      {/* TYPE */}
-      <Text style={globalStyles.label}>Type</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={selectedType}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => {
-            setSelectedType(v);
-            setSelectedRegion(null);
-            setSelectedSector(null);
-          }}
-        >
-          <Picker.Item label="All types" value={null} />
-          {types.map((t) => (
-            <Picker.Item key={t.id} label={t.typeName} value={t.id} />
-          ))}
-        </Picker>
-      </View>
-
-      {/* INSTRUMENTS */}
       <View style={[spacing.mt3, globalStyles.fullWidth]}>
-        {instruments.map((i) => (
+        {filteredInstruments.map((i) => (
           <View
             key={i.id}
             style={[globalStyles.card, { position: "relative" }]}
@@ -243,7 +203,7 @@ const InvestInstrument = () => {
               onPress={() => handleToggleWatchList(i.id)}
             >
               <Ionicons
-                name={watchListMap[Number(i.id)] ? "star" : "star-outline"}
+                name={watchListMap[i.id] ? "star" : "star-outline"}
                 size={26}
                 color="white"
               />
@@ -254,9 +214,8 @@ const InvestInstrument = () => {
             <Text style={globalStyles.textSmall}>
               Description: {i.description}
             </Text>
-            {/* QUANTITY + ADD TO WALLET */}
-            <View style={[spacing.mt2]}>
-              {/* Quantity row */}
+
+            <View style={spacing.mt2}>
               <View
                 style={{
                   flexDirection: "row",
@@ -268,7 +227,6 @@ const InvestInstrument = () => {
                 <Text style={globalStyles.text}>Quantity</Text>
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  {/* MINUS */}
                   <TouchableOpacity
                     onPress={() =>
                       setQuantity(i.id, (quantities[i.id] ?? 1) - 1)
@@ -282,7 +240,6 @@ const InvestInstrument = () => {
                     />
                   </TouchableOpacity>
 
-                  {/* VALUE */}
                   <Text
                     style={[
                       globalStyles.text,
@@ -292,7 +249,6 @@ const InvestInstrument = () => {
                     {quantities[i.id] ?? 1}
                   </Text>
 
-                  {/* PLUS */}
                   <TouchableOpacity
                     onPress={() =>
                       setQuantity(i.id, (quantities[i.id] ?? 1) + 1)
@@ -308,7 +264,6 @@ const InvestInstrument = () => {
                 </View>
               </View>
 
-              {/* ADD TO WALLET */}
               <TouchableOpacity
                 style={[
                   globalStyles.button,

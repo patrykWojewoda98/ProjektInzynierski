@@ -42,6 +42,8 @@ using ProjektIznynierski.Application.Commands.Employee.UpdateEmployee;
 using ProjektIznynierski.Application.Commands.RegionCode.CreateRegionCode;
 using ProjektIznynierski.Application.Commands.RegionCode.UpdateRegionCode;
 using ProjektIznynierski.Application.Commands.FinancialMetric.ImportFinancialIndicators;
+using ProjektIznynierski.Application.Commands.Comment.AddComment;
+using ProjektIznynierski.Application.Commands.Comment.UpdateComment;
 
 namespace ProjektIznynierski.Application
 {
@@ -114,6 +116,9 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<CreateRegionCodeCommand>, CreateRegionCodeCommandValidator>();
             services.AddScoped<IValidator<UpdateRegionCodeCommand>, UpdateRegionCodeCommandValidator>();
+
+            services.AddScoped<IValidator<AddCommentCommand>, AddCommentCommandValidation>();
+            services.AddScoped<IValidator<UpdateCommentCommand>, UpdateCommentCommandValidation>();
 
             services.AddScoped<IValidator<ImportFinancialMetricCommand>, ImportFinancialMetricCommandValidator>();
 

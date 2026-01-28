@@ -2,8 +2,8 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles, spacing } from "../assets/styles/styles";
-import { authGuard } from "../utils/authGuard";
 import { ROUTES } from "../routes";
+import { authGuard } from "../utils/authGuard";
 
 const icons = {
   InvestProfile: require("../assets/images/Client-Icon.png"),
@@ -34,12 +34,6 @@ const tiles = [
     label: "Wallet",
     icon: icons.Wallet,
     route: ROUTES.WALLET,
-  },
-  {
-    key: "TradeHistory",
-    label: "Trade History",
-    icon: icons.TradeHistory,
-    route: ROUTES.TRADE_HISTORY,
   },
   {
     key: "MarketData",

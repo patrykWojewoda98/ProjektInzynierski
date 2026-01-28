@@ -1,6 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,16 +9,12 @@ import {
   View,
 } from "react-native";
 
+import { authGuard } from "@/utils/authGuard";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
-import { confirmAction } from "../../utils/confirmAction";
-import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
-const EditMarketDataListScreen = () => {
-  const router = useRouter();
-
+const MarketDataListScreen = () => {
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
@@ -38,17 +32,15 @@ const EditMarketDataListScreen = () => {
   const [typeId, setTypeId] = useState<number>(0);
   const [instrumentId, setInstrumentId] = useState<number>(0);
 
-  // 🔐 AUTH
   useEffect(() => {
     const check = async () => {
-      const ok = await employeeAuthGuard();
+      const ok = await authGuard();
       setIsReady(!!ok);
       if (!ok) setLoading(false);
     };
     check();
   }, []);
 
-  // 📥 LOAD FILTER DATA
   useEffect(() => {
     if (!isReady) return;
 
@@ -78,7 +70,6 @@ const EditMarketDataListScreen = () => {
     load();
   }, [isReady]);
 
-  // 🔎 FILTER INSTRUMENTS
   const filteredInstruments = useMemo(() => {
     let data = instruments;
 
@@ -90,13 +81,11 @@ const EditMarketDataListScreen = () => {
     return data;
   }, [sectorId, regionId, countryId, typeId, instruments]);
 
-  // 🔄 RESET AFTER FILTER CHANGE
   useEffect(() => {
     setInstrumentId(0);
     setMarketData([]);
   }, [sectorId, regionId, countryId, typeId]);
 
-  // 📊 LOAD MARKET DATA
   useEffect(() => {
     if (instrumentId === 0) return;
 
@@ -112,7 +101,6 @@ const EditMarketDataListScreen = () => {
     loadMarketData();
   }, [instrumentId]);
 
-  // ⬇️ IMPORT
   const handleImportLatest = async () => {
     if (instrumentId === 0) return;
 
@@ -138,21 +126,6 @@ const EditMarketDataListScreen = () => {
     } finally {
       setImporting(false);
     }
-  };
-
-  const handleDeleteMarketData = (id: number) => {
-    confirmAction({
-      title: "Confirm delete",
-      message: "Delete this market data record?",
-      onConfirm: async () => {
-        try {
-          await ApiService.deleteMarketData(id);
-          setMarketData((p) => p.filter((x) => x.id !== id));
-        } catch {
-          Alert.alert("Error", "Failed to delete market data.");
-        }
-      },
-    });
   };
 
   if (!isReady || loading) {
@@ -186,7 +159,7 @@ const EditMarketDataListScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Text style={[globalStyles.header, spacing.mb4]}>Market Data (Edit)</Text>
+      <Text style={[globalStyles.header, spacing.mb4]}>Market Data</Text>
 
       {renderPicker("Sector", sectorId, setSectorId, sectors)}
       {renderPicker("Region", regionId, setRegionId, regions)}
@@ -234,41 +207,9 @@ const EditMarketDataListScreen = () => {
                 key={m.id}
                 style={[globalStyles.card, globalStyles.fullWidth, spacing.mb3]}
               >
-                <View
-                  style={[
-                    globalStyles.row,
-                    globalStyles.spaceBetween,
-                    spacing.mb1,
-                  ]}
-                >
-                  <Text style={globalStyles.cardTitle}>
-                    {new Date(m.date).toISOString().split("T")[0]}
-                  </Text>
-
-                  <View style={globalStyles.row}>
-                    <TouchableOpacity
-                      style={spacing.mr3}
-                      onPress={() =>
-                        router.push({
-                          pathname: ROUTES.EDIT_MARKET_DATA,
-                          params: { id: m.id },
-                        })
-                      }
-                    >
-                      <Ionicons
-                        name="pencil"
-                        size={20}
-                        color={COLORS.primary}
-                      />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => handleDeleteMarketData(m.id)}
-                    >
-                      <Ionicons name="trash" size={20} color={COLORS.error} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                <Text style={globalStyles.cardTitle}>
+                  {new Date(m.date).toISOString().split("T")[0]}
+                </Text>
 
                 <Text style={globalStyles.textSmall}>Open: {m.openPrice}</Text>
                 <Text style={globalStyles.textSmall}>
@@ -293,4 +234,4 @@ const EditMarketDataListScreen = () => {
   );
 };
 
-export default EditMarketDataListScreen;
+export default MarketDataListScreen;
