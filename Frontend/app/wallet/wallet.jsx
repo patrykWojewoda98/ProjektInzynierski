@@ -1,23 +1,23 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
   Text,
-  View,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
 
-import { AuthContext } from "../_layout";
-import ApiService from "../../services/api";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { AuthContext } from "../_layout";
 
 const WalletScreen = () => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
-
+  const [totalValue, setTotalValue] = useState(0);
   const [wallet, setWallet] = useState(null);
   const [currency, setCurrency] = useState(null);
   const [investmentSummary, setInvestmentSummary] = useState([]);
@@ -28,21 +28,29 @@ const WalletScreen = () => {
       if (!user?.id) return;
 
       try {
-        // 1️⃣ GET WALLET
         const walletResponse = await ApiService.getWalletByClientId(user.id);
         setWallet(walletResponse);
 
-        // 2️⃣ GET CURRENCY
         const currencyResponse = await ApiService.getCurrencyByID(
-          walletResponse.currencyId
+          walletResponse.currencyId,
         );
         setCurrency(currencyResponse);
 
-        // 3️⃣ GET INVESTMENT SUMMARY
         const summary = await ApiService.getWalletInvestmentSummary(
-          walletResponse.id
+          walletResponse.id,
         );
         setInvestmentSummary(summary);
+
+        let investmentsValue = 0;
+
+        for (const item of summary) {
+          const marketData = await ApiService.getMarketDataByInstrumentId(
+            item.instrumentId,
+          );
+          investmentsValue += item.totalQuantity * marketData.price;
+        }
+
+        setTotalValue(walletResponse.cashBalance + investmentsValue);
       } catch (error) {
         console.error("Wallet load error:", error);
       } finally {
@@ -72,8 +80,11 @@ const WalletScreen = () => {
       {/* WALLET SUMMARY */}
       <View style={[globalStyles.card, spacing.mb4]}>
         <Text style={globalStyles.cardTitle}>Wallet Summary</Text>
-        <Text style={globalStyles.text}>
-          Cash: {wallet.cashBalance} {currency?.name ?? ""}
+        <Text style={[globalStyles.text, spacing.mt1]}>
+          Total account value:{" "}
+          <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
+            {totalValue.toFixed(2)} {currency?.name}
+          </Text>
         </Text>
       </View>
 
@@ -116,21 +127,16 @@ const WalletScreen = () => {
         <Text style={globalStyles.buttonText}>Show all Invest Instruments</Text>
       </TouchableOpacity>
 
-      {/* NAVIGATION */}
       <TouchableOpacity
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
           spacing.py2,
-          spacing.mt1,
+          spacing.mt2,
         ]}
-        onPress={() =>
-          router.push({
-            pathname: ROUTES.WALLET_HISTORY,
-          })
-        }
+        onPress={() => router.push(ROUTES.WALLET_CHART)}
       >
-        <Text style={globalStyles.buttonText}>Show My Wallet History</Text>
+        <Text style={globalStyles.buttonText}>Show Portfolio Chart</Text>
       </TouchableOpacity>
 
       <TouchableOpacity

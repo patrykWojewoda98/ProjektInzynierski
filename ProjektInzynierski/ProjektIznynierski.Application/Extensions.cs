@@ -44,6 +44,10 @@ using ProjektIznynierski.Application.Commands.RegionCode.UpdateRegionCode;
 using ProjektIznynierski.Application.Commands.FinancialMetric.ImportFinancialIndicators;
 using ProjektIznynierski.Application.Commands.Comment.AddComment;
 using ProjektIznynierski.Application.Commands.Comment.UpdateComment;
+using ProjektIznynierski.Application.Commands.CurrencyPair.AddCurrencyPair;
+using ProjektIznynierski.Application.Commands.CurrencyPair.UpdateCurrencyPair;
+using ProjektIznynierski.Application.Commands.CurrencyRateHistory.AddCurrencyRateHistory;
+using ProjektIznynierski.Application.Commands.CurrencyRateHistory.UpdateCurrencyRateHistory;
 
 namespace ProjektIznynierski.Application
 {
@@ -119,6 +123,12 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<AddCommentCommand>, AddCommentCommandValidation>();
             services.AddScoped<IValidator<UpdateCommentCommand>, UpdateCommentCommandValidation>();
+
+            services.AddScoped<IValidator<AddCurrencyPairCommand>, AddCurrencyPairCommandValidation>();
+            services.AddScoped<IValidator<UpdateCurrencyPairCommand>, UpdateCurrencyPairCommandValidation>();
+
+            services.AddScoped<IValidator<AddCurrencyRateHistoryCommand>, AddCurrencyRateHistoryCommandValidation>();
+            services.AddScoped<IValidator<UpdateCurrencyRateHistoryCommand>, UpdateCurrencyRateHistoryCommandValidation>();
 
             services.AddScoped<IValidator<ImportFinancialMetricCommand>, ImportFinancialMetricCommandValidator>();
 

@@ -41,6 +41,8 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IRegionCodeRepository, RegionCodeRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<ICurrencyPairRepository, CurrencyPairRepository>();
+            services.AddScoped<ICurrencyRateHistoryRepository, CurrencyRateHistoryRepository>();
 
             services.AddScoped<IJwtTokenService, JwtService>();
             services.AddHttpClient<IChatGPTService, ChatGPTService>();

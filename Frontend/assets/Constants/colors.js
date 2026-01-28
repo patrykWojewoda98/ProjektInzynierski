@@ -24,4 +24,17 @@ export const COLORS = {
   commentMine: "#2B2B2B",
   commentOther: "#1F6F3D",
   commentInputBackground: "#1E1E1E",
+
+  chartColors: [
+    "#4CAF50",
+    "#2196F3",
+    "#FFC107",
+    "#F44336",
+    "#9C27B0",
+    "#00BCD4",
+    "#FF9800",
+    "#795548",
+    "#607D8B",
+    "#E91E63",
+  ],
 };

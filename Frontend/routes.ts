@@ -7,6 +7,9 @@ export const ROUTES = {
   INVEST_PROFILE: "/investProfile/investProfile",
   WATCHLIST: "/watchList/watchList",
   WALLET: "/wallet/wallet",
+
+  WALLET_CHART: "/wallet/walletChartScreen",
+
   REGION: "/regions/regionListScreen",
   REGION_CODE: "/regionCode/regionCodesListScreen",
   COUNTRY: "/country/countryListScreen",

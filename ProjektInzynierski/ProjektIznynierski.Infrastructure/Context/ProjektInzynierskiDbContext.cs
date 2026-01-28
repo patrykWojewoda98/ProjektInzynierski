@@ -30,6 +30,8 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<TradeType> TradeTypes { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<CurrencyPair> CurrencyPairs { get; set; }
+        public DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }
