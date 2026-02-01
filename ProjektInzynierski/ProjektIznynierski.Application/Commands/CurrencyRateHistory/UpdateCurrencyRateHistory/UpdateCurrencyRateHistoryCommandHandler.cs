@@ -49,7 +49,10 @@ namespace ProjektIznynierski.Application.Commands.CurrencyRateHistory.UpdateCurr
                 Id = entity.Id,
                 CurrencyPairId = entity.CurrencyPairId,
                 Date = entity.Date,
-                CloseRate = entity.CloseRate
+                CloseRate = entity.CloseRate,
+                OpenRate = entity.OpenRate,
+                HighRate = entity.HighRate,
+                LowRate = entity.LowRate
             };
         }
     }

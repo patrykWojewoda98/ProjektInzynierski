@@ -7,9 +7,7 @@ export const ROUTES = {
   INVEST_PROFILE: "/investProfile/investProfile",
   WATCHLIST: "/watchList/watchList",
   WALLET: "/wallet/wallet",
-
   WALLET_CHART: "/wallet/walletChartScreen",
-
   REGION: "/regions/regionListScreen",
   REGION_CODE: "/regionCode/regionCodesListScreen",
   COUNTRY: "/country/countryListScreen",
@@ -19,6 +17,10 @@ export const ROUTES = {
   SECTOR: "/sector/sectorListScreen",
   RISK_LEVEL: "/riskLevel/riskLevelListScreen",
   MARKET_DATA: "/marketData/marketDataListScreen",
+  CURRENCY_RATE_HISTORY: "/currencyRateHistory/CurrencyRateHistoryListScreen",
+  CURRENCY_PAIR: "/CurrencyPair/currencyPairListScreen",
+  CURRENCY_RATE_HISTORY_EDIT_LIST:
+    "/currencyRateHistory/editCurrencyRateHistoryListScreen",
 
   WALLET_HISTORY: "/walletHistory/walletHistory",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
@@ -64,6 +66,11 @@ export const ROUTES = {
   EDIT_MARKET_DATA: "/marketData/editMarketDataScreen",
   COMMENT_MODERATION: "/comment/commentModerationScreen",
   EDIT_COMMENT: "/comment/editCommentScreen",
+  EDIT_CURRENCY_PAIR: "/CurrencyPair/updateCurrencyPairScreen",
+  EDIT_SPECIFIC_CURRENCY_RATE_HISTORY:
+    "/currencyRateHistory/editSpecificsCurrencyRateHistoryScreen",
+  EDIT_CURRENCY_RATE_HISTORY_LIST:
+    "/currencyRateHistory/editCurrencyRateListScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",
@@ -77,4 +84,7 @@ export const ROUTES = {
   ADD_INVEST_INSTRUMENT: "/investInstrument/createInvestInstrumentScreen",
   ADD_FINANCIAL_METRIC: "/financialMetric/addFinancialMetricScreen",
   ADD_FINANCIAL_REPORT: "/financialReport/addFinancialReportScreen",
+  ADD_CURRENCY_PAIR: "/CurrencyPair/addCurrencyPairScreen",
+  ADD_CURRENCY_RATE_HISTORY:
+    "/currencyRateHistory/addCurrencyRateHistoryScreen",
 } as const;

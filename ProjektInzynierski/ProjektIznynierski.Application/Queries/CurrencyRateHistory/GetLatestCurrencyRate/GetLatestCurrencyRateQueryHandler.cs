@@ -32,7 +32,10 @@ namespace ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetLatestRa
                 Id = latestRate.Id,
                 CurrencyPairId = latestRate.CurrencyPairId,
                 Date = latestRate.Date,
-                CloseRate = latestRate.CloseRate
+                CloseRate = latestRate.CloseRate,
+                OpenRate = latestRate.OpenRate,
+                HighRate = latestRate.HighRate,
+                LowRate = latestRate.LowRate
             };
         }
     }

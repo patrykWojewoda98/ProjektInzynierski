@@ -30,7 +30,6 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IFinancialReportRepository, FinancialReportRepository>();
             services.AddScoped<IMarketDataRepository, MarketDataRepository>();
             services.AddScoped<ISectorRepository, SectorRepository>();
-            services.AddScoped<ITradeHistoryRepository, TradeHistoryRepository>();
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<IWalletInstrumentRepository, WalletInstrumentRepository>();
             services.AddScoped<IWatchListItemRepository, WatchListItemRepository>();

@@ -4,6 +4,8 @@ using ProjektIznynierski.Application.Commands.CurrencyRateHistory.AddCurrencyRat
 using ProjektIznynierski.Application.Commands.CurrencyRateHistory.DeleteCurrencyRateHistory;
 using ProjektIznynierski.Application.Commands.CurrencyRateHistory.UpdateCurrencyRateHistory;
 using ProjektIznynierski.Application.Dtos;
+using ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetAllCurrencyRates;
+using ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetCurrencyRateHistoryById;
 using ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetCurrencyRateHistoryByPairId;
 using ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetLatestRate;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,6 +21,18 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
         }
 
+        [HttpGet("{id:int}")]
+        [SwaggerOperation( Summary = "Get currency rate history by id",Description = "Retrieves a single currency rate history record by its ID.")]
+        [ProducesResponseType(typeof(CurrencyRateHistoryDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(
+                new GetCurrencyRateHistoryByIdQuery(id)
+            );
+
+            return Ok(result);
+        }
         [HttpGet("by-pair/{currencyPairId}")]
         [SwaggerOperation(
             Summary = "Get currency rate history by currency pair",
@@ -46,6 +60,17 @@ namespace ProjektIznynierski.Presentation.Controllers
             var result = await _mediator.Send(
                 new GetLatestCurrencyRateQuery(currencyPairId)
             );
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [SwaggerOperation(
+        Summary = "Get all currency rates",
+        Description = "Retrieves all currency rate history records.")]
+        [ProducesResponseType(typeof(IEnumerable<CurrencyRateHistoryDto>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _mediator.Send(new GetAllCurrencyRatesQuery());
             return Ok(result);
         }
 

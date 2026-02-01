@@ -138,6 +138,7 @@ const MarketDataListScreen = () => {
     setValue: (v: number) => void,
     data: any[],
     labelKey = "name",
+    placeholderLabel = "All",
   ) => (
     <View style={[globalStyles.card, globalStyles.fullWidth]}>
       <Text style={globalStyles.label}>{label}</Text>
@@ -148,7 +149,7 @@ const MarketDataListScreen = () => {
           style={globalStyles.pickerText}
           dropdownIconColor={COLORS.textGrey}
         >
-          <Picker.Item label="All" value={0} />
+          <Picker.Item label={placeholderLabel} value={0} />
           {data.map((x) => (
             <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
           ))}
@@ -171,6 +172,7 @@ const MarketDataListScreen = () => {
         setInstrumentId,
         filteredInstruments,
         "ticker",
+        "Choose one",
       )}
 
       {instrumentId > 0 && (

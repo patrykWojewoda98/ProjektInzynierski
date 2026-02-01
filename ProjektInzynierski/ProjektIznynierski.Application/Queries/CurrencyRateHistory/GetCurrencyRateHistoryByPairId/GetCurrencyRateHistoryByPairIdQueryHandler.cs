@@ -29,7 +29,10 @@ namespace ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetCurrency
                 Id = h.Id,
                 CurrencyPairId = h.CurrencyPairId,
                 Date = h.Date,
-                CloseRate = h.CloseRate
+                CloseRate = h.CloseRate,
+                OpenRate = h.OpenRate,
+                HighRate = h.HighRate,
+                LowRate = h.LowRate
             }).ToList();
         }
     }

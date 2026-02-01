@@ -22,21 +22,11 @@ const icons = {
   Currency: require("../assets/images/CurrencyIcon.png"),
   RegionCode: require("../assets/images/RegionCodeIcon.png"),
   Comment: require("../assets/images/CommentIcon.jpeg"),
+  CurrencyRateHistory: require("../assets/images/CurrencyRateHistoryIcon.png"),
+  CurrencyPair: require("../assets/images/CurrencyPairIcon.jpeg"),
 };
 
 const tiles = [
-  {
-    key: "InvestProfile",
-    label: "Edit Investment Profile",
-    icon: icons.InvestProfile,
-    route: ROUTES.EDIT_INVEST_PROFILE,
-  },
-  {
-    key: "Wallet",
-    label: "Edit Wallet",
-    icon: icons.Wallet,
-    route: ROUTES.EDIT_WALLET,
-  },
   {
     key: "MarketData",
     label: "Edit Market Data",
@@ -121,6 +111,18 @@ const tiles = [
     label: "Moderate Comments",
     icon: icons.Comment,
     route: ROUTES.COMMENT_MODERATION,
+  },
+  {
+    key: "CurrencyRateHistory",
+    label: "Currency Rate History",
+    icon: icons.CurrencyRateHistory,
+    route: ROUTES.CURRENCY_RATE_HISTORY_EDIT_LIST,
+  },
+  {
+    key: "CurrencyPair",
+    label: "Currency Pair",
+    icon: icons.CurrencyPair,
+    route: ROUTES.CURRENCY_PAIR,
   },
 ];
 

@@ -319,6 +319,115 @@ async deleteComment(id) {
     throw ["Failed to delete comment."];
   }
 },
+// CurrencyPair endpoints
+async getCurrencyPairs() {
+  const res = await axios.get(`${API_BASE_URL}/CurrencyPair`);
+  return res.data;
+},
+
+async getCurrencyPairById(id) {
+  const res = await axios.get(`${API_BASE_URL}/CurrencyPair/${id}`);
+  return res.data;
+},
+
+async createCurrencyPair(data) {
+  const res = await axios.post(`${API_BASE_URL}/CurrencyPair`, data);
+  return res.data;
+},
+
+async updateCurrencyPair(id, data) {
+  const res = await axios.put(`${API_BASE_URL}/CurrencyPair/${id}`, data);
+  return res.data;
+},
+
+async deleteCurrencyPair(id: number) {
+  const res = await axios.delete(`${API_BASE_URL}/CurrencyPair/${id}`);
+  return res.data;
+},
+
+async getCurrencyPairByCurrencies(baseCurrencyId, quoteCurrencyId) {
+  const res = await axios.get(
+    `${API_BASE_URL}/CurrencyPair/by-currencies`,
+    {
+      params: { baseCurrencyId, quoteCurrencyId },
+    }
+  );
+  return res.data;
+},
+
+// CurrencyRateHistory endpoints
+async getCurrencyRateHistoryById(id: number) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/CurrencyRateHistory/${id}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching currency rate history by id:", error);
+    throw ["Failed to load currency rate history."];
+  }
+},
+async getCurrencyRateHistoryByPair(currencyPairId: number) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/CurrencyRateHistory/by-pair/${currencyPairId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching currency rate history:", error);
+    throw ["Failed to load currency rate history."];
+  }
+},
+
+async getLatestCurrencyRate(currencyPairId: number) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/CurrencyRateHistory/latest/${currencyPairId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching latest currency rate:", error);
+    throw ["Failed to load latest currency rate."];
+  }
+},
+
+async createCurrencyRateHistory(dto: any) {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/CurrencyRateHistory`,
+      dto,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating currency rate history:", error);
+    throw ["Failed to create currency rate history."];
+  }
+},
+
+async updateCurrencyRateHistory(id: number, dto: any) {
+  try {
+    const response = await axios.put(
+      `${API_BASE_URL}/CurrencyRateHistory/${id}`,
+      {
+        id,
+        ...dto,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating currency rate history:", error);
+    throw ["Failed to update currency rate history."];
+  }
+},
+
+async deleteCurrencyRateHistory(id: number) {
+  try {
+    await axios.delete(`${API_BASE_URL}/CurrencyRateHistory/${id}`);
+  } catch (error) {
+    console.error("Error deleting currency rate history:", error);
+    throw ["Failed to delete currency rate history."];
+  }
+},
 
   //Employee endpoints
   async getAllEmployees() {

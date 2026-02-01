@@ -9,11 +9,11 @@ const icons = {
   InvestProfile: require("../assets/images/Client-Icon.png"),
   WatchList: require("../assets/images/WatchList-Icon.png"),
   Wallet: require("../assets/images/Wallet-Icon.png"),
-  TradeHistory: require("../assets/images/TradeHistory-Icon.png"),
   MarketData: require("../assets/images/MarketData-Icon.png"),
   InvestInstrument: require("../assets/images/InvestInstrument-Icon.png"),
   FinancialReport: require("../assets/images/FinancialReport-Icon.png"),
   FinancialMetric: require("../assets/images/FinancialMetric-Icon.png"),
+  CurrencyRateHistory: require("../assets/images/CurrencyRateHistoryIcon.png"),
 };
 
 const tiles = [
@@ -64,6 +64,12 @@ const tiles = [
     label: "My AI Analysis Requests",
     icon: require("../assets/images/MyAIAnalysisRequests-Icon.png"),
     route: ROUTES.MY_AI_ANALYSIS_REQUESTS,
+  },
+  {
+    key: "CurrencyRateHistory",
+    label: "Currency Rate History",
+    icon: icons.CurrencyRateHistory,
+    route: ROUTES.CURRENCY_RATE_HISTORY,
   },
 ];
 

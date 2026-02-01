@@ -22,8 +22,6 @@ using ProjektIznynierski.Application.Commands.Wallet.CreateWallet;
 using ProjektIznynierski.Application.Commands.Wallet.UpdateWallet;
 using ProjektIznynierski.Application.Commands.WalletInstrument.CreateWalletInstrument;
 using ProjektIznynierski.Application.Commands.WalletInstrument.UpdateWalletInstrument;
-using ProjektIznynierski.Application.Commands.TradeHistory.CreateTradeHistory;
-using ProjektIznynierski.Application.Commands.TradeHistory.UpdateTradeHistory;
 using ProjektIznynierski.Application.Commands.InvestProfile.CreateInvestProfile;
 using ProjektIznynierski.Application.Commands.InvestProfile.UpdateInvestProfile;
 using ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnalysisRequest;
@@ -90,9 +88,6 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<CreateWalletInstrumentCommand>, CreateWalletInstrumentCommandValidation>();
             services.AddScoped<IValidator<UpdateWalletInstrumentCommand>, UpdateWalletInstrumentCommandValidation>();
-
-            services.AddScoped<IValidator<CreateTradeHistoryCommand>, CreateTradeHistoryCommandValidation>();
-            services.AddScoped<IValidator<UpdateTradeHistoryCommand>, UpdateTradeHistoryCommandValidation>();
 
             services.AddScoped<IValidator<CreateInvestProfileCommand>, CreateInvestProfileCommandValidation>();
             services.AddScoped<IValidator<UpdateInvestProfileCommand>, UpdateInvestProfileCommandValidation>();
