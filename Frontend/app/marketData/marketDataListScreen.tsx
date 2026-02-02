@@ -1,8 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -13,8 +15,11 @@ import { authGuard } from "@/utils/authGuard";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const MarketDataListScreen = () => {
+  const { itemWidth } = useResponsiveColumns();
+
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
@@ -26,11 +31,11 @@ const MarketDataListScreen = () => {
   const [instruments, setInstruments] = useState<any[]>([]);
   const [marketData, setMarketData] = useState<any[]>([]);
 
-  const [sectorId, setSectorId] = useState<number>(0);
-  const [regionId, setRegionId] = useState<number>(0);
-  const [countryId, setCountryId] = useState<number>(0);
-  const [typeId, setTypeId] = useState<number>(0);
-  const [instrumentId, setInstrumentId] = useState<number>(0);
+  const [sectorId, setSectorId] = useState(0);
+  const [regionId, setRegionId] = useState(0);
+  const [countryId, setCountryId] = useState(0);
+  const [typeId, setTypeId] = useState(0);
+  const [instrumentId, setInstrumentId] = useState(0);
 
   useEffect(() => {
     const check = async () => {
@@ -45,7 +50,6 @@ const MarketDataListScreen = () => {
     if (!isReady) return;
 
     const load = async () => {
-      setLoading(true);
       try {
         const [s, r, c, t, i] = await Promise.all([
           ApiService.getSectors(),
@@ -89,7 +93,7 @@ const MarketDataListScreen = () => {
   useEffect(() => {
     if (instrumentId === 0) return;
 
-    const loadMarketData = async () => {
+    const load = async () => {
       try {
         const data = await ApiService.getMarketDataByInstrumentId(instrumentId);
         setMarketData(data);
@@ -98,7 +102,7 @@ const MarketDataListScreen = () => {
       }
     };
 
-    loadMarketData();
+    load();
   }, [instrumentId]);
 
   const handleImportLatest = async () => {
@@ -138,22 +142,34 @@ const MarketDataListScreen = () => {
     setValue: (v: number) => void,
     data: any[],
     labelKey = "name",
-    placeholderLabel = "All",
+    placeholder = "All",
   ) => (
-    <View style={[globalStyles.card, globalStyles.fullWidth]}>
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
       <Text style={globalStyles.label}>{label}</Text>
-      <View style={globalStyles.pickerWrapper}>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
         <Picker
           selectedValue={value}
           onValueChange={(v) => setValue(Number(v))}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
         >
-          <Picker.Item label={placeholderLabel} value={0} />
+          <Picker.Item label={placeholder} value={0} />
           {data.map((x) => (
             <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
           ))}
         </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
       </View>
     </View>
   );
@@ -162,18 +178,25 @@ const MarketDataListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Market Data</Text>
 
-      {renderPicker("Sector", sectorId, setSectorId, sectors)}
-      {renderPicker("Region", regionId, setRegionId, regions)}
-      {renderPicker("Country", countryId, setCountryId, countries)}
-      {renderPicker("Investment Type", typeId, setTypeId, types, "typeName")}
-      {renderPicker(
-        "Investment Instrument",
-        instrumentId,
-        setInstrumentId,
-        filteredInstruments,
-        "ticker",
-        "Choose one",
-      )}
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker("Sector", sectorId, setSectorId, sectors)}
+        {renderPicker("Region", regionId, setRegionId, regions)}
+        {renderPicker("Country", countryId, setCountryId, countries)}
+        {renderPicker("Investment Type", typeId, setTypeId, types, "typeName")}
+        {renderPicker(
+          "Investment Instrument",
+          instrumentId,
+          setInstrumentId,
+          filteredInstruments,
+          "ticker",
+          "Choose one",
+        )}
+      </View>
 
       {instrumentId > 0 && (
         <>
@@ -196,40 +219,51 @@ const MarketDataListScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {marketData.map((m) => {
-            const dailyColor =
-              m.dailyChange > 0
-                ? COLORS.success
-                : m.dailyChange < 0
-                  ? COLORS.error
-                  : COLORS.textGrey;
+          <View
+            style={[
+              globalStyles.row,
+              { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+            ]}
+          >
+            {marketData.map((m) => {
+              const dailyColor =
+                m.dailyChange > 0
+                  ? COLORS.success
+                  : m.dailyChange < 0
+                    ? COLORS.error
+                    : COLORS.textGrey;
 
-            return (
-              <View
-                key={m.id}
-                style={[globalStyles.card, globalStyles.fullWidth, spacing.mb3]}
-              >
-                <Text style={globalStyles.cardTitle}>
-                  {new Date(m.date).toISOString().split("T")[0]}
-                </Text>
+              return (
+                <View
+                  key={m.id}
+                  style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
+                >
+                  <Text style={globalStyles.cardTitle}>
+                    {new Date(m.date).toISOString().split("T")[0]}
+                  </Text>
 
-                <Text style={globalStyles.textSmall}>Open: {m.openPrice}</Text>
-                <Text style={globalStyles.textSmall}>
-                  Close: {m.closePrice}
-                </Text>
-                <Text style={globalStyles.textSmall}>High: {m.highPrice}</Text>
-                <Text style={globalStyles.textSmall}>Low: {m.lowPrice}</Text>
-                <Text style={globalStyles.textSmall}>Volume: {m.volume}</Text>
+                  <Text style={globalStyles.textSmall}>
+                    Open: {m.openPrice}
+                  </Text>
+                  <Text style={globalStyles.textSmall}>
+                    Close: {m.closePrice}
+                  </Text>
+                  <Text style={globalStyles.textSmall}>
+                    High: {m.highPrice}
+                  </Text>
+                  <Text style={globalStyles.textSmall}>Low: {m.lowPrice}</Text>
+                  <Text style={globalStyles.textSmall}>Volume: {m.volume}</Text>
 
-                <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
-                  Daily change: {m.dailyChange}
-                </Text>
-                <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
-                  Daily change %: {m.dailyChangePercent}%
-                </Text>
-              </View>
-            );
-          })}
+                  <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
+                    Daily change: {m.dailyChange}
+                  </Text>
+                  <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
+                    Daily change %: {m.dailyChangePercent}%
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
         </>
       )}
     </ScrollView>

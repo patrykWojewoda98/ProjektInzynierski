@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 
@@ -44,10 +44,6 @@ const FinancialMetricPreview = () => {
       <Text style={[globalStyles.header, spacing.mb4]}>
         Financial Metrics Overview
       </Text>
-      <Text style={[globalStyles.text, spacing.mb1]}>
-        Zastanowić sie czy nie zaciągać tego z bazy
-      </Text>
-
       <View style={globalStyles.fullWidth}>
         {metrics.map((m) => (
           <View key={m.key} style={[globalStyles.card, spacing.mb3]}>

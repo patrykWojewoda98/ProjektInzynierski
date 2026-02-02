@@ -2,27 +2,30 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
+  Platform,
   ScrollView,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
 import { authGuard } from "@/utils/authGuard";
+import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
-
-const screenWidth = Dimensions.get("window").width;
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const CurrencyRateHistoryScreen = () => {
+  const { width } = useWindowDimensions();
+  const { itemWidth } = useResponsiveColumns();
+
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [currencyPairs, setCurrencyPairs] = useState<any[]>([]);
-  const [selectedPairId, setSelectedPairId] = useState<number>(0);
-
+  const [selectedPairId, setSelectedPairId] = useState<number | "all">("all");
   const [rates, setRates] = useState<any[]>([]);
 
   useEffect(() => {
@@ -41,8 +44,6 @@ const CurrencyRateHistoryScreen = () => {
       try {
         const data = await ApiService.getCurrencyPairs();
         setCurrencyPairs(data);
-      } catch {
-        setCurrencyPairs([]);
       } finally {
         setLoading(false);
       }
@@ -52,7 +53,10 @@ const CurrencyRateHistoryScreen = () => {
   }, [isReady]);
 
   useEffect(() => {
-    if (!selectedPairId) return;
+    if (selectedPairId === "all") {
+      setRates([]);
+      return;
+    }
 
     const loadHistory = async () => {
       setLoading(true);
@@ -66,8 +70,6 @@ const CurrencyRateHistoryScreen = () => {
         );
 
         setRates(sorted);
-      } catch {
-        setRates([]);
       } finally {
         setLoading(false);
       }
@@ -96,33 +98,53 @@ const CurrencyRateHistoryScreen = () => {
         Currency Rate History
       </Text>
 
-      <View style={[globalStyles.card, spacing.mb4]}>
-        <Text style={globalStyles.label}>Select currency pair</Text>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Currency Pair</Text>
 
-        <View style={globalStyles.pickerWrapper}>
-          <Picker
-            selectedValue={selectedPairId}
-            style={globalStyles.pickerText}
-            dropdownIconColor={COLORS.textGrey}
-            onValueChange={(v) => setSelectedPairId(Number(v))}
+          <View
+            style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}
           >
-            <Picker.Item label="Select pair" value={0} />
-            {currencyPairs.map((p) => (
-              <Picker.Item key={p.id} label={p.symbol} value={p.id} />
-            ))}
-          </Picker>
+            <Picker
+              selectedValue={selectedPairId}
+              onValueChange={(v) =>
+                setSelectedPairId(v === "all" ? "all" : Number(v))
+              }
+              style={[
+                globalStyles.pickerText,
+                Platform.OS === "web" && globalStyles.pickerWeb,
+              ]}
+            >
+              <Picker.Item label="Select pair" value="all" />
+              {currencyPairs.map((p) => (
+                <Picker.Item key={p.id} label={p.symbol} value={p.id} />
+              ))}
+            </Picker>
+
+            {Platform.OS === "web" && (
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={COLORS.textGrey}
+                style={globalStyles.pickerWebArrow}
+              />
+            )}
+          </View>
         </View>
       </View>
 
       {rates.length > 0 ? (
-        <View style={globalStyles.card}>
+        <View style={[globalStyles.card, globalStyles.fullWidth]}>
           <LineChart
             data={chartData}
-            width={screenWidth - 40}
+            width={width - 40}
             height={260}
             chartConfig={{
-              backgroundGradientFrom: COLORS.cardBackground,
-              backgroundGradientTo: COLORS.cardBackground,
               decimalPlaces: 4,
               color: () => COLORS.primary,
               labelColor: () => COLORS.textGrey,
@@ -136,8 +158,8 @@ const CurrencyRateHistoryScreen = () => {
             style={{ borderRadius: 12 }}
           />
         </View>
-      ) : selectedPairId ? (
-        <View style={globalStyles.card}>
+      ) : selectedPairId !== "all" ? (
+        <View style={[globalStyles.card, globalStyles.fullWidth]}>
           <Text style={{ textAlign: "center", color: COLORS.textGrey }}>
             No data available for selected currency pair.
           </Text>

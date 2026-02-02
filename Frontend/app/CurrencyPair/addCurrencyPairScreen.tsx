@@ -1,9 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -15,12 +17,13 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const AddCurrencyPairScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const [currencies, setCurrencies] = useState<any[]>([]);
-
   const [baseCurrencyId, setBaseCurrencyId] = useState<number>(0);
   const [quoteCurrencyId, setQuoteCurrencyId] = useState<number>(0);
   const [symbol, setSymbol] = useState("");
@@ -29,7 +32,6 @@ const AddCurrencyPairScreen = () => {
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -39,7 +41,6 @@ const AddCurrencyPairScreen = () => {
     check();
   }, []);
 
-  // 📥 LOAD CURRENCIES
   useEffect(() => {
     if (!isReady) return;
 
@@ -57,7 +58,6 @@ const AddCurrencyPairScreen = () => {
     load();
   }, [isReady]);
 
-  // 🧠 AUTO SYMBOL (opcjonalne, ale bardzo UX)
   useEffect(() => {
     if (baseCurrencyId > 0 && quoteCurrencyId > 0) {
       const base = currencies.find((c) => c.id === baseCurrencyId);
@@ -110,57 +110,75 @@ const AddCurrencyPairScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
-  const renderCurrencyPicker = (
+  const renderPicker = (
     label: string,
     value: number,
     setValue: (v: number) => void,
   ) => (
-    <>
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
       <Text style={globalStyles.label}>{label}</Text>
-      <View style={globalStyles.pickerWrapper}>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
         <Picker
           selectedValue={value}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
           onValueChange={(v) => setValue(Number(v))}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
         >
           <Picker.Item label="Select currency" value={0} />
           {currencies.map((c) => (
-            <Picker.Item key={c.id} label={`${c.name}`} value={c.id} />
+            <Picker.Item key={c.id} label={c.name} value={c.id} />
           ))}
         </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
       </View>
-    </>
+    </View>
+  );
+
+  const renderInput = () => (
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+      <Text style={globalStyles.label}>Symbol</Text>
+      <TextInput
+        style={globalStyles.input}
+        value={symbol}
+        onChangeText={setSymbol}
+        placeholder="e.g. EUR/USD"
+        placeholderTextColor={COLORS.textGrey}
+      />
+    </View>
   );
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Add Currency Pair</Text>
 
-      <View style={globalStyles.card}>
-        {renderCurrencyPicker(
-          "Base Currency",
-          baseCurrencyId,
-          setBaseCurrencyId,
-        )}
-
-        {renderCurrencyPicker(
-          "Quote Currency",
-          quoteCurrencyId,
-          setQuoteCurrencyId,
-        )}
-
-        <Text style={globalStyles.label}>Symbol</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={symbol}
-          onChangeText={setSymbol}
-          placeholder="e.g. EUR/USD"
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker("Base Currency", baseCurrencyId, setBaseCurrencyId)}
+        {renderPicker("Quote Currency", quoteCurrencyId, setQuoteCurrencyId)}
+        {renderInput()}
       </View>
 
       <TouchableOpacity
-        style={[globalStyles.button, saving && globalStyles.buttonDisabled]}
+        style={[
+          globalStyles.button,
+          spacing.mt4,
+          saving && globalStyles.buttonDisabled,
+        ]}
         disabled={saving}
         onPress={handleSave}
       >

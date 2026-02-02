@@ -8,19 +8,30 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import ApiService from "../../services/api";
 
 const AddFinancialReportScreen = () => {
   const router = useRouter();
   const { instrumentId } = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   const [instrument, setInstrument] = useState<any>(null);
 
   const [period, setPeriod] = useState("");
@@ -32,12 +43,11 @@ const AddFinancialReportScreen = () => {
   const [operatingCashFlow, setOperatingCashFlow] = useState("");
   const [freeCashFlow, setFreeCashFlow] = useState("");
 
-  // 📥 LOAD INSTRUMENT
   useEffect(() => {
     const loadInstrument = async () => {
       try {
         const data = await ApiService.getInvestInstrumentById(
-          Number(instrumentId)
+          Number(instrumentId),
         );
         setInstrument(data);
       } catch {
@@ -53,7 +63,6 @@ const AddFinancialReportScreen = () => {
 
   const handleCreate = async () => {
     setSaving(true);
-
     try {
       await ApiService.createFinancialReport({
         investInstrumentId: Number(instrumentId),
@@ -80,13 +89,23 @@ const AddFinancialReportScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
+  const fields = [
+    ["Period", period, setPeriod, "default"],
+    ["Revenue", revenue, setRevenue, "numeric"],
+    ["Net Income", netIncome, setNetIncome, "numeric"],
+    ["EPS", eps, setEps, "numeric"],
+    ["Assets", assets, setAssets, "numeric"],
+    ["Liabilities", liabilities, setLiabilities, "numeric"],
+    ["Operating Cash Flow", operatingCashFlow, setOperatingCashFlow, "numeric"],
+    ["Free Cash Flow", freeCashFlow, setFreeCashFlow, "numeric"],
+  ];
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>
         Add Financial Report
       </Text>
 
-      {/* 🔹 INSTRUMENT INFO */}
       <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mb4]}>
         <Text style={[globalStyles.cardTitle, spacing.mb1]}>
           {instrument?.name}
@@ -94,51 +113,40 @@ const AddFinancialReportScreen = () => {
         <Text style={globalStyles.text}>Ticker: {instrument?.ticker}</Text>
       </View>
 
-      {/* 🔹 FORM */}
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {[
-          ["Period", period, setPeriod, "default"],
-          ["Revenue", revenue, setRevenue, "numeric"],
-          ["Net Income", netIncome, setNetIncome, "numeric"],
-          ["EPS", eps, setEps, "numeric"],
-          ["Assets", assets, setAssets, "numeric"],
-          ["Liabilities", liabilities, setLiabilities, "numeric"],
-          [
-            "Operating Cash Flow",
-            operatingCashFlow,
-            setOperatingCashFlow,
-            "numeric",
-          ],
-          ["Free Cash Flow", freeCashFlow, setFreeCashFlow, "numeric"],
-        ].map(([label, value, setter, type], i) => (
-          <View key={i}>
-            <Text style={globalStyles.label}>{label}</Text>
-            <TextInput
-              style={[globalStyles.input, spacing.mb3]}
-              value={value}
-              onChangeText={setter as any}
-              keyboardType={type === "numeric" ? "numeric" : "default"}
-            />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {fields.map(([label, value, setter, type], i) => (
+          <View key={i} style={[spacing.m2, { width: columnWidth }]}>
+            <View style={globalStyles.card}>
+              <Text style={globalStyles.label}>{label}</Text>
+              <TextInput
+                style={globalStyles.input}
+                value={value as string}
+                onChangeText={setter as any}
+                keyboardType={type === "numeric" ? "numeric" : "default"}
+              />
+            </View>
           </View>
         ))}
       </View>
 
-      {/* 🔹 SAVE */}
-      <TouchableOpacity
-        style={[
-          globalStyles.button,
-          globalStyles.fullWidth,
-          saving && globalStyles.buttonDisabled,
-        ]}
-        disabled={saving}
-        onPress={handleCreate}
-      >
-        {saving ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={globalStyles.buttonText}>Create Report</Text>
-        )}
-      </TouchableOpacity>
+      <View style={[spacing.mt4, globalStyles.fullWidth]}>
+        <TouchableOpacity
+          style={[globalStyles.button, saving && globalStyles.buttonDisabled]}
+          disabled={saving}
+          onPress={handleCreate}
+        >
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={globalStyles.buttonText}>Create Report</Text>
+          )}
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };

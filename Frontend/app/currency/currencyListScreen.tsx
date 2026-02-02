@@ -9,49 +9,53 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const CurrencyListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(3);
+
   const [currencies, setCurrencies] = useState<any[]>([]);
   const [riskLevels, setRiskLevels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
-    const checkAuth = async () => {
-      const isValid = await employeeAuthGuard();
-      if (isValid) {
-        setIsReady(true);
-      }
-    };
-    checkAuth();
+    employeeAuthGuard().then(setIsReady);
   }, []);
+
   useEffect(() => {
-    const loadData = async () => {
+    if (!isReady) return;
+
+    const load = async () => {
       try {
         const [currencyData, riskData] = await Promise.all([
           ApiService.getAllCurrencies(),
           ApiService.getRiskLevels(),
         ]);
+
         setCurrencies(currencyData);
         setRiskLevels(riskData);
-      } catch (e) {
+      } catch {
         Alert.alert("Error", "Failed to load currencies.");
       } finally {
         setLoading(false);
       }
     };
-    loadData();
-  }, []);
-  const getRiskDescription = (riskLevelId) => {
-    const risk = riskLevels.find((r) => r.id === riskLevelId);
-    return risk?.description ?? "N/A";
-  };
+
+    load();
+  }, [isReady]);
+
+  const getRiskDescription = (id: number) =>
+    riskLevels.find((r) => r.id === id)?.description ?? "N/A";
+
   const handleDelete = (id: number) => {
     confirmAction({
       title: "Confirm action",
@@ -59,7 +63,7 @@ const CurrencyListScreen = () => {
       onConfirm: async () => {
         try {
           await ApiService.deleteCurrency(id);
-          setCurrencies((prev) => prev.filter((c) => c.id !== id));
+          setCurrencies((p) => p.filter((c) => c.id !== id));
         } catch {
           Alert.alert("Error", "Failed to delete currency.");
         }
@@ -67,9 +71,10 @@ const CurrencyListScreen = () => {
     });
   };
 
-  if (loading) {
+  if (!isReady || loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Currencies</Text>
@@ -81,22 +86,34 @@ const CurrencyListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new Currency</Text>
       </TouchableOpacity>
 
-      {currencies.map((currency) => (
-        <View key={currency.id} style={[globalStyles.card, spacing.mb3]}>
-          <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <View>
-              <Text style={globalStyles.cardTitle}>
-                {currency.name} ({currency.code})
-              </Text>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {currencies.map((currency) => (
+          <View
+            key={currency.id}
+            style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
+          >
+            <Text style={globalStyles.cardTitle}>
+              {currency.name} ({currency.code})
+            </Text>
 
-              <Text style={globalStyles.textSmall}>
-                Risk level: {getRiskDescription(currency.currencyRiskLevelId)}
-              </Text>
-            </View>
+            <Text style={[globalStyles.textSmall, spacing.mb2]}>
+              Risk level: {getRiskDescription(currency.currencyRiskLevelId)}
+            </Text>
 
-            <View style={globalStyles.row}>
+            <View
+              style={[
+                globalStyles.row,
+                spacing.mt2,
+                { justifyContent: "center" },
+              ]}
+            >
               <TouchableOpacity
-                style={spacing.mr3}
+                style={spacing.mr4}
                 onPress={() =>
                   router.push({
                     pathname: ROUTES.EDIT_CURRENCY,
@@ -112,12 +129,11 @@ const CurrencyListScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
-
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={globalStyles.link}>Go back</Text>
         </TouchableOpacity>
@@ -125,4 +141,5 @@ const CurrencyListScreen = () => {
     </ScrollView>
   );
 };
+
 export default CurrencyListScreen;

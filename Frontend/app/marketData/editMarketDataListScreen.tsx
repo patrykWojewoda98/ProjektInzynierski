@@ -5,10 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import { COLORS } from "../../assets/Constants/colors";
@@ -20,6 +22,7 @@ import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const EditMarketDataListScreen = () => {
   const router = useRouter();
+  const { width } = useWindowDimensions();
 
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -32,13 +35,22 @@ const EditMarketDataListScreen = () => {
   const [instruments, setInstruments] = useState<any[]>([]);
   const [marketData, setMarketData] = useState<any[]>([]);
 
-  const [sectorId, setSectorId] = useState<number>(0);
-  const [regionId, setRegionId] = useState<number>(0);
-  const [countryId, setCountryId] = useState<number>(0);
-  const [typeId, setTypeId] = useState<number>(0);
-  const [instrumentId, setInstrumentId] = useState<number>(0);
+  const [sectorId, setSectorId] = useState(0);
+  const [regionId, setRegionId] = useState(0);
+  const [countryId, setCountryId] = useState(0);
+  const [typeId, setTypeId] = useState(0);
+  const [instrumentId, setInstrumentId] = useState(0);
 
-  // 🔐 AUTH
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const pickerWidth = `${100 / columns - 4}%`;
+
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -48,7 +60,6 @@ const EditMarketDataListScreen = () => {
     check();
   }, []);
 
-  // 📥 LOAD FILTER DATA
   useEffect(() => {
     if (!isReady) return;
 
@@ -62,7 +73,6 @@ const EditMarketDataListScreen = () => {
           ApiService.getAllInvestmentTypes(),
           ApiService.getInvestInstruments(),
         ]);
-
         setSectors(s);
         setRegions(r);
         setCountries(c);
@@ -78,25 +88,20 @@ const EditMarketDataListScreen = () => {
     load();
   }, [isReady]);
 
-  // 🔎 FILTER INSTRUMENTS
   const filteredInstruments = useMemo(() => {
     let data = instruments;
-
     if (sectorId > 0) data = data.filter((i) => i.sectorId === sectorId);
     if (regionId > 0) data = data.filter((i) => i.regionId === regionId);
     if (countryId > 0) data = data.filter((i) => i.countryId === countryId);
     if (typeId > 0) data = data.filter((i) => i.investmentTypeId === typeId);
-
     return data;
   }, [sectorId, regionId, countryId, typeId, instruments]);
 
-  // 🔄 RESET AFTER FILTER CHANGE
   useEffect(() => {
     setInstrumentId(0);
     setMarketData([]);
   }, [sectorId, regionId, countryId, typeId]);
 
-  // 📊 LOAD MARKET DATA
   useEffect(() => {
     if (instrumentId === 0) return;
 
@@ -112,25 +117,20 @@ const EditMarketDataListScreen = () => {
     loadMarketData();
   }, [instrumentId]);
 
-  // ⬇️ IMPORT
   const handleImportLatest = async () => {
     if (instrumentId === 0) return;
-
     setImporting(true);
 
     try {
       const instrument = instruments.find((i) => i.id === instrumentId);
-
       if (!instrument?.ticker) {
         Alert.alert("Error", "Instrument ticker not found.");
         return;
       }
 
       await ApiService.importMarketDataByTicker(instrument.ticker);
-
       const refreshed =
         await ApiService.getMarketDataByInstrumentId(instrumentId);
-
       setMarketData(refreshed);
       Alert.alert("Success", "Latest market data imported.");
     } catch {
@@ -166,20 +166,32 @@ const EditMarketDataListScreen = () => {
     data: any[],
     labelKey = "name",
   ) => (
-    <View style={[globalStyles.card, globalStyles.fullWidth]}>
+    <View style={[globalStyles.card, spacing.m2, { width: pickerWidth }]}>
       <Text style={globalStyles.label}>{label}</Text>
-      <View style={globalStyles.pickerWrapper}>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
         <Picker
           selectedValue={value}
           onValueChange={(v) => setValue(Number(v))}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
         >
           <Picker.Item label="All" value={0} />
           {data.map((x) => (
             <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
           ))}
         </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
       </View>
     </View>
   );
@@ -188,21 +200,28 @@ const EditMarketDataListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Market Data (Edit)</Text>
 
-      {renderPicker("Sector", sectorId, setSectorId, sectors)}
-      {renderPicker("Region", regionId, setRegionId, regions)}
-      {renderPicker("Country", countryId, setCountryId, countries)}
-      {renderPicker("Investment Type", typeId, setTypeId, types, "typeName")}
-      {renderPicker(
-        "Investment Instrument",
-        instrumentId,
-        setInstrumentId,
-        filteredInstruments,
-        "ticker",
-      )}
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker("Sector", sectorId, setSectorId, sectors)}
+        {renderPicker("Region", regionId, setRegionId, regions)}
+        {renderPicker("Country", countryId, setCountryId, countries)}
+        {renderPicker("Investment Type", typeId, setTypeId, types, "typeName")}
+        {renderPicker(
+          "Investment Instrument",
+          instrumentId,
+          setInstrumentId,
+          filteredInstruments,
+          "ticker",
+        )}
+      </View>
 
       {instrumentId > 0 && (
         <>
-          <View style={spacing.mt3}>
+          <View style={spacing.mt4}>
             <TouchableOpacity
               style={[
                 globalStyles.button,
@@ -232,7 +251,7 @@ const EditMarketDataListScreen = () => {
             return (
               <View
                 key={m.id}
-                style={[globalStyles.card, globalStyles.fullWidth, spacing.mb3]}
+                style={[globalStyles.card, globalStyles.fullWidth]}
               >
                 <View
                   style={[

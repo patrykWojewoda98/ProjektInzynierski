@@ -1,23 +1,27 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const CreateCountryScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(4);
 
   const [name, setName] = useState("");
   const [isoCode, setIsoCode] = useState("");
@@ -34,20 +38,14 @@ const CreateCountryScreen = () => {
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
-    const checkAuth = async () => {
-      const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
-    };
-    checkAuth();
+    employeeAuthGuard().then(setIsReady);
   }, []);
 
-  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
-    const loadData = async () => {
+    const load = async () => {
       try {
         const [r, c, rl] = await Promise.all([
           ApiService.getAllRegions(),
@@ -63,10 +61,9 @@ const CreateCountryScreen = () => {
       }
     };
 
-    loadData();
+    load();
   }, [isReady]);
 
-  // 💾 SAVE
   const handleSave = async () => {
     if (!name || !isoCode || !regionId || !currencyId || !riskLevelId) {
       Alert.alert("Validation error", "All fields are required.");
@@ -97,75 +94,119 @@ const CreateCountryScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
+  const renderPicker = (
+    label: string,
+    value: number | null,
+    setValue: (v: number | null) => void,
+    data: any[],
+    labelKey = "name",
+    placeholder = "Select",
+  ) => (
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+
+        <View
+          style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}
+        >
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(v)}
+            style={[
+              globalStyles.pickerText,
+              Platform.OS === "web" && globalStyles.pickerWeb,
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label={placeholder} value={null} />
+            {data.map((x) => (
+              <Picker.Item
+                key={x.id}
+                label={x[labelKey] ?? x.name ?? ""}
+                value={x.id}
+              />
+            ))}
+          </Picker>
+
+          {Platform.OS === "web" && (
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color={COLORS.textGrey}
+              style={globalStyles.pickerWebArrow}
+            />
+          )}
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Add Country</Text>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {/* NAME */}
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={name}
-          onChangeText={setName}
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Name</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
+        </View>
 
-        {/* ISO CODE */}
-        <Text style={globalStyles.label}>ISO Code</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={isoCode}
-          onChangeText={(text) => setIsoCode(text.toUpperCase())}
-          maxLength={2}
-          autoCapitalize="characters"
-        />
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>ISO Code</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={isoCode}
+              onChangeText={(v) => setIsoCode(v.toUpperCase())}
+              maxLength={2}
+              autoCapitalize="characters"
+            />
+          </View>
+        </View>
 
-        {/* REGION */}
-        <Text style={globalStyles.label}>Region</Text>
-        <Picker
-          selectedValue={regionId}
-          onValueChange={setRegionId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-        >
-          <Picker.Item label="Select region" value={null} />
-          {regions.map((r) => (
-            <Picker.Item key={r.id} label={r.name} value={r.id} />
-          ))}
-        </Picker>
-
-        {/* CURRENCY */}
-        <Text style={globalStyles.label}>Currency</Text>
-        <Picker
-          selectedValue={currencyId}
-          onValueChange={setCurrencyId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-        >
-          <Picker.Item label="Select currency" value={null} />
-          {currencies.map((c) => (
-            <Picker.Item key={c.id} label={c.name} value={c.id} />
-          ))}
-        </Picker>
-
-        {/* RISK LEVEL */}
-        <Text style={globalStyles.label}>Risk Level</Text>
-        <Picker
-          selectedValue={riskLevelId}
-          onValueChange={setRiskLevelId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-        >
-          <Picker.Item label="Select risk level" value={null} />
-          {riskLevels.map((r) => (
-            <Picker.Item key={r.id} label={r.description} value={r.id} />
-          ))}
-        </Picker>
+        {renderPicker(
+          "Region",
+          regionId,
+          setRegionId,
+          regions,
+          "name",
+          "Select region",
+        )}
+        {renderPicker(
+          "Currency",
+          currencyId,
+          setCurrencyId,
+          currencies,
+          "name",
+          "Select currency",
+        )}
+        {renderPicker(
+          "Risk Level",
+          riskLevelId,
+          setRiskLevelId,
+          riskLevels,
+          "description",
+          "Select risk level",
+        )}
       </View>
 
-      {/* SAVE */}
       <TouchableOpacity
-        style={[globalStyles.button, spacing.mt4]}
+        style={[
+          globalStyles.button,
+          saving && globalStyles.buttonDisabled,
+          spacing.mt4,
+        ]}
         onPress={handleSave}
         disabled={saving}
       >

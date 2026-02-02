@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -16,14 +17,15 @@ import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const CommentModerationScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const [comments, setComments] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
   const [instruments, setInstruments] = useState<any[]>([]);
-
   const [loading, setLoading] = useState(true);
 
   const [selectedClientId, setSelectedClientId] = useState<number | "all">(
@@ -33,9 +35,8 @@ const CommentModerationScreen = () => {
     number | "all"
   >("all");
 
-  // 📥 LOAD CLIENTS + INSTRUMENTS
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadInitial = async () => {
       const [clientsData, instrumentsData] = await Promise.all([
         ApiService.getAllClients(),
         ApiService.getInvestInstruments(),
@@ -45,10 +46,9 @@ const CommentModerationScreen = () => {
       setInstruments(instrumentsData);
     };
 
-    loadInitialData();
+    loadInitial();
   }, []);
 
-  // 📥 LOAD COMMENTS (FILTERED)
   useEffect(() => {
     loadComments();
   }, [selectedClientId, selectedInstrumentId]);
@@ -59,7 +59,6 @@ const CommentModerationScreen = () => {
       let data: any[] = [];
 
       if (selectedClientId !== "all" && selectedInstrumentId !== "all") {
-        // oba wybrane → filtr front
         const all = await ApiService.getAllComments();
         data = all.filter(
           (c) =>
@@ -96,7 +95,7 @@ const CommentModerationScreen = () => {
       onConfirm: async () => {
         try {
           await ApiService.deleteComment(id);
-          setComments((prev) => prev.filter((c) => c.id !== id));
+          setComments((p) => p.filter((c) => c.id !== id));
         } catch {
           Alert.alert("Error", "Failed to delete comment.");
         }
@@ -104,43 +103,64 @@ const CommentModerationScreen = () => {
     });
   };
 
+  const renderPicker = (
+    label: string,
+    value: number | "all",
+    setValue: (v: any) => void,
+    data: any[],
+    labelKey = "name",
+  ) => (
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+      <Text style={globalStyles.label}>{label}</Text>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
+        <Picker
+          selectedValue={value}
+          onValueChange={(v) => setValue(v)}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
+        >
+          <Picker.Item label="Show all" value="all" />
+          {data.map((x) => (
+            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+          ))}
+        </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Financial Comments</Text>
 
-      {/* 🔽 FILTERS */}
-      <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mb4]}>
-        <Text style={globalStyles.label}>Investment Instrument</Text>
-        <Picker
-          selectedValue={selectedInstrumentId}
-          onValueChange={(v) => setSelectedInstrumentId(v)}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-        >
-          <Picker.Item label="Show all" value="all" />
-          {instruments.map((i) => (
-            <Picker.Item key={i.id} label={i.name} value={i.id} />
-          ))}
-        </Picker>
-
-        <Text style={[globalStyles.label, spacing.mt3]}>Client</Text>
-        <Picker
-          selectedValue={selectedClientId}
-          onValueChange={(v) => setSelectedClientId(v)}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-        >
-          <Picker.Item label="Show all" value="all" />
-          {clients.map((c) => (
-            <Picker.Item key={c.id} label={c.name} value={c.id} />
-          ))}
-        </Picker>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker(
+          "Investment Instrument",
+          selectedInstrumentId,
+          setSelectedInstrumentId,
+          instruments,
+        )}
+        {renderPicker("Client", selectedClientId, setSelectedClientId, clients)}
       </View>
 
-      {/* 🔄 LOADING */}
       {loading && <ActivityIndicator color={COLORS.primary} />}
 
-      {/* ❌ NO COMMENTS */}
       {!loading && comments.length === 0 && (
         <View style={[globalStyles.card, globalStyles.fullWidth]}>
           <Text style={[globalStyles.title, { textAlign: "center" }]}>
@@ -149,52 +169,59 @@ const CommentModerationScreen = () => {
         </View>
       )}
 
-      {/* 💬 COMMENTS LIST */}
-      {!loading &&
-        comments.map((c) => (
-          <View
-            key={c.id}
-            style={[globalStyles.card, globalStyles.fullWidth, spacing.mb3]}
-          >
-            <Text style={globalStyles.cardTitle}>
-              {getInstrumentName(c.investInstrumentID)}
-            </Text>
-
-            <Text style={globalStyles.textSmall}>
-              Author: {getClientName(c.clientId)}
-            </Text>
-
-            <Text style={[globalStyles.text, spacing.mt2]}>{c.content}</Text>
-
-            <Text style={[globalStyles.textSmall, spacing.mt1]}>
-              {new Date(c.dateTime).toLocaleString()}
-            </Text>
-
+      {!loading && (
+        <View
+          style={[
+            globalStyles.row,
+            { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+          ]}
+        >
+          {comments.map((c) => (
             <View
-              style={[
-                globalStyles.row,
-                spacing.mt3,
-                { justifyContent: "center" },
-              ]}
+              key={c.id}
+              style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
             >
-              <TouchableOpacity
-                style={spacing.mr4}
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.EDIT_COMMENT,
-                    params: { id: c.id },
-                  })
-                }
-              >
-                <Ionicons name="pencil" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+              <Text style={globalStyles.cardTitle}>
+                {getInstrumentName(c.investInstrumentID)}
+              </Text>
 
-              <TouchableOpacity onPress={() => handleDeleteComment(c.id)}>
-                <Ionicons name="trash" size={22} color={COLORS.error} />
-              </TouchableOpacity>
+              <Text style={globalStyles.textSmall}>
+                Author: {getClientName(c.clientId)}
+              </Text>
+
+              <Text style={[globalStyles.text, spacing.mt2]}>{c.content}</Text>
+
+              <Text style={[globalStyles.textSmall, spacing.mt1]}>
+                {new Date(c.dateTime).toLocaleString()}
+              </Text>
+
+              <View
+                style={[
+                  globalStyles.row,
+                  spacing.mt3,
+                  { justifyContent: "center" },
+                ]}
+              >
+                <TouchableOpacity
+                  style={spacing.mr4}
+                  onPress={() =>
+                    router.push({
+                      pathname: ROUTES.EDIT_COMMENT,
+                      params: { id: c.id },
+                    })
+                  }
+                >
+                  <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => handleDeleteComment(c.id)}>
+                  <Ionicons name="trash" size={22} color={COLORS.error} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 };

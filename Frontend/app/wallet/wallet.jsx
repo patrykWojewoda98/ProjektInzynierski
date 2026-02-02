@@ -12,11 +12,14 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 import { AuthContext } from "../_layout";
 
 const WalletScreen = () => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { itemWidth } = useResponsiveColumns();
+
   const [totalValue, setTotalValue] = useState(0);
   const [wallet, setWallet] = useState(null);
   const [currency, setCurrency] = useState(null);
@@ -51,8 +54,8 @@ const WalletScreen = () => {
         }
 
         setTotalValue(walletResponse.cashBalance + investmentsValue);
-      } catch (error) {
-        console.error("Wallet load error:", error);
+      } catch (err) {
+        console.error("Wallet load error:", err);
       } finally {
         setLoading(false);
       }
@@ -78,8 +81,9 @@ const WalletScreen = () => {
       <Text style={[globalStyles.header, spacing.mb4]}>My Wallet</Text>
 
       {/* WALLET SUMMARY */}
-      <View style={[globalStyles.card, spacing.mb4]}>
+      <View style={[globalStyles.card, spacing.mb4, globalStyles.fullWidth]}>
         <Text style={globalStyles.cardTitle}>Wallet Summary</Text>
+
         <Text style={[globalStyles.text, spacing.mt1]}>
           Total account value:{" "}
           <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
@@ -88,7 +92,7 @@ const WalletScreen = () => {
         </Text>
       </View>
 
-      {/* MY INVESTMENTS */}
+      {/* INVESTMENTS */}
       <Text style={[globalStyles.header, spacing.mb3]}>My Investments</Text>
 
       {investmentSummary.length === 0 ? (
@@ -96,33 +100,37 @@ const WalletScreen = () => {
           You don't have any investments yet.
         </Text>
       ) : (
-        investmentSummary.map((item) => (
-          <View
-            key={item.instrumentId}
-            style={[globalStyles.card, spacing.mb3]}
-          >
-            <Text style={globalStyles.cardTitle}>{item.instrumentName}</Text>
+        <View
+          style={[
+            globalStyles.row,
+            { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+          ]}
+        >
+          {investmentSummary.map((item) => (
+            <View
+              key={item.instrumentId}
+              style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
+            >
+              <Text style={globalStyles.cardTitle}>{item.instrumentName}</Text>
 
-            <Text style={globalStyles.text}>
-              Total quantity: {item.totalQuantity}
-            </Text>
-          </View>
-        ))
+              <Text style={globalStyles.text}>
+                Total quantity:{" "}
+                <Text style={{ fontWeight: "600" }}>{item.totalQuantity}</Text>
+              </Text>
+            </View>
+          ))}
+        </View>
       )}
 
-      {/* NAVIGATION */}
+      {/* ACTIONS */}
       <TouchableOpacity
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
           spacing.py2,
-          spacing.mt1,
+          spacing.mt3,
         ]}
-        onPress={() =>
-          router.push({
-            pathname: ROUTES.INVEST_INSTRUMENT,
-          })
-        }
+        onPress={() => router.push(ROUTES.INVEST_INSTRUMENT)}
       >
         <Text style={globalStyles.buttonText}>Show all Invest Instruments</Text>
       </TouchableOpacity>

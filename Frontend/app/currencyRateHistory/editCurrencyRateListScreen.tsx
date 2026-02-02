@@ -16,6 +16,7 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 type CurrencyRateHistoryItem = {
   id: number;
@@ -29,6 +30,7 @@ type CurrencyRateHistoryItem = {
 const EditCurrencyRateHistoryByPairScreen = () => {
   const { currencyPairId } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const pairId = Number(
     Array.isArray(currencyPairId) ? currencyPairId[0] : currencyPairId,
@@ -53,7 +55,6 @@ const EditCurrencyRateHistoryByPairScreen = () => {
     const load = async () => {
       try {
         const data = await ApiService.getCurrencyRateHistoryByPair(pairId);
-
         setItems(
           data.sort(
             (a: CurrencyRateHistoryItem, b: CurrencyRateHistoryItem) =>
@@ -94,6 +95,7 @@ const EditCurrencyRateHistoryByPairScreen = () => {
       <Text style={[globalStyles.header, spacing.mb4]}>
         Currency Rate History
       </Text>
+
       <View
         style={[globalStyles.row, spacing.mb4, { justifyContent: "center" }]}
       >
@@ -118,50 +120,65 @@ const EditCurrencyRateHistoryByPairScreen = () => {
           <Text style={globalStyles.buttonText}>Add rate</Text>
         </TouchableOpacity>
       </View>
-      {items.map((i) => (
-        <View key={i.id} style={[globalStyles.card, spacing.mb3]}>
-          <Text style={globalStyles.cardTitle}>
-            {new Date(i.date).toLocaleDateString()}
-          </Text>
 
-          <Text style={globalStyles.textSmall}>Open: {i.openRate ?? "-"}</Text>
-          <Text style={globalStyles.textSmall}>High: {i.highRate ?? "-"}</Text>
-          <Text style={globalStyles.textSmall}>Low: {i.lowRate ?? "-"}</Text>
-          <Text style={globalStyles.textSmall}>
-            Close:{" "}
-            <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
-              {i.closeRate}
-            </Text>
-          </Text>
-
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {items.map((i) => (
           <View
-            style={[
-              globalStyles.row,
-              spacing.mt2,
-              { justifyContent: "center" },
-            ]}
+            key={i.id}
+            style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
           >
-            <TouchableOpacity
-              style={spacing.mr4}
-              onPress={() =>
-                router.push({
-                  pathname: ROUTES.EDIT_SPECIFIC_CURRENCY_RATE_HISTORY,
-                  params: { rateId: String(i.id) },
-                })
-              }
-            >
-              <Ionicons name="pencil" size={22} color={COLORS.primary} />
-            </TouchableOpacity>
+            <Text style={globalStyles.cardTitle}>
+              {new Date(i.date).toLocaleDateString()}
+            </Text>
 
-            <TouchableOpacity onPress={() => handleDelete(i.id)}>
-              <Ionicons name="trash" size={22} color={COLORS.error} />
-            </TouchableOpacity>
+            <Text style={globalStyles.textSmall}>
+              Open: {i.openRate ?? "-"}
+            </Text>
+            <Text style={globalStyles.textSmall}>
+              High: {i.highRate ?? "-"}
+            </Text>
+            <Text style={globalStyles.textSmall}>Low: {i.lowRate ?? "-"}</Text>
+            <Text style={globalStyles.textSmall}>
+              Close:{" "}
+              <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
+                {i.closeRate}
+              </Text>
+            </Text>
+
+            <View
+              style={[
+                globalStyles.row,
+                spacing.mt3,
+                { justifyContent: "center" },
+              ]}
+            >
+              <TouchableOpacity
+                style={spacing.mr4}
+                onPress={() =>
+                  router.push({
+                    pathname: ROUTES.EDIT_SPECIFIC_CURRENCY_RATE_HISTORY,
+                    params: { rateId: String(i.id) },
+                  })
+                }
+              >
+                <Ionicons name="pencil" size={22} color={COLORS.primary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => handleDelete(i.id)}>
+                <Ionicons name="trash" size={22} color={COLORS.error} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       {items.length === 0 && (
-        <View style={globalStyles.card}>
+        <View style={[globalStyles.card, globalStyles.fullWidth]}>
           <Text style={[globalStyles.text, { textAlign: "center" }]}>
             No currency rates found.
           </Text>

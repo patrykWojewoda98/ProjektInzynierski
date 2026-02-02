@@ -9,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import { COLORS } from "../../assets/Constants/colors";
@@ -19,20 +20,30 @@ import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const InvestmentInstrumentListScreen = () => {
   const router = useRouter();
+  const { width } = useWindowDimensions();
 
   const [regions, setRegions] = useState<any[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [types, setTypes] = useState<any[]>([]);
   const [allItems, setAllItems] = useState<any[]>([]);
 
-  const [regionId, setRegionId] = useState<number>(0);
-  const [sectorId, setSectorId] = useState<number>(0);
-  const [typeId, setTypeId] = useState<number>(0);
+  const [regionId, setRegionId] = useState(0);
+  const [sectorId, setSectorId] = useState(0);
+  const [typeId, setTypeId] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
+
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -42,7 +53,6 @@ const InvestmentInstrumentListScreen = () => {
     check();
   }, []);
 
-  // 📥 LOAD FILTERS + INSTRUMENTS
   useEffect(() => {
     if (!isReady) return;
 
@@ -55,7 +65,6 @@ const InvestmentInstrumentListScreen = () => {
           ApiService.getAllInvestmentTypes(),
           ApiService.getInvestInstruments(),
         ]);
-
         setRegions(r);
         setSectors(s);
         setTypes(t);
@@ -68,14 +77,11 @@ const InvestmentInstrumentListScreen = () => {
     load();
   }, [isReady]);
 
-  // 🔎 FILTER ITEMS (FRONTEND)
   const items = useMemo(() => {
     let data = allItems;
-
     if (regionId > 0) data = data.filter((i) => i.regionId === regionId);
     if (sectorId > 0) data = data.filter((i) => i.sectorId === sectorId);
     if (typeId > 0) data = data.filter((i) => i.investmentTypeId === typeId);
-
     return data;
   }, [regionId, sectorId, typeId, allItems]);
 
@@ -104,22 +110,45 @@ const InvestmentInstrumentListScreen = () => {
     data: any[],
     labelKey = "name",
   ) => (
-    <>
-      <Text style={globalStyles.label}>{label}</Text>
-      <View style={globalStyles.pickerWrapper}>
-        <Picker
-          selectedValue={value}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => setValue(Number(v))}
+    <View style={[spacing.m2, { width: columnWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
+          style={[
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
+          ]}
         >
-          <Picker.Item label="All" value={0} />
-          {data.map((x) => (
-            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
-          ))}
-        </Picker>
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(Number(v))}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label="All" value={0} />
+            {data.map((x) => (
+              <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+            ))}
+          </Picker>
+          <Ionicons
+            name="chevron-down"
+            size={18}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        </View>
       </View>
-    </>
+    </View>
   );
 
   return (
@@ -128,7 +157,6 @@ const InvestmentInstrumentListScreen = () => {
         Investment Instruments
       </Text>
 
-      {/* ➕ ADD */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mb4]}
         onPress={() => router.push(ROUTES.ADD_INVEST_INSTRUMENT)}
@@ -136,16 +164,32 @@ const InvestmentInstrumentListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new instrument</Text>
       </TouchableOpacity>
 
-      {renderPicker("Region", regionId, setRegionId, regions)}
-      {renderPicker("Sector", sectorId, setSectorId, sectors)}
-      {renderPicker("Type", typeId, setTypeId, types, "typeName")}
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker("Region", regionId, setRegionId, regions)}
+        {renderPicker("Sector", sectorId, setSectorId, sectors)}
+        {renderPicker("Type", typeId, setTypeId, types, "typeName")}
+      </View>
 
-      {/* LIST */}
-      <View style={[spacing.mt3, globalStyles.fullWidth]}>
+      <View
+        style={[
+          globalStyles.row,
+          spacing.mt4,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
         {items.map((i) => (
           <View
             key={i.id}
-            style={[globalStyles.card, spacing.mb4, { width: "100%" }]}
+            style={[
+              globalStyles.card,
+              spacing.m2,
+              { width: columnWidth, minWidth: 280 },
+            ]}
           >
             <Text style={globalStyles.cardTitle}>{i.ticker}</Text>
             <Text style={globalStyles.text}>{i.name}</Text>
@@ -174,11 +218,9 @@ const InvestmentInstrumentListScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <View
-              style={[spacing.mt2, { width: "100%", alignItems: "center" }]}
-            >
+            <View style={spacing.mt3}>
               <TouchableOpacity
-                style={[globalStyles.button, { width: "100%" }]}
+                style={globalStyles.button}
                 onPress={async () => {
                   const instrument = await ApiService.getInvestInstrumentById(
                     i.id,
@@ -195,12 +237,7 @@ const InvestmentInstrumentListScreen = () => {
                   });
                 }}
               >
-                <Text
-                  style={[
-                    globalStyles.buttonText,
-                    { fontSize: 18, textAlign: "center" },
-                  ]}
-                >
+                <Text style={globalStyles.buttonText}>
                   {i.financialMetricId
                     ? "Edit Financial Metric"
                     : "Add Financial Metric"}
@@ -208,17 +245,9 @@ const InvestmentInstrumentListScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <View
-              style={[spacing.mt2, { width: "100%", alignItems: "center" }]}
-            >
+            <View style={spacing.mt2}>
               <TouchableOpacity
-                style={[
-                  globalStyles.button,
-                  {
-                    width: "100%",
-                    backgroundColor: COLORS.primary,
-                  },
-                ]}
+                style={globalStyles.button}
                 onPress={() =>
                   router.push({
                     pathname: ROUTES.EDIT_FINANCIAL_REPORT_LIST,
@@ -226,14 +255,7 @@ const InvestmentInstrumentListScreen = () => {
                   })
                 }
               >
-                <Text
-                  style={[
-                    globalStyles.buttonText,
-                    { fontSize: 18, textAlign: "center" },
-                  ]}
-                >
-                  Financial Reports
-                </Text>
+                <Text style={globalStyles.buttonText}>Financial Reports</Text>
               </TouchableOpacity>
             </View>
           </View>

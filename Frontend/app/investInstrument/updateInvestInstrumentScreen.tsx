@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -9,32 +10,41 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
+import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
-import { globalStyles, spacing } from "../../assets/styles/styles";
-import { COLORS } from "../../assets/Constants/colors";
-import { ROUTES } from "../../routes";
 
 const UpdateInvestInstrumentScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const { width } = useWindowDimensions();
 
-  // 🔹 BASIC
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
+
   const [name, setName] = useState("");
   const [ticker, setTicker] = useState("");
   const [description, setDescription] = useState("");
   const [isin, setIsin] = useState("");
 
-  // 🔹 IDS
   const [regionId, setRegionId] = useState<number | null>(null);
   const [sectorId, setSectorId] = useState<number | null>(null);
   const [investmentTypeId, setInvestmentTypeId] = useState<number | null>(null);
   const [countryId, setCountryId] = useState<number | null>(null);
   const [currencyId, setCurrencyId] = useState<number | null>(null);
 
-  // 🔹 LISTS
   const [regions, setRegions] = useState<any[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [types, setTypes] = useState<any[]>([]);
@@ -45,7 +55,6 @@ const UpdateInvestInstrumentScreen = () => {
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -54,13 +63,12 @@ const UpdateInvestInstrumentScreen = () => {
     check();
   }, []);
 
-  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady || !id) return;
 
     const load = async () => {
       try {
-        const [instrument, r, s, t, c, cur, m] = await Promise.all([
+        const [instrument, r, s, t, c, cur] = await Promise.all([
           ApiService.getInvestInstrumentById(Number(id)),
           ApiService.getAllRegions(),
           ApiService.getSectors(),
@@ -69,14 +77,12 @@ const UpdateInvestInstrumentScreen = () => {
           ApiService.getAllCurrencies(),
         ]);
 
-        // lists
         setRegions(r);
         setSectors(s);
         setTypes(t);
         setCountries(c);
         setCurrencies(cur);
 
-        // values
         setName(instrument.name ?? "");
         setTicker(instrument.ticker ?? "");
         setDescription(instrument.description ?? "");
@@ -98,7 +104,6 @@ const UpdateInvestInstrumentScreen = () => {
     load();
   }, [isReady, id]);
 
-  // 💾 SAVE
   const handleSave = async () => {
     if (
       !name.trim() ||
@@ -143,89 +148,117 @@ const UpdateInvestInstrumentScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
+  const renderInput = (
+    label: string,
+    value: string,
+    setValue: (v: string) => void,
+    props: any = {},
+  ) => (
+    <View style={[spacing.m2, { width: columnWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <TextInput
+          style={globalStyles.input}
+          value={value}
+          onChangeText={setValue}
+          {...props}
+        />
+      </View>
+    </View>
+  );
+
+  const renderPicker = (
+    label: string,
+    value: number | null,
+    setValue: (v: number | null) => void,
+    data: any[],
+    labelKey = "name",
+  ) => (
+    <View style={[spacing.m2, { width: columnWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
+          style={[
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
+          ]}
+        >
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(v)}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            {data.map((x) => (
+              <Picker.Item
+                key={x.id}
+                label={labelKey ? x[labelKey] : x.name}
+                value={x.id}
+              />
+            ))}
+          </Picker>
+          <Ionicons
+            name="chevron-down"
+            size={18}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>
         Edit Investment Instrument
       </Text>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={[globalStyles.input, spacing.mb3]}
-          value={name}
-          onChangeText={setName}
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderInput("Name", name, setName)}
+        {renderInput("Ticker", ticker, setTicker, {
+          autoCapitalize: "characters",
+        })}
+        {renderInput("ISIN", isin, setIsin, {
+          autoCapitalize: "characters",
+        })}
+        {renderInput("Description", description, setDescription, {
+          multiline: true,
+        })}
 
-        <Text style={globalStyles.label}>Ticker</Text>
-        <TextInput
-          style={[globalStyles.input, spacing.mb3]}
-          value={ticker}
-          onChangeText={setTicker}
-          autoCapitalize="characters"
-        />
-
-        <Text style={globalStyles.label}>Description</Text>
-        <TextInput
-          style={[globalStyles.input, spacing.mb3]}
-          value={description}
-          onChangeText={setDescription}
-          multiline
-        />
-
-        <Text style={globalStyles.label}>ISIN</Text>
-        <TextInput
-          style={[globalStyles.input, spacing.mb3]}
-          value={isin}
-          onChangeText={setIsin}
-          autoCapitalize="characters"
-        />
-
-        {/* PICKERS */}
-        {[
-          ["Region", regionId, setRegionId, regions],
-          ["Sector", sectorId, setSectorId, sectors],
-          ["Country", countryId, setCountryId, countries],
-          ["Currency", currencyId, setCurrencyId, currencies],
-        ].map(([label, value, setter, list]: any, i) => (
-          <View key={i}>
-            <Text style={globalStyles.label}>{label}</Text>
-            <View style={[globalStyles.pickerWrapper, spacing.mb3]}>
-              <Picker
-                selectedValue={value}
-                style={globalStyles.pickerText}
-                dropdownIconColor={COLORS.textGrey}
-                onValueChange={(v) => setter(v)}
-              >
-                {list.map((x: any) => (
-                  <Picker.Item key={x.id} label={x.name} value={x.id} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-        ))}
-        <Text style={globalStyles.label}>Investment Type</Text>
-        <Picker
-          selectedValue={investmentTypeId}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
-          onValueChange={(v) => setInvestmentTypeId(v)}
-        >
-          <Picker.Item label="-- choose type --" value={null} />
-          {types.map((t) => (
-            <Picker.Item
-              key={t.id}
-              label={t.typeName ?? t.name ?? "Type"} // ✅ TU JEST FIX
-              value={t.id}
-            />
-          ))}
-        </Picker>
+        {renderPicker("Region", regionId, setRegionId, regions)}
+        {renderPicker("Sector", sectorId, setSectorId, sectors)}
+        {renderPicker(
+          "Investment Type",
+          investmentTypeId,
+          setInvestmentTypeId,
+          types,
+          "typeName",
+        )}
+        {renderPicker("Country", countryId, setCountryId, countries)}
+        {renderPicker("Currency", currencyId, setCurrencyId, currencies)}
       </View>
 
       <TouchableOpacity
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
+          spacing.mt4,
           saving && globalStyles.buttonDisabled,
         ]}
         disabled={saving}

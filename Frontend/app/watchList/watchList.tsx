@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
@@ -7,51 +8,45 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import ApiService from "../../services/api";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 import { AuthContext } from "../_layout";
 
 const WatchList = () => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { itemWidth } = useResponsiveColumns();
 
-  const [instruments, setInstruments] = useState([]);
-
-  // ⭐ investInstrumentId -> watchListItemId
-  const [watchListMap, setWatchListMap] = useState({});
-
+  const [instruments, setInstruments] = useState<any[]>([]);
+  const [watchListMap, setWatchListMap] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
   const [watchListLoaded, setWatchListLoaded] = useState(false);
 
-  // ⭐ TOGGLE WATCHLIST
-  const handleToggleWatchList = async (instrumentId) => {
+  const handleToggleWatchList = async (instrumentId: number) => {
     if (!user?.id) return;
 
-    const key = Number(instrumentId);
-    const watchListItemId = watchListMap[key];
+    const watchListItemId = watchListMap[instrumentId];
+    if (!watchListItemId) return;
 
     try {
-      if (watchListItemId) {
-        await ApiService.deleteWatchListItem(watchListItemId);
+      await ApiService.deleteWatchListItem(watchListItemId);
 
-        setWatchListMap((prev) => {
-          const copy = { ...prev };
-          delete copy[key];
-          return copy;
-        });
+      setWatchListMap((prev) => {
+        const copy = { ...prev };
+        delete copy[instrumentId];
+        return copy;
+      });
 
-        setInstruments((prev) => prev.filter((x) => x.id !== key));
-      }
+      setInstruments((prev) => prev.filter((x) => x.id !== instrumentId));
     } catch (err) {
       console.error("Watchlist toggle error:", err);
     }
   };
 
-  // ⭐ LOAD WATCHLIST + INSTRUMENTS
   useEffect(() => {
     const loadData = async () => {
       if (!user?.id) {
@@ -61,25 +56,20 @@ const WatchList = () => {
       }
 
       try {
-        // 1️⃣ WatchList items
         const raw = await ApiService.getWatchListItemsByClientId(user.id);
         const arr = Array.isArray(raw) ? raw : [raw];
 
-        const map = {};
+        const map: Record<number, number> = {};
         arr.forEach((x) => {
           map[Number(x.investInstrumentId)] = x.id;
         });
         setWatchListMap(map);
 
-        // 2️⃣ Wszystkie instrumenty
         const allInstruments = await ApiService.getInvestInstruments();
-
-        // 3️⃣ TYLKO polubione
-        const favorites = allInstruments.filter((i) => map[Number(i.id)]);
+        const favorites = allInstruments.filter((i) => map[i.id]);
 
         setInstruments(favorites);
-      } catch (err) {
-        console.error("Error loading watchlist:", err);
+      } catch {
         setInstruments([]);
         setWatchListMap({});
       } finally {
@@ -105,21 +95,26 @@ const WatchList = () => {
         </Text>
       )}
 
-      <View style={[spacing.mt3, globalStyles.fullWidth]}>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
         {instruments.map((i) => (
           <View
             key={i.id}
-            style={[globalStyles.card, { position: "relative" }]}
+            style={[
+              globalStyles.card,
+              spacing.m2,
+              { width: itemWidth, position: "relative" },
+            ]}
           >
             <TouchableOpacity
               style={globalStyles.star}
               onPress={() => handleToggleWatchList(i.id)}
             >
-              <Ionicons
-                name={watchListMap[i.id] ? "star" : "star-outline"}
-                size={26}
-                color="white"
-              />
+              <Ionicons name="star" size={26} color={COLORS.whiteHeader} />
             </TouchableOpacity>
 
             <Text style={globalStyles.cardTitle}>Ticker: {i.ticker}</Text>
@@ -133,7 +128,7 @@ const WatchList = () => {
                 globalStyles.button,
                 globalStyles.fullWidth,
                 spacing.py2,
-                spacing.mt1,
+                spacing.mt2,
               ]}
               onPress={() =>
                 router.push({

@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -15,20 +16,22 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 import { AuthContext } from "../_layout";
 
 const InvestInstrument = () => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { itemWidth } = useResponsiveColumns();
 
   const [regions, setRegions] = useState<any[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [types, setTypes] = useState<any[]>([]);
   const [allInstruments, setAllInstruments] = useState<any[]>([]);
 
-  const [selectedRegion, setSelectedRegion] = useState<number>(0);
-  const [selectedSector, setSelectedSector] = useState<number>(0);
-  const [selectedType, setSelectedType] = useState<number>(0);
+  const [selectedRegion, setSelectedRegion] = useState(0);
+  const [selectedSector, setSelectedSector] = useState(0);
+  const [selectedType, setSelectedType] = useState(0);
 
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [watchListMap, setWatchListMap] = useState<Record<number, number>>({});
@@ -38,10 +41,7 @@ const InvestInstrument = () => {
 
   const setQuantity = (instrumentId: number, value: number) => {
     const qty = Math.max(1, Number(value) || 1);
-    setQuantities((prev) => ({
-      ...prev,
-      [instrumentId]: qty,
-    }));
+    setQuantities((prev) => ({ ...prev, [instrumentId]: qty }));
   };
 
   const handleAddToWallet = async (instrumentId: number) => {
@@ -50,12 +50,9 @@ const InvestInstrument = () => {
     try {
       const wallet = await ApiService.getWalletByClientId(user.id);
       const quantity = quantities[instrumentId] ?? 1;
-
       await ApiService.addWalletInstrument(wallet.id, instrumentId, quantity);
       Alert.alert("Info", "Instrument added to wallet successfully.");
-    } catch (err) {
-      console.error("Error adding to wallet:", err);
-    }
+    } catch {}
   };
 
   const handleToggleWatchList = async (instrumentId: number) => {
@@ -66,7 +63,6 @@ const InvestInstrument = () => {
     try {
       if (watchListItemId) {
         await ApiService.deleteWatchListItem(watchListItemId);
-
         setWatchListMap((prev) => {
           const copy = { ...prev };
           delete copy[instrumentId];
@@ -77,18 +73,11 @@ const InvestInstrument = () => {
           user.id,
           instrumentId,
         );
-
-        setWatchListMap((prev) => ({
-          ...prev,
-          [instrumentId]: created.id,
-        }));
+        setWatchListMap((prev) => ({ ...prev, [instrumentId]: created.id }));
       }
-    } catch (err) {
-      console.error("Error toggling watchlist:", err);
-    }
+    } catch {}
   };
 
-  // ⭐ LOAD WATCHLIST
   useEffect(() => {
     const loadWatchList = async () => {
       if (!user?.id) {
@@ -99,12 +88,8 @@ const InvestInstrument = () => {
       try {
         const raw = await ApiService.getWatchListItemsByClientId(user.id);
         const arr = Array.isArray(raw) ? raw : [raw];
-
         const map: Record<number, number> = {};
-        arr.forEach((x) => {
-          map[Number(x.investInstrumentId)] = x.id;
-        });
-
+        arr.forEach((x) => (map[Number(x.investInstrumentId)] = x.id));
         setWatchListMap(map);
       } catch {
         setWatchListMap({});
@@ -116,7 +101,6 @@ const InvestInstrument = () => {
     loadWatchList();
   }, [user]);
 
-  // 🔹 LOAD FILTERS + INSTRUMENTS
   useEffect(() => {
     const load = async () => {
       try {
@@ -139,7 +123,6 @@ const InvestInstrument = () => {
     load();
   }, []);
 
-  // 🔎 FILTER INSTRUMENTS (FRONTEND)
   const filteredInstruments = useMemo(() => {
     let data = allInstruments;
 
@@ -164,22 +147,34 @@ const InvestInstrument = () => {
     data: any[],
     labelKey = "name",
   ) => (
-    <>
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
       <Text style={globalStyles.label}>{label}</Text>
-      <View style={globalStyles.pickerWrapper}>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
         <Picker
           selectedValue={value}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
           onValueChange={(v) => setValue(Number(v))}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
         >
           <Picker.Item label="All" value={0} />
           {data.map((x) => (
             <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
           ))}
         </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
       </View>
-    </>
+    </View>
   );
 
   return (
@@ -188,15 +183,32 @@ const InvestInstrument = () => {
         Investment Instruments
       </Text>
 
-      {renderPicker("Region", selectedRegion, setSelectedRegion, regions)}
-      {renderPicker("Sector", selectedSector, setSelectedSector, sectors)}
-      {renderPicker("Type", selectedType, setSelectedType, types, "typeName")}
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker("Region", selectedRegion, setSelectedRegion, regions)}
+        {renderPicker("Sector", selectedSector, setSelectedSector, sectors)}
+        {renderPicker("Type", selectedType, setSelectedType, types, "typeName")}
+      </View>
 
-      <View style={[spacing.mt3, globalStyles.fullWidth]}>
+      <View
+        style={[
+          globalStyles.row,
+          spacing.mt3,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
         {filteredInstruments.map((i) => (
           <View
             key={i.id}
-            style={[globalStyles.card, { position: "relative" }]}
+            style={[
+              globalStyles.card,
+              spacing.m2,
+              { width: itemWidth, position: "relative" },
+            ]}
           >
             <TouchableOpacity
               style={globalStyles.star}
@@ -211,27 +223,23 @@ const InvestInstrument = () => {
 
             <Text style={globalStyles.cardTitle}>Ticker: {i.ticker}</Text>
             <Text style={globalStyles.text}>Name: {i.name}</Text>
-            <Text style={globalStyles.textSmall}>
-              Description: {i.description}
-            </Text>
+            <Text style={globalStyles.textSmall}>{i.description}</Text>
 
             <View style={spacing.mt2}>
               <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 8,
-                }}
+                style={[
+                  globalStyles.row,
+                  globalStyles.spaceBetween,
+                  spacing.mb2,
+                ]}
               >
                 <Text style={globalStyles.text}>Quantity</Text>
 
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={globalStyles.row}>
                   <TouchableOpacity
                     onPress={() =>
                       setQuantity(i.id, (quantities[i.id] ?? 1) - 1)
                     }
-                    style={{ padding: 6 }}
                   >
                     <Ionicons
                       name="remove-circle-outline"
@@ -253,7 +261,6 @@ const InvestInstrument = () => {
                     onPress={() =>
                       setQuantity(i.id, (quantities[i.id] ?? 1) + 1)
                     }
-                    style={{ padding: 6 }}
                   >
                     <Ionicons
                       name="add-circle-outline"
@@ -274,30 +281,30 @@ const InvestInstrument = () => {
               >
                 <Text style={globalStyles.buttonText}>Add to Wallet</Text>
               </TouchableOpacity>
-            </View>
 
-            <TouchableOpacity
-              style={[
-                globalStyles.button,
-                globalStyles.fullWidth,
-                spacing.py2,
-                spacing.mt1,
-              ]}
-              onPress={() =>
-                router.push({
-                  pathname: ROUTES.FINANCIAL_METRIC,
-                  params: { id: i.id },
-                })
-              }
-            >
-              <Text style={globalStyles.buttonText}>See more</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  globalStyles.button,
+                  globalStyles.fullWidth,
+                  spacing.py2,
+                  spacing.mt1,
+                ]}
+                onPress={() =>
+                  router.push({
+                    pathname: ROUTES.FINANCIAL_METRIC,
+                    params: { id: i.id },
+                  })
+                }
+              >
+                <Text style={globalStyles.buttonText}>See more</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </View>
 
       <TouchableOpacity
-        style={[spacing.mt6]}
+        style={spacing.mt6}
         onPress={() => router.push({ pathname: ROUTES.MAIN_MENU })}
       >
         <Text style={globalStyles.link}>Back to Main Menu</Text>

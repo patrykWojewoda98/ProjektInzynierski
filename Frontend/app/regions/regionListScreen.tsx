@@ -16,9 +16,11 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const RegionListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(4);
 
   const [regions, setRegions] = useState<any[]>([]);
   const [riskLevels, setRiskLevels] = useState<any[]>([]);
@@ -26,30 +28,24 @@ const RegionListScreen = () => {
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
-    const checkAuth = async () => {
-      const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
-    };
-    checkAuth();
+    employeeAuthGuard().then(setIsReady);
   }, []);
 
-  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
-    const loadData = async () => {
+    const load = async () => {
       try {
-        const [regionsData, risks, codes] = await Promise.all([
+        const [r, rl, rc] = await Promise.all([
           ApiService.getAllRegions(),
           ApiService.getRiskLevels(),
           ApiService.getAllRegionCodes(),
         ]);
 
-        setRegions(regionsData);
-        setRiskLevels(risks);
-        setRegionCodes(codes);
+        setRegions(r);
+        setRiskLevels(rl);
+        setRegionCodes(rc);
       } catch {
         Alert.alert("Error", "Failed to load regions.");
       } finally {
@@ -57,7 +53,7 @@ const RegionListScreen = () => {
       }
     };
 
-    loadData();
+    load();
   }, [isReady]);
 
   const getRiskDescription = (id: number) =>
@@ -73,7 +69,7 @@ const RegionListScreen = () => {
       onConfirm: async () => {
         try {
           await ApiService.deleteRegion(id);
-          setRegions((prev) => prev.filter((r) => r.id !== id));
+          setRegions((p) => p.filter((r) => r.id !== id));
         } catch {
           Alert.alert("Error", "Failed to delete region.");
         }
@@ -89,7 +85,6 @@ const RegionListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Regions</Text>
 
-      {/* ➕ ADD */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mb4]}
         onPress={() => router.push(ROUTES.ADD_REGION)}
@@ -97,11 +92,15 @@ const RegionListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new Region</Text>
       </TouchableOpacity>
 
-      {/* 📄 LIST */}
-      {regions.map((region) => (
-        <View key={region.id} style={[globalStyles.card, spacing.mb3]}>
-          <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <View>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {regions.map((region) => (
+          <View key={region.id} style={[spacing.m2, { width: itemWidth }]}>
+            <View style={globalStyles.card}>
               <Text style={globalStyles.cardTitle}>{region.name}</Text>
 
               <Text style={globalStyles.textSmall}>
@@ -111,30 +110,35 @@ const RegionListScreen = () => {
               <Text style={globalStyles.textSmall}>
                 Region code: {getRegionCode(region.regionCodeId)}
               </Text>
-            </View>
 
-            <View style={globalStyles.row}>
-              <TouchableOpacity
-                style={spacing.mr3}
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.EDIT_REGION,
-                    params: { id: region.id },
-                  })
-                }
+              <View
+                style={[
+                  globalStyles.row,
+                  spacing.mt2,
+                  { justifyContent: "center" },
+                ]}
               >
-                <Ionicons name="pencil" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={spacing.mr4}
+                  onPress={() =>
+                    router.push({
+                      pathname: ROUTES.EDIT_REGION,
+                      params: { id: region.id },
+                    })
+                  }
+                >
+                  <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handleDelete(region.id)}>
-                <Ionicons name="trash" size={22} color={COLORS.error} />
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(region.id)}>
+                  <Ionicons name="trash" size={22} color={COLORS.error} />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
-      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

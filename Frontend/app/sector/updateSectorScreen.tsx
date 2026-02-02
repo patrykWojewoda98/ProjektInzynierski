@@ -8,16 +8,28 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const UpdateSectorScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { width } = useWindowDimensions();
+
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
 
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -76,30 +88,50 @@ const UpdateSectorScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Edit Sector</Text>
 
-      <View style={globalStyles.card}>
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={name}
-          onChangeText={setName}
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[spacing.m2, { width: columnWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Name</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
+        </View>
 
-        <Text style={globalStyles.label}>Code</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={code}
-          onChangeText={setCode}
-        />
+        <View style={[spacing.m2, { width: columnWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Code</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={code}
+              onChangeText={setCode}
+            />
+          </View>
+        </View>
 
-        <Text style={globalStyles.label}>Description</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={description}
-          onChangeText={setDescription}
-        />
+        <View style={[spacing.m2, { width: columnWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Description</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={description}
+              onChangeText={setDescription}
+            />
+          </View>
+        </View>
       </View>
 
-      <TouchableOpacity style={globalStyles.button} onPress={handleSave}>
+      <TouchableOpacity
+        style={[globalStyles.button, spacing.mt4]}
+        onPress={handleSave}
+      >
         <Text style={globalStyles.buttonText}>Save changes</Text>
       </TouchableOpacity>
 

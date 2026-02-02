@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import { COLORS } from "../../assets/Constants/colors";
@@ -19,12 +20,22 @@ import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 
 const SectorListScreen = () => {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
 
   const [sectors, setSectors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -33,7 +44,6 @@ const SectorListScreen = () => {
     check();
   }, []);
 
-  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
@@ -74,7 +84,6 @@ const SectorListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Sectors</Text>
 
-      {/* ➕ ADD */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mb4]}
         onPress={() => router.push(ROUTES.ADD_SECTOR)}
@@ -82,39 +91,48 @@ const SectorListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new sector</Text>
       </TouchableOpacity>
 
-      {/* 📄 LIST */}
-      {sectors.map((s) => (
-        <View key={s.id} style={[globalStyles.cardWithLongText, spacing.mb3]}>
-          <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <View style={{ flex: 1 }}>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {sectors.map((s) => (
+          <View key={s.id} style={[spacing.m2, { width: columnWidth }]}>
+            <View style={globalStyles.cardWithLongText}>
               <Text style={globalStyles.cardTitle}>{s.name}</Text>
               <Text style={globalStyles.textLong}>
                 {s.code} • {s.description}
               </Text>
-            </View>
 
-            <View style={globalStyles.row}>
-              <TouchableOpacity
-                style={spacing.mr3}
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.EDIT_SECTOR,
-                    params: { id: s.id },
-                  })
-                }
+              <View
+                style={[
+                  globalStyles.row,
+                  spacing.mt3,
+                  { justifyContent: "center" },
+                ]}
               >
-                <Ionicons name="pencil" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={spacing.mr4}
+                  onPress={() =>
+                    router.push({
+                      pathname: ROUTES.EDIT_SECTOR,
+                      params: { id: s.id },
+                    })
+                  }
+                >
+                  <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handleDelete(s.id)}>
-                <Ionicons name="trash" size={22} color={COLORS.error} />
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(s.id)}>
+                  <Ionicons name="trash" size={22} color={COLORS.error} />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
-      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

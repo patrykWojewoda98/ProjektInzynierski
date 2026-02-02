@@ -16,9 +16,12 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const InvestmentTypeListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(4);
+
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -66,31 +69,40 @@ const InvestmentTypeListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new investment type</Text>
       </TouchableOpacity>
 
-      {items.map((i) => (
-        <View key={i.id} style={[globalStyles.card, spacing.mb3]}>
-          <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <Text style={globalStyles.cardTitle}>{i.typeName}</Text>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {items.map((i) => (
+          <View key={i.id} style={[spacing.m2, { width: itemWidth }]}>
+            <View style={globalStyles.card}>
+              <View style={[globalStyles.row, globalStyles.spaceBetween]}>
+                <Text style={globalStyles.cardTitle}>{i.typeName}</Text>
 
-            <View style={globalStyles.row}>
-              <TouchableOpacity
-                style={spacing.mr3}
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.EDIT_INVESTMENT_TYPE,
-                    params: { id: i.id },
-                  })
-                }
-              >
-                <Ionicons name="pencil" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+                <View style={globalStyles.row}>
+                  <TouchableOpacity
+                    style={spacing.mr3}
+                    onPress={() =>
+                      router.push({
+                        pathname: ROUTES.EDIT_INVESTMENT_TYPE,
+                        params: { id: i.id },
+                      })
+                    }
+                  >
+                    <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                  </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handleDelete(i.id)}>
-                <Ionicons name="trash" size={22} color={COLORS.error} />
-              </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDelete(i.id)}>
+                    <Ionicons name="trash" size={22} color={COLORS.error} />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>

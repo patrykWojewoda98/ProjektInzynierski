@@ -10,19 +10,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 import { AuthContext } from "../_layout";
 
 const MyAIRequests = () => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { itemWidth } = useResponsiveColumns();
 
   const [requests, setRequests] = useState([]);
   const [instrumentNames, setInstrumentNames] = useState({});
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,13 +35,14 @@ const MyAIRequests = () => {
         const aiRequests = await ApiService.getAnalysisRequestsByClientId(
           user.id,
         );
+
         setRequests(aiRequests);
 
         const uniqueInstrumentIds = [
           ...new Set(aiRequests.map((r) => r.investInstrumentId)),
         ];
 
-        const namesMap: Record<number, string> = {};
+        const namesMap = {};
 
         await Promise.all(
           uniqueInstrumentIds.map(async (id) => {
@@ -61,6 +64,8 @@ const MyAIRequests = () => {
 
   const handleDeleteRequest = (id) => {
     confirmAction({
+      title: "Confirm delete",
+      message: "Delete this AI analysis request?",
       onConfirm: async () => {
         try {
           await ApiService.deleteAIAnalysisRequest(id);
@@ -87,9 +92,17 @@ const MyAIRequests = () => {
           You don’t have any AI analysis requests yet.
         </Text>
       ) : (
-        <View style={globalStyles.fullWidth}>
+        <View
+          style={[
+            globalStyles.row,
+            { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+          ]}
+        >
           {requests.map((req) => (
-            <View key={req.id} style={[globalStyles.card, spacing.mb3]}>
+            <View
+              key={req.id}
+              style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
+            >
               {/* HEADER */}
               <View
                 style={[

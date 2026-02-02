@@ -16,11 +16,13 @@ import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const CurrencyPairListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
@@ -56,12 +58,9 @@ const CurrencyPairListScreen = () => {
       onConfirm: async () => {
         try {
           await ApiService.deleteCurrencyPair(id);
-
-          // 🔥 WAŻNE – reload z backendu
           const refreshed = await ApiService.getCurrencyPairs();
           setItems(refreshed);
-        } catch (err) {
-          console.log(err);
+        } catch {
           Alert.alert("Error", "Failed to delete currency pair.");
         }
       },
@@ -83,42 +82,52 @@ const CurrencyPairListScreen = () => {
         <Text style={globalStyles.buttonText}>Add currency pair</Text>
       </TouchableOpacity>
 
-      {items.map((i) => (
-        <View key={i.id} style={[globalStyles.card, spacing.mb3]}>
-          <Text style={globalStyles.cardTitle}>{i.symbol}</Text>
-
-          <Text style={globalStyles.textSmall}>
-            Base currency ID: {i.baseCurrencyId}
-          </Text>
-          <Text style={globalStyles.textSmall}>
-            Quote currency ID: {i.quoteCurrencyId}
-          </Text>
-
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {items.map((i) => (
           <View
-            style={[
-              globalStyles.row,
-              spacing.mt2,
-              { justifyContent: "center" },
-            ]}
+            key={i.id}
+            style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
           >
-            <TouchableOpacity
-              style={spacing.mr4}
-              onPress={() =>
-                router.push({
-                  pathname: ROUTES.EDIT_CURRENCY_PAIR,
-                  params: { id: i.id },
-                })
-              }
-            >
-              <Ionicons name="pencil" size={22} color={COLORS.primary} />
-            </TouchableOpacity>
+            <Text style={globalStyles.cardTitle}>{i.symbol}</Text>
 
-            <TouchableOpacity onPress={() => handleDelete(i.id)}>
-              <Ionicons name="trash" size={22} color={COLORS.error} />
-            </TouchableOpacity>
+            <Text style={globalStyles.textSmall}>
+              Base currency ID: {i.baseCurrencyId}
+            </Text>
+            <Text style={globalStyles.textSmall}>
+              Quote currency ID: {i.quoteCurrencyId}
+            </Text>
+
+            <View
+              style={[
+                globalStyles.row,
+                spacing.mt3,
+                { justifyContent: "center" },
+              ]}
+            >
+              <TouchableOpacity
+                style={spacing.mr4}
+                onPress={() =>
+                  router.push({
+                    pathname: ROUTES.EDIT_CURRENCY_PAIR,
+                    params: { id: i.id },
+                  })
+                }
+              >
+                <Ionicons name="pencil" size={22} color={COLORS.primary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => handleDelete(i.id)}>
+                <Ionicons name="trash" size={22} color={COLORS.error} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <TouchableOpacity onPress={() => router.back()}>

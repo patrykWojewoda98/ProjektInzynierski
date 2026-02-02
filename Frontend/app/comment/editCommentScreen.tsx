@@ -16,46 +16,48 @@ import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const EditCommentScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const [comment, setComment] = useState<any>(null);
+  const [clientName, setClientName] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // 📥 LOAD COMMENT
   useEffect(() => {
-    const loadComment = async () => {
+    const load = async () => {
       try {
         const data = await ApiService.getCommentById(Number(id));
         setComment(data);
         setContent(data.content);
+
+        const client = await ApiService.getClientById(data.clientId);
+        setClientName(client.name);
       } catch {
         Alert.alert("Error", "Failed to load comment.");
+        router.back();
       } finally {
         setLoading(false);
       }
     };
 
-    loadComment();
+    load();
   }, [id]);
 
-  // 💾 SAVE
   const handleSave = async () => {
     if (!content.trim()) {
-      Alert.alert("Validation", "Comment content cannot be empty.");
+      Alert.alert("Validation error", "Comment content cannot be empty.");
       return;
     }
 
     setSaving(true);
     try {
-      await ApiService.updateComment(comment.id, {
-        content,
-      });
-
+      await ApiService.updateComment(comment.id, { content });
       Alert.alert("Success", "Comment updated successfully.");
       router.back();
     } catch {
@@ -65,7 +67,6 @@ const EditCommentScreen = () => {
     }
   };
 
-  // 🗑 DELETE
   const handleDelete = () => {
     confirmAction({
       title: "Confirm delete",
@@ -97,21 +98,32 @@ const EditCommentScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Edit Comment</Text>
 
-      {/* INFO */}
-      <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mb3]}>
-        <Text style={globalStyles.textSmall}>Client: {comment.clientName}</Text>
-        <Text style={globalStyles.textSmall}>
-          Instrument ID: {comment.investInstrumentID}
-        </Text>
-        <Text style={globalStyles.textSmall}>
-          Date: {new Date(comment.dateTime).toLocaleString()}
-        </Text>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.textSmall}>Client</Text>
+          <Text style={globalStyles.text}>{clientName}</Text>
+        </View>
+
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.textSmall}>Instrument ID</Text>
+          <Text style={globalStyles.text}>{comment.investInstrumentID}</Text>
+        </View>
+
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.textSmall}>Date</Text>
+          <Text style={globalStyles.text}>
+            {new Date(comment.dateTime).toLocaleString()}
+          </Text>
+        </View>
       </View>
 
-      {/* CONTENT */}
       <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mb4]}>
         <Text style={globalStyles.label}>Comment content</Text>
-
         <TextInput
           style={[
             globalStyles.input,

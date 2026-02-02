@@ -1,48 +1,45 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const UpdateCurrencyScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(2);
 
   const [name, setName] = useState("");
   const [riskLevelId, setRiskLevelId] = useState<number | null>(null);
-
   const [riskLevels, setRiskLevels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 EMPLOYEE AUTH GUARD
   useEffect(() => {
-    const checkAuth = async () => {
-      const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
-    };
-    checkAuth();
+    employeeAuthGuard().then(setIsReady);
   }, []);
 
-  // 📥 LOAD DATA
   useEffect(() => {
     if (!id || !isReady) return;
 
-    const loadData = async () => {
+    const load = async () => {
       try {
         const [currency, risks] = await Promise.all([
           ApiService.getCurrencyByID(Number(id)),
@@ -60,7 +57,7 @@ const UpdateCurrencyScreen = () => {
       }
     };
 
-    loadData();
+    load();
   }, [id, isReady]);
 
   const handleSave = async () => {
@@ -95,32 +92,55 @@ const UpdateCurrencyScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Edit Currency</Text>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {/* NAME */}
-        <Text style={globalStyles.label}>Currency Name</Text>
-        <TextInput
-          style={[globalStyles.input, spacing.mb1]}
-          value={name}
-          onChangeText={setName}
-        />
-      </View>
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {/* RISK LEVEL */}
-        <Text style={globalStyles.label}>Risk Level</Text>
-        <View style={[globalStyles.pickerWrapper, spacing.mb1]}>
-          <Picker
-            selectedValue={riskLevelId}
-            style={globalStyles.pickerText}
-            dropdownIconColor={COLORS.textGrey}
-            onValueChange={(v) => setRiskLevelId(v)}
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Currency Name</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
+
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Risk Level</Text>
+
+          <View
+            style={[
+              globalStyles.pickerWrapper,
+              Platform.OS === "web" && globalStyles.pickerWebWrapper,
+            ]}
           >
-            {riskLevels.map((r) => (
-              <Picker.Item key={r.id} label={r.description} value={r.id} />
-            ))}
-          </Picker>
+            <Picker
+              selectedValue={riskLevelId}
+              onValueChange={(v) => setRiskLevelId(v)}
+              style={[
+                globalStyles.pickerText,
+                Platform.OS === "web" && globalStyles.pickerWeb,
+              ]}
+            >
+              {riskLevels.map((r) => (
+                <Picker.Item key={r.id} label={r.description} value={r.id} />
+              ))}
+            </Picker>
+
+            {Platform.OS === "web" && (
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={COLORS.textGrey}
+                style={globalStyles.pickerWebArrow}
+              />
+            )}
+          </View>
         </View>
       </View>
-      {/* SAVE */}
+
       <TouchableOpacity
         style={[
           globalStyles.button,
@@ -137,7 +157,6 @@ const UpdateCurrencyScreen = () => {
         )}
       </TouchableOpacity>
 
-      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

@@ -79,7 +79,38 @@ export const globalStyles = StyleSheet.create({
   pickerText: {
     color: COLORS.textGrey,
   },
+  pickerWebWrapper: {
+    ...(Platform.OS === "web" && {
+      position: "relative",
+    }),
+  },
 
+  pickerWeb: {
+    ...(Platform.OS === "web" && {
+      backgroundColor: COLORS.darkGrey,
+      color: COLORS.textGrey,
+      height: 48,
+      paddingLeft: 12,
+      paddingRight: 40,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: COLORS.mediumGrey,
+      outlineStyle: "none",
+      appearance: "none",
+      WebkitAppearance: "none",
+      MozAppearance: "none",
+    }),
+  },
+
+  pickerWebArrow: {
+    ...(Platform.OS === "web" && {
+      position: "absolute",
+      right: 12,
+      top: "50%",
+      transform: [{ translateY: -10 }],
+      pointerEvents: "none",
+    }),
+  },
   // Text
   text: {
     color: COLORS.textGrey,

@@ -16,6 +16,7 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 type PairWithLatestRate = {
   pairId: number;
@@ -27,6 +28,7 @@ type PairWithLatestRate = {
 
 const EditCurrencyRateHistoryListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const [items, setItems] = useState<PairWithLatestRate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,74 +115,91 @@ const EditCurrencyRateHistoryListScreen = () => {
         Currency Rate History
       </Text>
 
-      {items.map((i) => (
-        <View key={i.pairId} style={[globalStyles.card, spacing.mb3]}>
-          <Text style={globalStyles.cardTitle}>{i.symbol}</Text>
-          {i.rate !== null ? (
-            <>
-              <Text style={globalStyles.textSmall}>
-                Latest rate:{" "}
-                <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
-                  {i.rate}
-                </Text>
-              </Text>
-
-              <Text style={globalStyles.textSmall}>
-                Date: {new Date(i.date!).toLocaleDateString()}
-              </Text>
-            </>
-          ) : (
-            <Text style={globalStyles.textSmall}>No rate available</Text>
-          )}
-
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {items.map((i) => (
           <View
-            style={[
-              globalStyles.row,
-              spacing.mt2,
-              { justifyContent: "center" },
-            ]}
+            key={i.pairId}
+            style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
           >
-            {i.latestRateId === null && (
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.ADD_CURRENCY_RATE_HISTORY,
-                    params: { pairId: String(i.pairId) },
-                  })
-                }
-              >
-                <Ionicons name="add-circle" size={28} color={COLORS.success} />
-              </TouchableOpacity>
+            <Text style={globalStyles.cardTitle}>{i.symbol}</Text>
+
+            {i.rate !== null ? (
+              <>
+                <Text style={globalStyles.textSmall}>
+                  Latest rate:{" "}
+                  <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
+                    {i.rate}
+                  </Text>
+                </Text>
+
+                <Text style={globalStyles.textSmall}>
+                  Date: {new Date(i.date!).toLocaleDateString()}
+                </Text>
+              </>
+            ) : (
+              <Text style={globalStyles.textSmall}>No rate available</Text>
             )}
 
-            {i.latestRateId !== null && (
-              <>
+            <View
+              style={[
+                globalStyles.row,
+                spacing.mt3,
+                { justifyContent: "center" },
+              ]}
+            >
+              {i.latestRateId === null && (
                 <TouchableOpacity
-                  style={spacing.mr4}
                   onPress={() =>
                     router.push({
-                      pathname: ROUTES.EDIT_CURRENCY_RATE_HISTORY_LIST,
-                      params: {
-                        currencyPairId: String(i.pairId),
-                        symbol: i.symbol,
-                      },
+                      pathname: ROUTES.ADD_CURRENCY_RATE_HISTORY,
+                      params: { pairId: String(i.pairId) },
                     })
                   }
                 >
-                  <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                  <Ionicons
+                    name="add-circle"
+                    size={28}
+                    color={COLORS.success}
+                  />
                 </TouchableOpacity>
+              )}
 
-                <TouchableOpacity onPress={() => handleDelete(i.latestRateId!)}>
-                  <Ionicons name="trash" size={22} color={COLORS.error} />
-                </TouchableOpacity>
-              </>
-            )}
+              {i.latestRateId !== null && (
+                <>
+                  <TouchableOpacity
+                    style={spacing.mr4}
+                    onPress={() =>
+                      router.push({
+                        pathname: ROUTES.EDIT_CURRENCY_RATE_HISTORY_LIST,
+                        params: {
+                          currencyPairId: String(i.pairId),
+                          symbol: i.symbol,
+                        },
+                      })
+                    }
+                  >
+                    <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => handleDelete(i.latestRateId!)}
+                  >
+                    <Ionicons name="trash" size={22} color={COLORS.error} />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       {items.length === 0 && (
-        <View style={globalStyles.card}>
+        <View style={[globalStyles.card, globalStyles.fullWidth]}>
           <Text style={[globalStyles.text, { textAlign: "center" }]}>
             No currency rates found.
           </Text>

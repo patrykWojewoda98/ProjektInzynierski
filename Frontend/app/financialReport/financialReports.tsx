@@ -4,21 +4,17 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
 
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
-import { confirmAction } from "../../utils/confirmAction";
 
-const EditFinancialMetricListScreen = () => {
+const FinancialReports = () => {
   const { instrumentId } = useLocalSearchParams();
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -36,17 +32,11 @@ const EditFinancialMetricListScreen = () => {
   const [instruments, setInstruments] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [importing, setImporting] = useState(false);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState(false);
 
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<
     number | "all"
   >(instrumentId ? Number(instrumentId) : "all");
-
-  const selectedInstrument =
-    selectedInstrumentId === "all"
-      ? null
-      : instruments.find((i) => i.id === selectedInstrumentId);
 
   const getInstrumentName = (id: number) =>
     instruments.find((i) => i.id === id)?.name ?? "Unknown instrument";
@@ -77,40 +67,6 @@ const EditFinancialMetricListScreen = () => {
       setReports(data);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDeleteReport = (id: number) => {
-    confirmAction({
-      title: "Confirm delete",
-      message: "Delete this financial report?",
-      onConfirm: async () => {
-        await ApiService.deleteFinancialReport(id);
-        setReports((p) => p.filter((x) => x.id !== id));
-      },
-    });
-  };
-
-  const handleImportReports = async () => {
-    if (!selectedInstrument) {
-      Alert.alert("Select instrument", "Please select an instrument.");
-      return;
-    }
-
-    if (!selectedInstrument.isin) {
-      Alert.alert("Missing ISIN", "This instrument does not have ISIN.");
-      return;
-    }
-
-    setImporting(true);
-    try {
-      await ApiService.importFinancialReportsByIsin(selectedInstrument.isin);
-      await loadReports();
-      Alert.alert("Success", "Reports imported successfully.");
-    } catch {
-      Alert.alert("Error", "Failed to import reports.");
-    } finally {
-      setImporting(false);
     }
   };
 
@@ -169,54 +125,6 @@ const EditFinancialMetricListScreen = () => {
         {renderPicker()}
       </View>
 
-      <View
-        style={[
-          globalStyles.row,
-          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
-        ]}
-      >
-        <View style={[spacing.m2, { width: columnWidth }]}>
-          <TouchableOpacity
-            style={[
-              globalStyles.button,
-              importing && globalStyles.buttonDisabled,
-            ]}
-            disabled={importing}
-            onPress={handleImportReports}
-          >
-            {importing ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={globalStyles.buttonText}>
-                Import reports automatically (ISIN)
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        <View style={[spacing.m2, { width: columnWidth }]}>
-          <TouchableOpacity
-            style={globalStyles.button}
-            onPress={() => {
-              if (selectedInstrumentId === "all") {
-                Alert.alert(
-                  "Select instrument",
-                  "Please select an instrument first.",
-                );
-                return;
-              }
-
-              router.push({
-                pathname: ROUTES.ADD_FINANCIAL_REPORT,
-                params: { instrumentId: selectedInstrumentId },
-              });
-            }}
-          >
-            <Text style={globalStyles.buttonText}>Add report manually</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
       {loading && <ActivityIndicator color={COLORS.primary} />}
 
       {!loading && reports.length === 0 && (
@@ -237,7 +145,9 @@ const EditFinancialMetricListScreen = () => {
           reports.map((r) => (
             <View key={r.id} style={[spacing.m2, { width: columnWidth }]}>
               <View style={globalStyles.card}>
-                <Text style={globalStyles.cardTitle}>
+                <Text
+                  style={[globalStyles.cardTitle, { color: COLORS.success }]}
+                >
                   {getInstrumentName(r.investInstrumentId)}
                 </Text>
 
@@ -259,23 +169,7 @@ const EditFinancialMetricListScreen = () => {
                     spacing.mt3,
                     { justifyContent: "center" },
                   ]}
-                >
-                  <TouchableOpacity
-                    style={spacing.mr4}
-                    onPress={() =>
-                      router.push({
-                        pathname: ROUTES.EDIT_FINANCIAL_REPORT,
-                        params: { id: r.id },
-                      })
-                    }
-                  >
-                    <Ionicons name="pencil" size={22} color={COLORS.primary} />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={() => handleDeleteReport(r.id)}>
-                    <Ionicons name="trash" size={22} color={COLORS.error} />
-                  </TouchableOpacity>
-                </View>
+                ></View>
               </View>
             </View>
           ))}
@@ -284,4 +178,4 @@ const EditFinancialMetricListScreen = () => {
   );
 };
 
-export default EditFinancialMetricListScreen;
+export default FinancialReports;

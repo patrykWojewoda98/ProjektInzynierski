@@ -1,9 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -16,10 +18,12 @@ import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const UpdateRegionScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(3);
 
   const [name, setName] = useState("");
   const [regionCodeId, setRegionCodeId] = useState<number | null>(null);
@@ -27,24 +31,19 @@ const UpdateRegionScreen = () => {
 
   const [riskLevels, setRiskLevels] = useState<any[]>([]);
   const [regionCodes, setRegionCodes] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
-    const checkAuth = async () => {
-      const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
-    };
-    checkAuth();
+    employeeAuthGuard().then(setIsReady);
   }, []);
 
-  // 📥 LOAD
   useEffect(() => {
     if (!id || !isReady) return;
 
-    const loadData = async () => {
+    const load = async () => {
       try {
         const [region, risks, codes] = await Promise.all([
           ApiService.getRegionById(Number(id)),
@@ -65,7 +64,7 @@ const UpdateRegionScreen = () => {
       }
     };
 
-    loadData();
+    load();
   }, [id, isReady]);
 
   const handleSave = async () => {
@@ -79,7 +78,7 @@ const UpdateRegionScreen = () => {
     try {
       await ApiService.updateRegion(Number(id), {
         id: Number(id),
-        name,
+        name: name.trim(),
         regionCodeId,
         regionRiskLevelId: riskLevelId,
       });
@@ -97,50 +96,79 @@ const UpdateRegionScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
+  const renderPicker = (
+    label: string,
+    value: number | null,
+    setValue: (v: number | null) => void,
+    data: any[],
+    labelKey: string,
+    emptyLabel?: string,
+  ) => (
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+      <Text style={globalStyles.label}>{label}</Text>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
+        <Picker
+          selectedValue={value}
+          onValueChange={setValue}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
+        >
+          {emptyLabel && <Picker.Item label={emptyLabel} value={null} />}
+          {data.map((x) => (
+            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+          ))}
+        </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Edit Region</Text>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        <Text style={globalStyles.label}>Region Name</Text>
-        <TextInput
-          style={[globalStyles.input, spacing.mb3]}
-          value={name}
-          onChangeText={setName}
-        />
-      </View>
-
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        <Text style={globalStyles.label}>Region Code</Text>
-        <View style={globalStyles.pickerWrapper}>
-          <Picker
-            selectedValue={regionCodeId}
-            onValueChange={(v) => setRegionCodeId(v)}
-            style={globalStyles.pickerText}
-            dropdownIconColor={COLORS.textGrey}
-          >
-            <Picker.Item label="— No code —" value={null} />
-            {regionCodes.map((c) => (
-              <Picker.Item key={c.id} label={c.code} value={c.id} />
-            ))}
-          </Picker>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Region Name</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={name}
+            onChangeText={setName}
+          />
         </View>
-      </View>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        <Text style={globalStyles.label}>Risk Level</Text>
-        <View style={globalStyles.pickerWrapper}>
-          <Picker
-            selectedValue={riskLevelId}
-            onValueChange={(v) => setRiskLevelId(v)}
-            style={globalStyles.pickerText}
-            dropdownIconColor={COLORS.textGrey}
-          >
-            {riskLevels.map((r) => (
-              <Picker.Item key={r.id} label={r.description} value={r.id} />
-            ))}
-          </Picker>
-        </View>
+        {renderPicker(
+          "Region Code",
+          regionCodeId,
+          setRegionCodeId,
+          regionCodes,
+          "code",
+          "— No code —",
+        )}
+
+        {renderPicker(
+          "Risk Level",
+          riskLevelId,
+          setRiskLevelId,
+          riskLevels,
+          "description",
+        )}
       </View>
 
       <TouchableOpacity
@@ -149,8 +177,8 @@ const UpdateRegionScreen = () => {
           globalStyles.fullWidth,
           saving && globalStyles.buttonDisabled,
         ]}
-        onPress={handleSave}
         disabled={saving}
+        onPress={handleSave}
       >
         {saving ? (
           <ActivityIndicator color={COLORS.whiteHeader} />

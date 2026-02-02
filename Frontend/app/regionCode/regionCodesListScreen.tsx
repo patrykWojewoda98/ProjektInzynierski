@@ -16,15 +16,16 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const RegionCodesListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const [regionCodes, setRegionCodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
     const checkAuth = async () => {
       const ok = await employeeAuthGuard();
@@ -33,7 +34,6 @@ const RegionCodesListScreen = () => {
     checkAuth();
   }, []);
 
-  // 📥 LOAD DATA
   useEffect(() => {
     if (!isReady) return;
 
@@ -74,7 +74,6 @@ const RegionCodesListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb3]}>Region Codes</Text>
 
-      {/* ➕ ADD */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mb4]}
         onPress={() => router.push(ROUTES.ADD_REGION_CODE)}
@@ -82,34 +81,42 @@ const RegionCodesListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new Region Code</Text>
       </TouchableOpacity>
 
-      {/* 📄 LIST */}
-      {regionCodes.map((code) => (
-        <View key={code.id} style={[globalStyles.card, spacing.mb3]}>
-          <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <Text style={globalStyles.cardTitle}>{code.code}</Text>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {regionCodes.map((code) => (
+          <View
+            key={code.id}
+            style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
+          >
+            <View style={[globalStyles.row, globalStyles.spaceBetween]}>
+              <Text style={globalStyles.cardTitle}>{code.code}</Text>
 
-            <View style={globalStyles.row}>
-              <TouchableOpacity
-                style={spacing.mr3}
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.EDIT_REGION_CODE,
-                    params: { id: code.id },
-                  })
-                }
-              >
-                <Ionicons name="pencil" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+              <View style={globalStyles.row}>
+                <TouchableOpacity
+                  style={spacing.mr3}
+                  onPress={() =>
+                    router.push({
+                      pathname: ROUTES.EDIT_REGION_CODE,
+                      params: { id: code.id },
+                    })
+                  }
+                >
+                  <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handleDelete(code.id)}>
-                <Ionicons name="trash" size={22} color={COLORS.error} />
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(code.id)}>
+                  <Ionicons name="trash" size={22} color={COLORS.error} />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
-      {/* ⬅️ BACK */}
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>
         <TouchableOpacity onPress={() => router.back()}>

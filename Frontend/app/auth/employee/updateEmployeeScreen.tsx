@@ -4,21 +4,23 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Switch,
 } from "react-native";
 
-import ApiService from "../../../services/api";
-import { globalStyles, spacing } from "../../../assets/styles/styles";
 import { COLORS } from "../../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../../assets/styles/styles";
+import ApiService from "../../../services/api";
 import { employeeAuthGuard } from "../../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../../utils/useResponsiveColumns";
 
 const UpdateEmployeeScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(4);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -84,38 +86,58 @@ const UpdateEmployeeScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Edit Employee</Text>
 
-      <View style={globalStyles.card}>
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={name}
-          onChangeText={setName}
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {[
+          ["Name", name, setName, true],
+          ["Email", email, () => {}, false],
+          ["Phone", phoneNumber, setPhoneNumber, true],
+          ["PESEL", pesel, setPesel, true],
+        ].map(([label, value, setter, editable], i) => (
+          <View key={i} style={[spacing.m2, { width: itemWidth }]}>
+            <View style={globalStyles.card}>
+              <Text style={globalStyles.label}>{label}</Text>
+              <TextInput
+                style={globalStyles.input}
+                value={value as string}
+                onChangeText={setter as any}
+                editable={editable as boolean}
+              />
+            </View>
+          </View>
+        ))}
 
-        <Text style={globalStyles.label}>Email</Text>
-        <TextInput style={globalStyles.input} value={email} editable={false} />
-
-        <Text style={globalStyles.label}>Phone</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-        />
-
-        <Text style={globalStyles.label}>PESEL</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={pesel}
-          onChangeText={setPesel}
-        />
-
-        <View style={[globalStyles.row, spacing.mt3]}>
-          <Text style={globalStyles.text}>Admin</Text>
-          <Switch value={isAdmin} onValueChange={setIsAdmin} />
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Admin</Text>
+            <View
+              style={[
+                globalStyles.row,
+                globalStyles.spaceBetween,
+                { alignItems: "center" },
+              ]}
+            >
+              <Text style={globalStyles.text}>
+                Grant administrator privileges
+              </Text>
+              <Switch
+                value={isAdmin}
+                onValueChange={setIsAdmin}
+                thumbColor={isAdmin ? COLORS.primary : undefined}
+              />
+            </View>
+          </View>
         </View>
       </View>
 
-      <TouchableOpacity style={globalStyles.button} onPress={handleSave}>
+      <TouchableOpacity
+        style={[globalStyles.button, spacing.mt4]}
+        onPress={handleSave}
+      >
         <Text style={globalStyles.buttonText}>Save changes</Text>
       </TouchableOpacity>
     </ScrollView>

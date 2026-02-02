@@ -8,21 +8,32 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import ApiService from "../../services/api";
 
 const EditFinancialReportScreen = () => {
   const router = useRouter();
-  const { id } = useLocalSearchParams(); // reportId
+  const { id } = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [report, setReport] = useState(null);
-  const [instrument, setInstrument] = useState(null);
+  const [instrument, setInstrument] = useState<any>(null);
 
   const [period, setPeriod] = useState("");
   const [revenue, setRevenue] = useState("");
@@ -33,24 +44,22 @@ const EditFinancialReportScreen = () => {
   const [operatingCashFlow, setOperatingCashFlow] = useState("");
   const [freeCashFlow, setFreeCashFlow] = useState("");
 
-  // 📥 LOAD REPORT + INSTRUMENT
   useEffect(() => {
     const loadData = async () => {
       try {
-        const reportData = await ApiService.getFinancialReportById(Number(id));
-        setReport(reportData);
+        const report = await ApiService.getFinancialReportById(Number(id));
 
-        setPeriod(reportData.period ?? "");
-        setRevenue(String(reportData.revenue ?? ""));
-        setNetIncome(String(reportData.netIncome ?? ""));
-        setEps(String(reportData.eps ?? ""));
-        setAssets(String(reportData.assets ?? ""));
-        setLiabilities(String(reportData.liabilities ?? ""));
-        setOperatingCashFlow(String(reportData.operatingCashFlow ?? ""));
-        setFreeCashFlow(String(reportData.freeCashFlow ?? ""));
+        setPeriod(report.period ?? "");
+        setRevenue(String(report.revenue ?? ""));
+        setNetIncome(String(report.netIncome ?? ""));
+        setEps(String(report.eps ?? ""));
+        setAssets(String(report.assets ?? ""));
+        setLiabilities(String(report.liabilities ?? ""));
+        setOperatingCashFlow(String(report.operatingCashFlow ?? ""));
+        setFreeCashFlow(String(report.freeCashFlow ?? ""));
 
         const instrumentData = await ApiService.getInvestInstrumentById(
-          reportData.investInstrumentId
+          report.investInstrumentId,
         );
         setInstrument(instrumentData);
       } catch {
@@ -66,7 +75,6 @@ const EditFinancialReportScreen = () => {
 
   const handleSave = async () => {
     setSaving(true);
-
     try {
       await ApiService.updateFinancialReport(Number(id), {
         id: Number(id),
@@ -94,13 +102,23 @@ const EditFinancialReportScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
+  const fields = [
+    ["Period", period, setPeriod, "default"],
+    ["Revenue", revenue, setRevenue, "numeric"],
+    ["Net Income", netIncome, setNetIncome, "numeric"],
+    ["EPS", eps, setEps, "numeric"],
+    ["Assets", assets, setAssets, "numeric"],
+    ["Liabilities", liabilities, setLiabilities, "numeric"],
+    ["Operating Cash Flow", operatingCashFlow, setOperatingCashFlow, "numeric"],
+    ["Free Cash Flow", freeCashFlow, setFreeCashFlow, "numeric"],
+  ];
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>
         Edit Financial Report
       </Text>
 
-      {/* 🔹 INSTRUMENT INFO */}
       <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mb4]}>
         <Text style={[globalStyles.cardTitle, spacing.mb1]}>
           {instrument?.name}
@@ -108,45 +126,40 @@ const EditFinancialReportScreen = () => {
         <Text style={globalStyles.text}>Ticker: {instrument?.ticker}</Text>
       </View>
 
-      {/* 🔹 FORM */}
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {[
-          ["Period", period, setPeriod],
-          ["Revenue", revenue, setRevenue],
-          ["Net Income", netIncome, setNetIncome],
-          ["EPS", eps, setEps],
-          ["Assets", assets, setAssets],
-          ["Liabilities", liabilities, setLiabilities],
-          ["Operating Cash Flow", operatingCashFlow, setOperatingCashFlow],
-          ["Free Cash Flow", freeCashFlow, setFreeCashFlow],
-        ].map(([label, value, setter], i) => (
-          <View key={i}>
-            <Text style={globalStyles.label}>{label}</Text>
-            <TextInput
-              style={[globalStyles.input, spacing.mb3]}
-              value={value}
-              onChangeText={setter}
-              keyboardType="numeric"
-            />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {fields.map(([label, value, setter, type], i) => (
+          <View key={i} style={[spacing.m2, { width: columnWidth }]}>
+            <View style={globalStyles.card}>
+              <Text style={globalStyles.label}>{label}</Text>
+              <TextInput
+                style={globalStyles.input}
+                value={value as string}
+                onChangeText={setter as any}
+                keyboardType={type === "numeric" ? "numeric" : "default"}
+              />
+            </View>
           </View>
         ))}
       </View>
 
-      <TouchableOpacity
-        style={[
-          globalStyles.button,
-          globalStyles.fullWidth,
-          saving && globalStyles.buttonDisabled,
-        ]}
-        disabled={saving}
-        onPress={handleSave}
-      >
-        {saving ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={globalStyles.buttonText}>Save Changes</Text>
-        )}
-      </TouchableOpacity>
+      <View style={[spacing.mt4, globalStyles.fullWidth]}>
+        <TouchableOpacity
+          style={[globalStyles.button, saving && globalStyles.buttonDisabled]}
+          disabled={saving}
+          onPress={handleSave}
+        >
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={globalStyles.buttonText}>Save Changes</Text>
+          )}
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };

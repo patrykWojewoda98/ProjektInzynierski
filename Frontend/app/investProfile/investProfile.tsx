@@ -4,17 +4,20 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
+  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import ApiService from "../../services/api";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 import { AuthContext } from "../_layout";
 
 type RiskLevelDto = {
@@ -31,6 +34,7 @@ type InvestHorizonDto = {
 const InvestProfile = () => {
   const { user } = useContext(AuthContext);
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -49,19 +53,15 @@ const InvestProfile = () => {
     clientId: null as number | null,
   });
 
-  /* ===== LOAD DICTIONARIES ===== */
-
   useEffect(() => {
     ApiService.getRiskLevels()
-      .then((d) => setRiskLevels(d))
+      .then(setRiskLevels)
       .catch(() => Alert.alert("Error", "Failed to load risk levels"));
 
     ApiService.getInvestHorizons()
-      .then((d) => setInvestHorizons(d))
+      .then(setInvestHorizons)
       .catch(() => Alert.alert("Error", "Failed to load investment horizons"));
   }, []);
-
-  /* ===== LOAD PROFILE ===== */
 
   useEffect(() => {
     if (!user?.id) return;
@@ -90,8 +90,6 @@ const InvestProfile = () => {
       .catch(() => Alert.alert("Error", "Failed to load profile"));
   }, [user]);
 
-  /* ===== HELPERS ===== */
-
   const handleChange = (field: string, value: any) => {
     if (field === "targetReturn" || field === "maxDrawDown") {
       value = value.replace(/[^0-9.]/g, "");
@@ -107,7 +105,6 @@ const InvestProfile = () => {
     if (!formData.investHorizonId) e.push("Investment horizon is required");
     if (!formData.targetReturn) e.push("Target return is required");
     if (!formData.maxDrawDown) e.push("Max drawdown is required");
-
     setErrors(e);
     return e.length === 0;
   };
@@ -118,46 +115,96 @@ const InvestProfile = () => {
     setIsLoading(true);
 
     try {
-      if (isEditMode && profileId) {
-        const updatePayload = {
-          id: profileId,
-          profileName: formData.profileName,
-          acceptableRiskLevelId: Number(formData.acceptableRiskLevelId),
-          investHorizonId: Number(formData.investHorizonId),
-          targetReturn: Number(formData.targetReturn),
-          maxDrawDown: Number(formData.maxDrawDown),
-          clientId: Number(formData.clientId),
-        };
+      const payload = {
+        profileName: formData.profileName,
+        acceptableRiskLevelId: Number(formData.acceptableRiskLevelId),
+        investHorizonId: Number(formData.investHorizonId),
+        targetReturn: Number(formData.targetReturn),
+        maxDrawDown: Number(formData.maxDrawDown),
+        clientId: Number(formData.clientId),
+      };
 
-        await ApiService.updateInvestProfile(profileId, updatePayload);
+      if (isEditMode && profileId) {
+        await ApiService.updateInvestProfile(profileId, {
+          id: profileId,
+          ...payload,
+        });
         Alert.alert("Success", "Investment profile updated");
       } else {
-        const createPayload = {
-          profileName: formData.profileName,
-          acceptableRiskLevelId: Number(formData.acceptableRiskLevelId),
-          investHorizonId: Number(formData.investHorizonId),
-          targetReturn: Number(formData.targetReturn),
-          maxDrawDown: Number(formData.maxDrawDown),
-          clientId: Number(formData.clientId),
-        };
-
-        await ApiService.createInvestProfile(createPayload);
+        await ApiService.createInvestProfile(payload);
         Alert.alert("Success", "Investment profile created");
       }
 
       router.push({ pathname: ROUTES.MAIN_MENU });
-    } catch (err) {
+    } catch {
       Alert.alert("Error", "Operation failed");
     } finally {
       setIsLoading(false);
     }
   };
 
-  /* ===== UI ===== */
+  const renderPicker = (
+    label: string,
+    value: number | "",
+    setValue: (v: any) => void,
+    data: any[],
+    labelKey = "name",
+    format?: (x: any) => string,
+  ) => (
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+      <Text style={globalStyles.label}>{label}</Text>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
+        <Picker
+          selectedValue={value}
+          onValueChange={setValue}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
+        >
+          <Picker.Item label="Select" value="" />
+          {data.map((x) => (
+            <Picker.Item
+              key={x.id}
+              label={format ? format(x) : x[labelKey]}
+              value={x.id}
+            />
+          ))}
+        </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
+      </View>
+    </View>
+  );
+
+  const renderInput = (
+    label: string,
+    value: string,
+    onChange: (v: string) => void,
+    keyboardType: any = "default",
+  ) => (
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+      <Text style={globalStyles.label}>{label}</Text>
+      <TextInput
+        style={globalStyles.input}
+        value={value}
+        keyboardType={keyboardType}
+        onChangeText={onChange}
+      />
+    </View>
+  );
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Text style={[globalStyles.header, spacing.mb3]}>
+      <Text style={[globalStyles.header, spacing.mb4]}>
         {isEditMode ? "Update Investment Profile" : "Create Investment Profile"}
       </Text>
 
@@ -171,80 +218,65 @@ const InvestProfile = () => {
         </View>
       )}
 
-      <View style={globalStyles.formContainer}>
-        <Text style={globalStyles.label}>Profile Name</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={formData.profileName}
-          onChangeText={(v) => handleChange("profileName", v)}
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderInput("Profile Name", formData.profileName, (v) =>
+          handleChange("profileName", v),
+        )}
 
-        <Text style={globalStyles.label}>Risk Level</Text>
-        <View style={globalStyles.pickerWrapper}>
-          <Picker
-            selectedValue={formData.acceptableRiskLevelId}
-            onValueChange={(v) => handleChange("acceptableRiskLevelId", v)}
-            style={globalStyles.pickerText}
-            dropdownIconColor={COLORS.textGrey}
-          >
-            <Picker.Item label="Select" value="" />
-            {riskLevels.map((r) => (
-              <Picker.Item
-                key={r.id}
-                label={`Risk ${r.riskScale} – ${r.description}`}
-                value={r.id}
-              />
-            ))}
-          </Picker>
-        </View>
+        {renderPicker(
+          "Risk Level",
+          formData.acceptableRiskLevelId,
+          (v) => handleChange("acceptableRiskLevelId", v),
+          riskLevels,
+          undefined,
+          (r) => `Risk ${r.riskScale} – ${r.description}`,
+        )}
 
-        <Text style={globalStyles.label}>Investment Horizon</Text>
-        <View style={globalStyles.pickerWrapper}>
-          <View style={globalStyles.pickerWrapper}>
-            <Picker
-              selectedValue={formData.investHorizonId}
-              onValueChange={(v) => handleChange("investHorizonId", v)}
-              style={globalStyles.pickerText}
-              dropdownIconColor={COLORS.textGrey}
-            >
-              <Picker.Item label="Select" value="" />
-              {investHorizons.map((h) => (
-                <Picker.Item key={h.id} label={h.horizon} value={h.id} />
-              ))}
-            </Picker>
-          </View>
-        </View>
+        {renderPicker(
+          "Investment Horizon",
+          formData.investHorizonId,
+          (v) => handleChange("investHorizonId", v),
+          investHorizons,
+          "horizon",
+        )}
 
-        <Text style={globalStyles.label}>Target Return (%)</Text>
-        <TextInput
-          style={globalStyles.input}
-          keyboardType="decimal-pad"
-          value={formData.targetReturn}
-          onChangeText={(v) => handleChange("targetReturn", v)}
-        />
+        {renderInput(
+          "Target Return (%)",
+          formData.targetReturn,
+          (v) => handleChange("targetReturn", v),
+          "decimal-pad",
+        )}
 
-        <Text style={globalStyles.label}>Max Drawdown (%)</Text>
-        <TextInput
-          style={globalStyles.input}
-          keyboardType="decimal-pad"
-          value={formData.maxDrawDown}
-          onChangeText={(v) => handleChange("maxDrawDown", v)}
-        />
-
-        <TouchableOpacity
-          style={globalStyles.button}
-          onPress={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={COLORS.whiteHeader} />
-          ) : (
-            <Text style={globalStyles.buttonText}>
-              {isEditMode ? "Update" : "Create"}
-            </Text>
-          )}
-        </TouchableOpacity>
+        {renderInput(
+          "Max Drawdown (%)",
+          formData.maxDrawDown,
+          (v) => handleChange("maxDrawDown", v),
+          "decimal-pad",
+        )}
       </View>
+
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          spacing.mt4,
+          isLoading && globalStyles.buttonDisabled,
+        ]}
+        onPress={handleSubmit}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator color={COLORS.whiteHeader} />
+        ) : (
+          <Text style={globalStyles.buttonText}>
+            {isEditMode ? "Update" : "Create"}
+          </Text>
+        )}
+      </TouchableOpacity>
     </ScrollView>
   );
 };

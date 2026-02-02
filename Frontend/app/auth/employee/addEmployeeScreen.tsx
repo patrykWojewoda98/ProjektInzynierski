@@ -16,9 +16,12 @@ import { globalStyles, spacing } from "../../../assets/styles/styles";
 import ApiService from "../../../services/api";
 import { employeeAuthGuard } from "../../../utils/employeeAuthGuard";
 import { showValidationErrors } from "../../../utils/showValidationErrors";
+import { useResponsiveColumns } from "../../../utils/useResponsiveColumns";
 
 const AddEmployeeScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(4);
+
   const [isReady, setIsReady] = useState(false);
 
   const [name, setName] = useState("");
@@ -62,46 +65,52 @@ const AddEmployeeScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Add Employee</Text>
 
-      <View style={globalStyles.card}>
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={name}
-          onChangeText={setName}
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {[
+          ["Name", name, setName, false],
+          ["Email", email, setEmail, false],
+          ["Phone", phoneNumber, setPhoneNumber, false],
+          ["PESEL", pesel, setPesel, false],
+          ["Password", password, setPassword, true],
+        ].map(([label, value, setter, secure], i) => (
+          <View key={i} style={[spacing.m2, { width: itemWidth }]}>
+            <View style={globalStyles.card}>
+              <Text style={globalStyles.label}>{label}</Text>
+              <TextInput
+                style={globalStyles.input}
+                value={value as string}
+                onChangeText={setter as any}
+                secureTextEntry={secure as boolean}
+              />
+            </View>
+          </View>
+        ))}
 
-        <Text style={globalStyles.label}>Email</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <Text style={globalStyles.label}>Phone</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-        />
-
-        <Text style={globalStyles.label}>PESEL</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={pesel}
-          onChangeText={setPesel}
-        />
-
-        <Text style={globalStyles.label}>Password</Text>
-        <TextInput
-          style={globalStyles.input}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <View style={[globalStyles.row, spacing.mt3]}>
-          <Text style={globalStyles.text}>Admin</Text>
-          <Switch value={isAdmin} onValueChange={setIsAdmin} />
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Admin</Text>
+            <View
+              style={[
+                globalStyles.row,
+                globalStyles.spaceBetween,
+                { alignItems: "center" },
+              ]}
+            >
+              <Text style={globalStyles.text}>
+                Grant administrator privileges
+              </Text>
+              <Switch
+                value={isAdmin}
+                onValueChange={setIsAdmin}
+                thumbColor={isAdmin ? COLORS.primary : undefined}
+              />
+            </View>
+          </View>
         </View>
       </View>
 

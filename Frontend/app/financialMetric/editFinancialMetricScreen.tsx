@@ -8,15 +8,27 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
-import ApiService from "../../services/api";
-import { globalStyles, spacing } from "../../assets/styles/styles";
 import { COLORS } from "../../assets/Constants/colors";
+import { globalStyles, spacing } from "../../assets/styles/styles";
+import ApiService from "../../services/api";
 
 const EditFinancialMetricScreen = () => {
   const router = useRouter();
   const { metricId } = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const columnWidth = `${100 / columns - 4}%`;
 
   const [pe, setPe] = useState("");
   const [pb, setPb] = useState("");
@@ -31,7 +43,7 @@ const EditFinancialMetricScreen = () => {
     const load = async () => {
       try {
         const metric = await ApiService.getFinancialMetricById(
-          Number(metricId)
+          Number(metricId),
         );
 
         setPe(String(metric.pe ?? ""));
@@ -52,7 +64,6 @@ const EditFinancialMetricScreen = () => {
 
   const handleSave = async () => {
     setSaving(true);
-
     try {
       await ApiService.updateFinancialMetric(Number(metricId), {
         pe: Number(pe),
@@ -75,47 +86,54 @@ const EditFinancialMetricScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
+  const fields = [
+    ["P/E", pe, setPe],
+    ["P/B", pb, setPb],
+    ["ROE (%)", roe, setRoe],
+    ["Debt to Equity", debtToEquity, setDebtToEquity],
+    ["Dividend Yield (%)", dividendYield, setDividendYield],
+  ];
+
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>
         Edit Financial Metrics
       </Text>
 
-      <View style={[globalStyles.card, globalStyles.fullWidth]}>
-        {[
-          ["P/E", pe, setPe],
-          ["P/B", pb, setPb],
-          ["ROE (%)", roe, setRoe],
-          ["Debt to Equity", debtToEquity, setDebtToEquity],
-          ["Dividend Yield (%)", dividendYield, setDividendYield],
-        ].map(([label, value, setter], i) => (
-          <View key={i}>
-            <Text style={globalStyles.label}>{label}</Text>
-            <TextInput
-              style={[globalStyles.input, spacing.mb3]}
-              value={value}
-              onChangeText={setter}
-              keyboardType="numeric"
-            />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {fields.map(([label, value, setter], i) => (
+          <View key={i} style={[spacing.m2, { width: columnWidth }]}>
+            <View style={globalStyles.card}>
+              <Text style={globalStyles.label}>{label}</Text>
+              <TextInput
+                style={globalStyles.input}
+                value={value as string}
+                onChangeText={setter as any}
+                keyboardType="numeric"
+              />
+            </View>
           </View>
         ))}
       </View>
 
-      <TouchableOpacity
-        style={[
-          globalStyles.button,
-          globalStyles.fullWidth,
-          saving && globalStyles.buttonDisabled,
-        ]}
-        disabled={saving}
-        onPress={handleSave}
-      >
-        {saving ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={globalStyles.buttonText}>Save Changes</Text>
-        )}
-      </TouchableOpacity>
+      <View style={[spacing.mt4, globalStyles.fullWidth]}>
+        <TouchableOpacity
+          style={[globalStyles.button, saving && globalStyles.buttonDisabled]}
+          disabled={saving}
+          onPress={handleSave}
+        >
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={globalStyles.buttonText}>Save Changes</Text>
+          )}
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };

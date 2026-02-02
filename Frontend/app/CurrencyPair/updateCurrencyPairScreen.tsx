@@ -1,9 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -15,15 +17,18 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const UpdateCurrencyPairScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
+
+  const currencyPairId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
   const [currencies, setCurrencies] = useState<any[]>([]);
-
-  const [baseCurrencyId, setBaseCurrencyId] = useState<number>(0);
-  const [quoteCurrencyId, setQuoteCurrencyId] = useState<number>(0);
+  const [baseCurrencyId, setBaseCurrencyId] = useState(0);
+  const [quoteCurrencyId, setQuoteCurrencyId] = useState(0);
   const [symbol, setSymbol] = useState("");
 
   const [loading, setLoading] = useState(true);
@@ -40,16 +45,16 @@ const UpdateCurrencyPairScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!id || !isReady) return;
+    if (!currencyPairId || !isReady) return;
 
     const load = async () => {
       try {
-        const [pair, currencyList] = await Promise.all([
-          ApiService.getCurrencyPairById(Number(id)),
+        const [pair, list] = await Promise.all([
+          ApiService.getCurrencyPairById(currencyPairId),
           ApiService.getAllCurrencies(),
         ]);
 
-        setCurrencies(currencyList);
+        setCurrencies(list);
         setBaseCurrencyId(pair.baseCurrencyId);
         setQuoteCurrencyId(pair.quoteCurrencyId);
         setSymbol(pair.symbol);
@@ -62,7 +67,7 @@ const UpdateCurrencyPairScreen = () => {
     };
 
     load();
-  }, [id, isReady]);
+  }, [currencyPairId, isReady]);
 
   useEffect(() => {
     if (baseCurrencyId > 0 && quoteCurrencyId > 0) {
@@ -74,8 +79,6 @@ const UpdateCurrencyPairScreen = () => {
       }
     }
   }, [baseCurrencyId, quoteCurrencyId, currencies]);
-
-  const currencyPairId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
   const handleSave = async () => {
     if (!currencyPairId) {
@@ -108,8 +111,7 @@ const UpdateCurrencyPairScreen = () => {
 
       Alert.alert("Success", "Currency pair updated.");
       router.back();
-    } catch (err) {
-      console.log(err);
+    } catch {
       Alert.alert("Error", "Failed to update currency pair.");
     } finally {
       setSaving(false);
@@ -120,57 +122,71 @@ const UpdateCurrencyPairScreen = () => {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
-  const renderCurrencyPicker = (
+  const renderPicker = (
     label: string,
     value: number,
     setValue: (v: number) => void,
   ) => (
-    <>
+    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
       <Text style={globalStyles.label}>{label}</Text>
-      <View style={globalStyles.pickerWrapper}>
+
+      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
         <Picker
           selectedValue={value}
-          style={globalStyles.pickerText}
-          dropdownIconColor={COLORS.textGrey}
           onValueChange={(v) => setValue(Number(v))}
+          style={[
+            globalStyles.pickerText,
+            Platform.OS === "web" && globalStyles.pickerWeb,
+          ]}
         >
           <Picker.Item label="Select currency" value={0} />
           {currencies.map((c) => (
-            <Picker.Item key={c.id} label={`${c.name}`} value={c.id} />
+            <Picker.Item key={c.id} label={c.name} value={c.id} />
           ))}
         </Picker>
+
+        {Platform.OS === "web" && (
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={COLORS.textGrey}
+            style={globalStyles.pickerWebArrow}
+          />
+        )}
       </View>
-    </>
+    </View>
   );
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Edit Currency Pair</Text>
 
-      <View style={globalStyles.card}>
-        {renderCurrencyPicker(
-          "Base Currency",
-          baseCurrencyId,
-          setBaseCurrencyId,
-        )}
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {renderPicker("Base Currency", baseCurrencyId, setBaseCurrencyId)}
+        {renderPicker("Quote Currency", quoteCurrencyId, setQuoteCurrencyId)}
 
-        {renderCurrencyPicker(
-          "Quote Currency",
-          quoteCurrencyId,
-          setQuoteCurrencyId,
-        )}
-
-        <Text style={globalStyles.label}>Symbol</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={symbol}
-          onChangeText={setSymbol}
-          placeholder="e.g. EUR/USD"
-        />
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Symbol</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={symbol}
+            onChangeText={setSymbol}
+            placeholder="e.g. EUR/USD"
+          />
+        </View>
       </View>
 
       <TouchableOpacity
-        style={[globalStyles.button, saving && globalStyles.buttonDisabled]}
+        style={[
+          globalStyles.button,
+          globalStyles.fullWidth,
+          saving && globalStyles.buttonDisabled,
+        ]}
         disabled={saving}
         onPress={handleSave}
       >

@@ -16,15 +16,16 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const CountryListScreen = () => {
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns(4);
 
   const [countries, setCountries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
-  // 🔐 AUTH
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
@@ -33,7 +34,6 @@ const CountryListScreen = () => {
     check();
   }, []);
 
-  // 📥 LOAD
   useEffect(() => {
     if (!isReady) return;
 
@@ -58,7 +58,7 @@ const CountryListScreen = () => {
       onConfirm: async () => {
         try {
           await ApiService.deleteCountry(id);
-          setCountries((prev) => prev.filter((c) => c.id !== id));
+          setCountries((p) => p.filter((c) => c.id !== id));
         } catch {
           Alert.alert("Error", "Failed to delete country.");
         }
@@ -74,7 +74,6 @@ const CountryListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Countries</Text>
 
-      {/* ➕ ADD */}
       <TouchableOpacity
         style={[globalStyles.button, spacing.mb4]}
         onPress={() => router.push(ROUTES.ADD_COUNTRY)}
@@ -82,34 +81,49 @@ const CountryListScreen = () => {
         <Text style={globalStyles.buttonText}>Add new country</Text>
       </TouchableOpacity>
 
-      {countries.map((c) => (
-        <View key={c.id} style={[globalStyles.card, spacing.mb3]}>
-          <View style={[globalStyles.row, globalStyles.spaceBetween]}>
-            <View>
-              <Text style={globalStyles.cardTitle}>{c.name}</Text>
-              <Text style={globalStyles.textSmall}>ISO: {c.isoCode}</Text>
-            </View>
-
-            <View style={globalStyles.row}>
-              <TouchableOpacity
-                style={spacing.mr3}
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.EDIT_COUNTRY,
-                    params: { id: c.id },
-                  })
-                }
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        {countries.map((c) => (
+          <View key={c.id} style={[spacing.m2, { width: itemWidth }]}>
+            <View style={globalStyles.card}>
+              <View
+                style={[
+                  globalStyles.row,
+                  globalStyles.spaceBetween,
+                  { alignItems: "center" },
+                ]}
               >
-                <Ionicons name="pencil" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+                <View style={{ flex: 1 }}>
+                  <Text style={globalStyles.cardTitle}>{c.name}</Text>
+                  <Text style={globalStyles.textSmall}>ISO: {c.isoCode}</Text>
+                </View>
 
-              <TouchableOpacity onPress={() => handleDelete(c.id)}>
-                <Ionicons name="trash" size={22} color={COLORS.error} />
-              </TouchableOpacity>
+                <View style={globalStyles.row}>
+                  <TouchableOpacity
+                    style={spacing.mr3}
+                    onPress={() =>
+                      router.push({
+                        pathname: ROUTES.EDIT_COUNTRY,
+                        params: { id: c.id },
+                      })
+                    }
+                  >
+                    <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => handleDelete(c.id)}>
+                    <Ionicons name="trash" size={22} color={COLORS.error} />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       <View style={[globalStyles.row, globalStyles.center, spacing.mt5]}>
         <Text style={[globalStyles.text, spacing.mr1]}>Want to go back?</Text>

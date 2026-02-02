@@ -25,7 +25,7 @@ export const ROUTES = {
   WALLET_HISTORY: "/walletHistory/walletHistory",
   INVEST_INSTRUMENT: "/investInstrument/investInstrument",
   INVEST_INSTRUMENT_EDIT_LIST: "/investInstrument/investInstrumentListScreen",
-  FINANCIAL_REPORT: "/financialReport",
+  FINANCIAL_REPORT: "/financialReport/financialReports",
   FINANCIAL_METRIC: "/financialMetric/financialMetric",
   FINANCIAL_METRIC_PREVIEW: "/financialMetric/financialMetricPreview",
   FINANCIAL_REPORT_BY_INSTRUMENT:

@@ -14,10 +14,12 @@ import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
 import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
+import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const AddCurrencyRateHistoryScreen = () => {
   const { currencyPairId } = useLocalSearchParams();
   const router = useRouter();
+  const { itemWidth } = useResponsiveColumns();
 
   const pairId = Number(
     Array.isArray(currencyPairId) ? currencyPairId[0] : currencyPairId,
@@ -101,39 +103,54 @@ const AddCurrencyRateHistoryScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Add Currency Rate</Text>
 
-      <View style={globalStyles.card}>
-        <Text style={globalStyles.label}>Open Rate</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={openRate}
-          onChangeText={setOpenRate}
-          keyboardType="numeric"
-        />
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Open Rate</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={openRate}
+            onChangeText={setOpenRate}
+            keyboardType="numeric"
+          />
+        </View>
 
-        <Text style={globalStyles.label}>High Rate</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={highRate}
-          onChangeText={setHighRate}
-          keyboardType="numeric"
-        />
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>High Rate</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={highRate}
+            onChangeText={setHighRate}
+            keyboardType="numeric"
+          />
+        </View>
 
-        <Text style={globalStyles.label}>Low Rate</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={lowRate}
-          onChangeText={setLowRate}
-          keyboardType="numeric"
-        />
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Low Rate</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={lowRate}
+            onChangeText={setLowRate}
+            keyboardType="numeric"
+          />
+        </View>
 
-        <Text style={globalStyles.label}>Close Rate *</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={closeRate}
-          onChangeText={setCloseRate}
-          keyboardType="numeric"
-        />
+        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
+          <Text style={globalStyles.label}>Close Rate *</Text>
+          <TextInput
+            style={globalStyles.input}
+            value={closeRate}
+            onChangeText={setCloseRate}
+            keyboardType="numeric"
+          />
+        </View>
+      </View>
 
+      <View style={[globalStyles.card, globalStyles.fullWidth, spacing.mt2]}>
         <Text style={globalStyles.label}>Date</Text>
         <TextInput
           style={globalStyles.input}
@@ -143,7 +160,11 @@ const AddCurrencyRateHistoryScreen = () => {
       </View>
 
       <TouchableOpacity
-        style={[globalStyles.button, saving && globalStyles.buttonDisabled]}
+        style={[
+          globalStyles.button,
+          spacing.mt4,
+          saving && globalStyles.buttonDisabled,
+        ]}
         disabled={saving}
         onPress={handleSave}
       >
