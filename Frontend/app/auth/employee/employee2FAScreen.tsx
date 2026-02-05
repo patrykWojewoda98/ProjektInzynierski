@@ -1,5 +1,6 @@
+import { AuthContext } from "@/app/_layout";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -9,9 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ApiService from "../../../services/api";
 import { globalStyles, spacing } from "../../../assets/styles/styles";
 import { ROUTES } from "../../../routes";
+import ApiService from "../../../services/api";
 
 const EmployeeTwoFactorScreen = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const EmployeeTwoFactorScreen = () => {
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const { refreshAuth } = useContext(AuthContext);
   const handleVerify = async () => {
     if (code.length !== 6) {
       Alert.alert("Error", "Enter 6-digit code");
@@ -39,6 +40,7 @@ const EmployeeTwoFactorScreen = () => {
       }
 
       // ✅ token już zapisany → można wejść
+      await refreshAuth();
       router.replace(ROUTES.EMPLOYEE_MAIN_MENU);
     } catch (e: any) {
       Alert.alert("Error", e.message || "Invalid verification code");

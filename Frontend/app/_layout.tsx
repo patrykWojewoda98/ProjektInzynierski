@@ -8,9 +8,10 @@ import { decodeToken } from "../utils/decodeToken";
 
 export const AuthContext = createContext<any>({
   user: null,
-  userType: null, // "client" | "employee"
+  userType: null,
   token: "",
   logout: () => {},
+  refreshAuth: () => {},
 });
 
 export default function RootLayout() {
@@ -20,58 +21,53 @@ export default function RootLayout() {
 
   const router = useRouter();
 
-  // 🔹 Jednorazowe ładowanie auth przy starcie appki
+  const refreshAuth = async () => {
+    const clientToken = await AsyncStorage.getItem("userToken");
+    const employeeToken = await AsyncStorage.getItem("employeeToken");
+
+    if (employeeToken) {
+      const decoded = decodeToken(employeeToken);
+      if (decoded && (!decoded.exp || decoded.exp > Date.now() / 1000)) {
+        setToken(employeeToken);
+        setUserType("employee");
+        setUser({
+          id: decoded.id,
+          name: decoded.name,
+          isAdmin: decoded.isAdmin,
+        });
+        return;
+      } else {
+        await AsyncStorage.removeItem("employeeToken");
+      }
+    }
+
+    if (clientToken) {
+      const decoded = decodeToken(clientToken);
+      if (decoded && (!decoded.exp || decoded.exp > Date.now() / 1000)) {
+        setToken(clientToken);
+        setUserType("client");
+        setUser({
+          id: decoded.id,
+          name: decoded.name,
+        });
+        return;
+      } else {
+        await AsyncStorage.removeItem("userToken");
+      }
+    }
+
+    setUser(null);
+    setToken("");
+    setUserType(null);
+  };
+
   useEffect(() => {
-    const loadAuth = async () => {
-      const clientToken = await AsyncStorage.getItem("userToken");
-      const employeeToken = await AsyncStorage.getItem("employeeToken");
-
-      // 🟢 EMPLOYEE ma priorytet
-      if (employeeToken) {
-        const decoded = decodeToken(employeeToken);
-        if (decoded && (!decoded.exp || decoded.exp > Date.now() / 1000)) {
-          setToken(employeeToken);
-          setUserType("employee");
-          setUser({
-            id: decoded.id,
-            name: decoded.name,
-            isAdmin: decoded.isAdmin,
-          });
-          return;
-        } else {
-          await AsyncStorage.removeItem("employeeToken");
-        }
-      }
-
-      // 🟢 CLIENT
-      if (clientToken) {
-        const decoded = decodeToken(clientToken);
-        if (decoded && (!decoded.exp || decoded.exp > Date.now() / 1000)) {
-          setToken(clientToken);
-          setUserType("client");
-          setUser({
-            id: decoded.id,
-            name: decoded.name,
-          });
-          return;
-        } else {
-          await AsyncStorage.removeItem("userToken");
-        }
-      }
-
-      setUser(null);
-      setToken("");
-      setUserType(null);
-    };
-
-    loadAuth();
+    refreshAuth();
   }, []);
 
   const logout = async () => {
     await AsyncStorage.multiRemove(["userToken", "employeeToken"]);
-    setUser(null);
-    setToken("");
-    setUserType(null);
+    await refreshAuth();
     router.replace("/");
   };
 
@@ -82,20 +78,12 @@ export default function RootLayout() {
           source={require("../assets/images/Logo.png")}
           style={globalStyles.logoSmall}
         />
-
-        {userType === "client" && user?.name && (
-          <Text style={[globalStyles.text, { color: "white", marginLeft: 10 }]}>
-            Welcome, {user.name}
-          </Text>
-        )}
-
-        {userType === "employee" && (
+        {user && (
           <Text style={[globalStyles.text, { color: "white", marginLeft: 10 }]}>
             Welcome, {user.name}
           </Text>
         )}
       </View>
-
       {token && (
         <Pressable onPress={logout} style={globalStyles.buttonSmall}>
           <Text style={globalStyles.buttonText}>Logout</Text>
@@ -105,7 +93,9 @@ export default function RootLayout() {
   );
 
   return (
-    <AuthContext.Provider value={{ user, userType, token, logout }}>
+    <AuthContext.Provider
+      value={{ user, userType, token, logout, refreshAuth }}
+    >
       <SafeAreaView style={[globalStyles.container, globalStyles.flex1]}>
         <Header />
         <View style={[globalStyles.flex1, globalStyles.containerPadding]}>
