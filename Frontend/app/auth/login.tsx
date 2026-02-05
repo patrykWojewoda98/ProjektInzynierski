@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,11 +11,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
-import ApiService from "../../services/api";
 import { ROUTES } from "../../routes";
+import ApiService from "../../services/api";
 import { decodeToken } from "../../utils/decodeToken";
 
 const LoginScreen = () => {

@@ -12,6 +12,13 @@ namespace ProjektIznynierski.Infrastructure.Repositories
             
         }
 
+        public async Task<AIAnalysisRequest?> GetByIdAsync(int id,CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.AIAnalysisRequests
+                .Include(x => x.AIAnalysisResult)
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
         public async Task<List<AIAnalysisRequest>> GetByClientIdAsync(int clientId,CancellationToken cancellationToken = default)
         {
             return await _dbContext.AIAnalysisRequests.Where(x => x.ClientId == clientId).ToListAsync(cancellationToken);

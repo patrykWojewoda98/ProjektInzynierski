@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Constants from "expo-constants";
+import * as FileSystem from "expo-file-system/legacy";
 import { Platform } from "react-native";
 
 const getApiBaseUrl = () => {
@@ -481,6 +482,36 @@ async deleteCurrencyRateHistory(id: number) {
       throw ["Failed to delete employee."];
     }
   },
+
+  // PDF Generation endpoints
+async generateInvestmentRecommendationPdf(analysisRequestId: number) {
+  try {
+    const url = `${API_BASE_URL}/InvestmentRecommendationPdf/${analysisRequestId}`;
+
+    const fileUri =
+      FileSystem.documentDirectory +
+      `Investment_Recommendation_${analysisRequestId}.pdf`;
+
+    const result = await FileSystem.downloadAsync(url, fileUri);
+
+    return result.uri; 
+  } catch (error) {
+    console.error("Error downloading PDF:", error);
+    throw error;
+  }
+},
+
+async downloadInvestmentRecommendationPdfToTemp(
+  analysisRequestId: number
+) {
+  const url = `${API_BASE_URL}/InvestmentRecommendationPdf/${analysisRequestId}`;
+  const fileName = `Investment_Recommendation_${analysisRequestId}.pdf`;
+
+  const tempUri = FileSystem.documentDirectory + fileName;
+  const { uri } = await FileSystem.downloadAsync(url, tempUri);
+
+  return uri; // tymczasowy plik
+},
 
   // Region endpoints
   async getAllRegions() {

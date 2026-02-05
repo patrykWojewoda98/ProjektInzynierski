@@ -2,9 +2,11 @@ using ProjektIznynierski.Infrastructure;
 using ProjektIznynierski.Application;
 using ProjektIznynierski.Presentation;
 using DotNetEnv;
+using QuestPDF.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = LicenseType.Community;
 
 Env.Load();
 // Add services to the container.

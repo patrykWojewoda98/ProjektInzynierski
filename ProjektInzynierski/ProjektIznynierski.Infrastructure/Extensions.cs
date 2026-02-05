@@ -50,6 +50,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITwoFactorCodeService, TwoFactorCodeService>();
             services.AddScoped<IYahooFinanceService, YahooFinanceService>();
+            services.AddScoped<IInvestmentRecommendationPdfService, InvestmentRecommendationPdfService>();
 
 
             services.AddDbContext<ProjektInzynierskiDbContext>(options =>

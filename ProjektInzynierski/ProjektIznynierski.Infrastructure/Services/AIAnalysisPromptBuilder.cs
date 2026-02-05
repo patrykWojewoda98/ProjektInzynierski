@@ -1,7 +1,5 @@
-﻿using ProjektIznynierski.Application.Services;
-using ProjektIznynierski.Domain.Abstractions;
+﻿using ProjektIznynierski.Domain.Abstractions;
 using ProjektIznynierski.Domain.Entities;
-using ProjektIznynierski.Infrastructure.Repositories;
 using System.Text;
 
 namespace ProjektIznynierski.Infrastructure.Services
@@ -9,22 +7,26 @@ namespace ProjektIznynierski.Infrastructure.Services
     internal class AIAnalysisPromptBuilder : IAIAnalysisPromptBuilder
     {
         private readonly IClientRepository _clientRepository;
-        private readonly IInvestProfileRepository _investProfileRepository;
-        private readonly IInvestHorizonRepository _investHorizonRepository;
-        private readonly IInvestInstrumentRepository _investInstrumentRepository;
-        private readonly IFinancialMetricRepository _financialMetricRepository;
-        private readonly IInvestmentTypeRepository _investmentTypeRepository;
-        private readonly IRegionRepository _regionRepository;
-        private readonly IRiskLevelRepository _riskLevelRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ICurrencyRepository _currencyRepository;
-        private readonly ISectorRepository _sectorRepository;
+        private readonly IFinancialMetricRepository _financialMetricRepository;
         private readonly IFinancialReportRepository _financialReportRepository;
+        private readonly IInvestHorizonRepository _investHorizonRepository;
+        private readonly IInvestInstrumentRepository _investInstrumentRepository;
+        private readonly IInvestmentTypeRepository _investmentTypeRepository;
+        private readonly IInvestProfileRepository _investProfileRepository;
+        private readonly IRegionRepository _regionRepository;
+        private readonly IRiskLevelRepository _riskLevelRepository;
+        private readonly ISectorRepository _sectorRepository;
         private readonly IMarketDataRepository _marketDataRepository;
+
+        private readonly IWalletInstrumentRepository _walletInstrumentRepository;
+        private readonly IWalletRepository _walletRepository;
+
 
         public AIAnalysisPromptBuilder(IClientRepository clientRepository, IInvestProfileRepository investProfileRepository, IInvestHorizonRepository investHorizonRepository, IInvestInstrumentRepository investInstrumentRepository,
         IFinancialMetricRepository financialMetricRepository, IInvestmentTypeRepository investmentTypeRepository, IRegionRepository regionRepository, IRiskLevelRepository riskLevelRepository, ICountryRepository countryRepository,
-        ICurrencyRepository currencyRepository, ISectorRepository sectorRepository, IFinancialReportRepository financialReportRepository, IMarketDataRepository marketDataRepository)
+        ICurrencyRepository currencyRepository, ISectorRepository sectorRepository, IFinancialReportRepository financialReportRepository, IMarketDataRepository marketDataRepository, IWalletInstrumentRepository walletInstrumentRepository, IWalletRepository walletRepository)
         {
             _clientRepository = clientRepository;
             _investProfileRepository = investProfileRepository;
@@ -39,6 +41,8 @@ namespace ProjektIznynierski.Infrastructure.Services
             _sectorRepository = sectorRepository;
             _financialReportRepository = financialReportRepository;
             _marketDataRepository = marketDataRepository;
+            _walletInstrumentRepository = walletInstrumentRepository;
+            _walletRepository = walletRepository;
         }
 
         public async Task<string> BuildPromptAsync(
@@ -66,6 +70,18 @@ Act conservatively:
 - NEVER recommend an investment that exceeds the client’s maximum acceptable risk level.
 - If data is insufficient, inconsistent, or signals elevated risk, prefer HOLD or SELL over BUY.
 - Do not assume missing data.
+
+Confidence score rules:
+- confidenceScore represents how confident you are in the recommendation itself, not the expected return.
+- confidenceScore MUST be an integer from 0 to 100.
+- 0 means no confidence due to missing, contradictory, or highly risky data.
+- 100 means extremely high confidence based on strong, consistent, low-risk signals.
+
+Reduce confidenceScore when:
+- data quality is poor, incomplete, or outdated,
+- risk levels approach or exceed the client’s acceptable risk,
+- portfolio concentration or currency exposure increases overall risk,
+- financial metrics, reports, or market data are weak or contradictory.
 
 Your recommendation must be logical, explainable, and defensible from a professional financial advisory perspective.
 
@@ -148,6 +164,17 @@ Do not include any additional text, explanations, or formatting outside the JSON
             //Market data
             var marketData = await _marketDataRepository.GetLatestByInvestInstrumentIdAsync(investInstrumentId, cancellationToken);
 
+            // ================= WALLET =================
+            var wallet = await _walletRepository.GetWalletByClientIdAsync(client.Id);
+
+            if (wallet == null)
+                throw new Exception("Wallet not found for client");
+
+            var walletCurrency = await _currencyRepository.GetByIdAsync(wallet.CurrencyId, cancellationToken);
+
+            var walletInstruments = await _walletInstrumentRepository.GetByWalletIdAsync(wallet.Id, cancellationToken);
+
+
             // ================= PROMPT CONTENT =================
 
             sb.AppendLine("\n=== CLIENT PROFILE ===");
@@ -192,6 +219,29 @@ Do not include any additional text, explanations, or formatting outside the JSON
             sb.AppendLine("\n=== SECTOR ===");
             sb.AppendLine($"Sector: {sector.Name}");
             sb.AppendLine($"Description: {sector.Description}");
+
+            sb.AppendLine("\n=== WALLET OVERVIEW ===");
+            sb.AppendLine($"Cash balance: {wallet.CashBalance}");
+            sb.AppendLine($"Wallet currency: {walletCurrency?.Name}");
+
+            sb.AppendLine("\n=== WALLET INSTRUMENTS ===");
+
+            if (walletInstruments.Any())
+            {
+                foreach (var wi in walletInstruments)
+                {
+                    var wiInstrument = await _investInstrumentRepository
+                        .GetByIdAsync(wi.InvestInstrumentId, cancellationToken);
+
+                    sb.AppendLine($"Instrument: {wiInstrument?.Name} ({wiInstrument?.Ticker})");
+                    sb.AppendLine($"Quantity: {wi.Quantity}");
+                    sb.AppendLine("---");
+                }
+            }
+            else
+            {
+                sb.AppendLine("No instruments in wallet.");
+            }
 
             sb.AppendLine("\n=== FINANCIAL REPORTS ===");
 
@@ -243,7 +293,7 @@ Daily change %: {marketData.DailyChangePercent}
   "summary": "string",
   "recommendation": "BUY | HOLD | SELL",
   "keyInsights": "string",
-  "confidenceScore": number,
+  "confidenceScore": number, // integer from 0 to 100 indicating confidence in the recommendation
   "clientId": number
 }
 """);

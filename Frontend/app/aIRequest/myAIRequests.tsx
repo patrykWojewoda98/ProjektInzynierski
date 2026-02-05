@@ -1,6 +1,8 @@
 import { confirmAction } from "@/utils/confirmAction";
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
@@ -23,9 +24,12 @@ const MyAIRequests = () => {
   const { user } = useContext(AuthContext);
   const { itemWidth } = useResponsiveColumns();
 
-  const [requests, setRequests] = useState([]);
-  const [instrumentNames, setInstrumentNames] = useState({});
+  const [requests, setRequests] = useState<any[]>([]);
+  const [instrumentNames, setInstrumentNames] = useState<
+    Record<number, string>
+  >({});
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -35,14 +39,12 @@ const MyAIRequests = () => {
         const aiRequests = await ApiService.getAnalysisRequestsByClientId(
           user.id,
         );
-
         setRequests(aiRequests);
 
         const uniqueInstrumentIds = [
-          ...new Set(aiRequests.map((r) => r.investInstrumentId)),
+          ...new Set(aiRequests.map((r: any) => r.investInstrumentId)),
         ];
-
-        const namesMap = {};
+        const namesMap: Record<number, string> = {};
 
         await Promise.all(
           uniqueInstrumentIds.map(async (id) => {
@@ -54,6 +56,7 @@ const MyAIRequests = () => {
         setInstrumentNames(namesMap);
       } catch (error) {
         console.error("Error loading AI requests:", error);
+        Alert.alert("Error", "Nie udało się załadować danych");
       } finally {
         setLoading(false);
       }
@@ -62,7 +65,7 @@ const MyAIRequests = () => {
     loadData();
   }, [user]);
 
-  const handleDeleteRequest = (id) => {
+  const handleDeleteRequest = (id: number) => {
     confirmAction({
       title: "Confirm delete",
       message: "Delete this AI analysis request?",
@@ -77,9 +80,57 @@ const MyAIRequests = () => {
     });
   };
 
-  if (loading) {
-    return <ActivityIndicator color={COLORS.primary} />;
-  }
+  const handleDownloadPdf = async (analysisRequestId: number) => {
+    try {
+      setDownloadingId(analysisRequestId);
+
+      const pdfUri =
+        await ApiService.generateInvestmentRecommendationPdf(analysisRequestId);
+
+      await Sharing.shareAsync(pdfUri);
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      Alert.alert("Error", "Failed to download PDF.");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+  const handleSavePdfWithPicker = async (id: number) => {
+    try {
+      // 1️⃣ pobierz PDF do sandboxu
+      const tempUri =
+        await ApiService.downloadInvestmentRecommendationPdfToTemp(id);
+
+      // 2️⃣ otwórz systemowy picker folderu (TU JEST RÓŻNICA)
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+      if (!permissions.granted) {
+        return;
+      }
+
+      // 3️⃣ utwórz nowy plik (tu pojawia się "Zapisz")
+      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        `Investment_Recommendation_${id}.pdf`,
+        "application/pdf",
+      );
+
+      // 4️⃣ skopiuj zawartość
+      const pdfBase64 = await FileSystem.readAsStringAsync(tempUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      Alert.alert("Saved", "PDF saved successfully");
+    } catch (error) {
+      console.error("Save as failed:", error);
+      Alert.alert("Error", "Failed to save PDF");
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
@@ -103,7 +154,6 @@ const MyAIRequests = () => {
               key={req.id}
               style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
             >
-              {/* HEADER */}
               <View
                 style={[
                   globalStyles.row,
@@ -114,13 +164,11 @@ const MyAIRequests = () => {
                 <Text style={globalStyles.cardTitle}>
                   {instrumentNames[req.investInstrumentId] ?? "Loading..."}
                 </Text>
-
                 <TouchableOpacity onPress={() => handleDeleteRequest(req.id)}>
                   <Ionicons name="trash" size={20} color={COLORS.error} />
                 </TouchableOpacity>
               </View>
 
-              {/* DETAILS */}
               <Text style={globalStyles.textSmall}>
                 Created at: {new Date(req.createdAt).toLocaleDateString()}
               </Text>
@@ -130,17 +178,31 @@ const MyAIRequests = () => {
               </Text>
 
               {req.aiAnalysisResultId && (
-                <TouchableOpacity
-                  style={spacing.mt2}
-                  onPress={() =>
-                    router.push({
-                      pathname: ROUTES.AI_ANALYSIS_RESULT,
-                      params: { id: req.aiAnalysisResultId },
-                    })
-                  }
-                >
-                  <Text style={globalStyles.link}>View Analysis Result</Text>
-                </TouchableOpacity>
+                <View style={spacing.mt4}>
+                  {/* SHARE */}
+                  <TouchableOpacity
+                    style={[globalStyles.button, spacing.mb2]}
+                    onPress={() => handleDownloadPdf(req.id)}
+                    disabled={downloadingId === req.id}
+                  >
+                    {downloadingId === req.id ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={globalStyles.primaryButtonText}>
+                        Share Investment Report (PDF)
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={globalStyles.secondaryButton}
+                    onPress={() => handleSavePdfWithPicker(req.id)}
+                  >
+                    <Text style={globalStyles.secondaryButtonText}>
+                      Save as…
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </View>
           ))}

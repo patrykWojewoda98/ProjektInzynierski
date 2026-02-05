@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
@@ -43,6 +42,17 @@ const AIAnalysisResult = () => {
     loadResult();
   }, [analysisId]);
 
+  const handleDownloadPdf = async () => {
+    try {
+      const pdfBlob = await ApiService.generateInvestmentRecommendationPdf(
+        Number(analysisId),
+      );
+
+      await savePdfWithPicker(Number(analysisId));
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+    }
+  };
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
