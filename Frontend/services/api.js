@@ -1266,6 +1266,33 @@ async deleteWalletInstrument(id: number) {
   );
   return res.data;
 },
+
+// Excel export endpoints
+async downloadWalletExcel(walletId: number) {
+  try {
+    const url = `${API_BASE_URL}/Wallet/${walletId}/export`;
+
+    const fileUri =
+      FileSystem.documentDirectory +
+      `Wallet_${walletId}.xlsx`;
+
+    const result = await FileSystem.downloadAsync(url, fileUri);
+
+    return result.uri; // ścieżka do pliku Excel
+  } catch (error) {
+    console.error("Error downloading wallet Excel:", error);
+    throw error;
+  }
+},
+async downloadWalletExcelToTemp(walletId: number) {
+  const url = `${API_BASE_URL}/Wallet/${walletId}/export`;
+  const fileName = `Wallet_${walletId}.xlsx`;
+
+  const tempUri = FileSystem.documentDirectory + fileName;
+  const { uri } = await FileSystem.downloadAsync(url, tempUri);
+
+  return uri;
+},
 };
 
 export default ApiService;

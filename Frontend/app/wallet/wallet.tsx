@@ -1,7 +1,10 @@
+import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -20,23 +23,25 @@ const WalletScreen = () => {
   const { user } = useContext(AuthContext);
   const { itemWidth } = useResponsiveColumns();
 
-  const [walletSummary, setWalletSummary] = useState(null);
+  const [walletSummary, setWalletSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [downloadingExcel, setDownloadingExcel] = useState(false);
 
   useEffect(() => {
     const loadWalletSummary = async () => {
       if (!user?.id) return;
 
       try {
-        // 1️⃣ najpierw portfel (żeby dostać walletId)
+        // 1️⃣ get wallet (walletId)
         const wallet = await ApiService.getWalletByClientId(user.id);
 
-        // 2️⃣ CAŁA wycena portfela z backendu
+        // 2️⃣ full investment summary
         const summary = await ApiService.getWalletInvestmentSummary(wallet.id);
 
         setWalletSummary(summary);
       } catch (err) {
         console.error("Wallet load error:", err);
+        Alert.alert("Error", "Failed to load wallet data");
       } finally {
         setLoading(false);
       }
@@ -45,6 +50,76 @@ const WalletScreen = () => {
     loadWalletSummary();
   }, [user]);
 
+  // =========================
+  // EXCEL: SHARE
+  // =========================
+  const handleShareExcel = async () => {
+    try {
+      if (!user?.id) return;
+
+      setDownloadingExcel(true);
+
+      const wallet = await ApiService.getWalletByClientId(user.id);
+      const excelUri = await ApiService.downloadWalletExcel(wallet.id);
+
+      await Sharing.shareAsync(excelUri, {
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        dialogTitle: "Export Wallet to Excel",
+        UTI: "com.microsoft.excel.xlsx",
+      });
+    } catch (error) {
+      console.error("Excel share error:", error);
+      Alert.alert("Error", "Failed to export wallet to Excel");
+    } finally {
+      setDownloadingExcel(false);
+    }
+  };
+
+  // =========================
+  // EXCEL: SAVE AS…
+  // =========================
+  const handleSaveExcelWithPicker = async () => {
+    try {
+      if (!user?.id) return;
+
+      const wallet = await ApiService.getWalletByClientId(user.id);
+
+      // 1️⃣ download to sandbox
+      const tempUri = await ApiService.downloadWalletExcelToTemp(wallet.id);
+
+      // 2️⃣ ask for directory
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+      if (!permissions.granted) return;
+
+      // 3️⃣ create file
+      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        `Wallet_${wallet.id}.xlsx`,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+
+      // 4️⃣ copy content
+      const base64 = await FileSystem.readAsStringAsync(tempUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      Alert.alert("Saved", "Excel file saved successfully");
+    } catch (error) {
+      console.error("Excel save error:", error);
+      Alert.alert("Error", "Failed to save Excel file");
+    }
+  };
+
+  // =========================
+  // RENDER
+  // =========================
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
@@ -59,7 +134,7 @@ const WalletScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
-      <Text style={[globalStyles.header, spacing.mb4]}>My Wallet</Text>
+      <Text style={[globalStyles.header, spacing.mb4]}>My Walt</Text>
 
       {/* WALLET SUMMARY */}
       <View style={[globalStyles.card, spacing.mb4, globalStyles.fullWidth]}>
@@ -89,6 +164,28 @@ const WalletScreen = () => {
         </TouchableOpacity>
       </View>
 
+      {/* EXPORT EXCEL */}
+      <View style={spacing.mb5}>
+        <TouchableOpacity
+          style={[globalStyles.button, spacing.mb2]}
+          onPress={handleShareExcel}
+          disabled={downloadingExcel}
+        >
+          {downloadingExcel ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={globalStyles.buttonText}>Export Wallet (Excel)</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={globalStyles.secondaryButton}
+          onPress={handleSaveExcelWithPicker}
+        >
+          <Text style={globalStyles.secondaryButtonText}>Save Excel as…</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* INVESTMENTS */}
       <Text style={[globalStyles.header, spacing.mb3]}>My Investments</Text>
 
@@ -103,7 +200,7 @@ const WalletScreen = () => {
             { flexWrap: "wrap", justifyContent: "center", width: "100%" },
           ]}
         >
-          {walletSummary.investments.map((item) => (
+          {walletSummary.investments.map((item: any) => (
             <View
               key={item.instrumentId}
               style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
@@ -160,7 +257,7 @@ const WalletScreen = () => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[spacing.mt6]}
+        style={spacing.mt6}
         onPress={() => router.push(ROUTES.MAIN_MENU)}
       >
         <Text style={globalStyles.link}>Back to Main Menu</Text>

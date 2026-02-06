@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ProjektIznynierski.Application.Commands.Wallet.CreateWallet;
 using ProjektIznynierski.Application.Commands.Wallet.DeleteWallet;
+using ProjektIznynierski.Application.Commands.Wallet.ExportWalletToExcel;
 using ProjektIznynierski.Application.Commands.Wallet.UpdateWallet;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Application.Queries.Wallet.GetAllWallets;
@@ -81,6 +82,23 @@ namespace ProjektIznynierski.Presentation.Controllers
         {
             await _mediator.Send(new DeleteWalletCommand { Id = id });
             return NoContent();
+        }
+
+        [HttpGet("{id}/export")]
+        [SwaggerOperation(
+    Summary = "Export Wallet to Excel",
+    Description = "Generates an Excel file with the current wallet content."
+)]
+        [ProducesResponseType(typeof(FileContentResult), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ExportToExcel(int id)
+        {
+            var file = await _mediator.Send(
+                new ExportWalletToExcelCommand(id));
+
+            return File(
+                file,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"wallet_{id}.xlsx");
         }
     }
 }
