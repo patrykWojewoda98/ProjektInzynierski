@@ -1243,6 +1243,29 @@ async downloadInvestmentRecommendationPdfToTemp(
     );
     return res.data;
   },
+getWalletInstrumentById(id: number) {
+  return axios
+    .get(`${API_BASE_URL}/WalletInstrument/${id}`)
+    .then((res) => res.data);
+},
+updateWalletInstrument(id: number, data: any) {
+  return axios.put(
+    `${API_BASE_URL}/WalletInstrument/${id}`,
+    data,
+  );
+},
+
+async deleteWalletInstrument(id: number) {
+  await axios.delete(`${API_BASE_URL}/WalletInstrument/${id}`);
+},
+
+  async updateWallet(walletId, data) {
+  const res = await axios.put(
+    `${API_BASE_URL}/Wallet/${walletId}`,
+    data
+  );
+  return res.data;
+},
 };
 
 export default ApiService;

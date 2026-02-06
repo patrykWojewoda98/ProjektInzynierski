@@ -21,11 +21,6 @@ type ChartItem = {
   legendFontSize: number;
 };
 
-type MarketData = {
-  date: string;
-  closePrice: number;
-};
-
 const screenWidth = Dimensions.get("window").width;
 
 const WalletChartScreen: React.FC = () => {
@@ -33,34 +28,28 @@ const WalletChartScreen: React.FC = () => {
 
   const [data, setData] = useState<ChartItem[]>([]);
   const [totalValue, setTotalValue] = useState<number>(0);
+  const [currency, setCurrency] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const wallet = await ApiService.getWalletByClientId(user!.id);
+        if (!user?.id) return;
+
+        // 1️⃣ Wallet (żeby dostać walletId)
+        const wallet = await ApiService.getWalletByClientId(user.id);
+
+        // 2️⃣ Gotowa wycena z backendu
         const summary = await ApiService.getWalletInvestmentSummary(wallet.id);
 
-        const result: ChartItem[] = [];
-        let investmentsValue = 0;
+        const chartData: ChartItem[] = [];
         let colorIndex = 0;
 
-        for (const item of summary) {
-          const marketData: MarketData[] =
-            await ApiService.getMarketDataByInstrumentId(item.instrumentId);
-
-          if (!marketData || marketData.length === 0) continue;
-
-          const latest = marketData.reduce((a, b) =>
-            new Date(a.date) > new Date(b.date) ? a : b,
-          );
-
-          const value = item.totalQuantity * latest.closePrice;
-          investmentsValue += value;
-
-          result.push({
+        // INVESTMENTS
+        for (const item of summary.investments) {
+          chartData.push({
             name: item.instrumentName,
-            value,
+            value: item.valueInAccountCurrency,
             color: COLORS.chartColors[colorIndex % COLORS.chartColors.length],
             legendFontColor: COLORS.textGrey,
             legendFontSize: 12,
@@ -69,16 +58,18 @@ const WalletChartScreen: React.FC = () => {
           colorIndex++;
         }
 
-        result.push({
+        // CASH
+        chartData.push({
           name: "Free Cash",
-          value: wallet.cashBalance,
+          value: summary.cashBalance,
           color: COLORS.chartColors[colorIndex % COLORS.chartColors.length],
           legendFontColor: COLORS.textGrey,
           legendFontSize: 12,
         });
 
-        setTotalValue(wallet.cashBalance + investmentsValue);
-        setData(result);
+        setCurrency(summary.accountCurrency);
+        setTotalValue(summary.totalAccountValue);
+        setData(chartData);
       } catch (err) {
         console.error("Chart load error:", err);
       } finally {
@@ -87,7 +78,7 @@ const WalletChartScreen: React.FC = () => {
     };
 
     loadData();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
@@ -103,7 +94,7 @@ const WalletChartScreen: React.FC = () => {
       <Text style={[globalStyles.subtitle, spacing.mb4]}>
         Total value:{" "}
         <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
-          {totalValue.toFixed(2)}
+          {totalValue.toFixed(2)} {currency}
         </Text>
       </Text>
 

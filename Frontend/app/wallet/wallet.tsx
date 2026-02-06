@@ -20,40 +20,21 @@ const WalletScreen = () => {
   const { user } = useContext(AuthContext);
   const { itemWidth } = useResponsiveColumns();
 
-  const [totalValue, setTotalValue] = useState(0);
-  const [wallet, setWallet] = useState(null);
-  const [currency, setCurrency] = useState(null);
-  const [investmentSummary, setInvestmentSummary] = useState([]);
+  const [walletSummary, setWalletSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadWalletData = async () => {
+    const loadWalletSummary = async () => {
       if (!user?.id) return;
 
       try {
-        const walletResponse = await ApiService.getWalletByClientId(user.id);
-        setWallet(walletResponse);
+        // 1️⃣ najpierw portfel (żeby dostać walletId)
+        const wallet = await ApiService.getWalletByClientId(user.id);
 
-        const currencyResponse = await ApiService.getCurrencyByID(
-          walletResponse.currencyId,
-        );
-        setCurrency(currencyResponse);
+        // 2️⃣ CAŁA wycena portfela z backendu
+        const summary = await ApiService.getWalletInvestmentSummary(wallet.id);
 
-        const summary = await ApiService.getWalletInvestmentSummary(
-          walletResponse.id,
-        );
-        setInvestmentSummary(summary);
-
-        let investmentsValue = 0;
-
-        for (const item of summary) {
-          const marketData = await ApiService.getMarketDataByInstrumentId(
-            item.instrumentId,
-          );
-          investmentsValue += item.totalQuantity * marketData.price;
-        }
-
-        setTotalValue(walletResponse.cashBalance + investmentsValue);
+        setWalletSummary(summary);
       } catch (err) {
         console.error("Wallet load error:", err);
       } finally {
@@ -61,14 +42,14 @@ const WalletScreen = () => {
       }
     };
 
-    loadWalletData();
+    loadWalletSummary();
   }, [user]);
 
   if (loading) {
     return <ActivityIndicator color={COLORS.primary} />;
   }
 
-  if (!wallet) {
+  if (!walletSummary) {
     return (
       <View style={globalStyles.centerContainer}>
         <Text style={globalStyles.text}>Wallet not available</Text>
@@ -87,15 +68,31 @@ const WalletScreen = () => {
         <Text style={[globalStyles.text, spacing.mt1]}>
           Total account value:{" "}
           <Text style={{ color: COLORS.primary, fontWeight: "600" }}>
-            {totalValue.toFixed(2)} {currency?.name}
+            {walletSummary.totalAccountValue.toFixed(2)}{" "}
+            {walletSummary.accountCurrency}
           </Text>
         </Text>
+
+        <Text style={[globalStyles.text, spacing.mt1]}>
+          Cash balance:{" "}
+          <Text style={{ fontWeight: "600" }}>
+            {walletSummary.cashBalance.toFixed(2)}{" "}
+            {walletSummary.accountCurrency}
+          </Text>
+        </Text>
+
+        <TouchableOpacity
+          style={[globalStyles.button, spacing.mt3]}
+          onPress={() => router.push(ROUTES.EDIT_WALLET)}
+        >
+          <Text style={globalStyles.buttonText}>Edit Wallet</Text>
+        </TouchableOpacity>
       </View>
 
       {/* INVESTMENTS */}
       <Text style={[globalStyles.header, spacing.mb3]}>My Investments</Text>
 
-      {investmentSummary.length === 0 ? (
+      {walletSummary.investments.length === 0 ? (
         <Text style={globalStyles.text}>
           You don't have any investments yet.
         </Text>
@@ -106,7 +103,7 @@ const WalletScreen = () => {
             { flexWrap: "wrap", justifyContent: "center", width: "100%" },
           ]}
         >
-          {investmentSummary.map((item) => (
+          {walletSummary.investments.map((item) => (
             <View
               key={item.instrumentId}
               style={[globalStyles.card, spacing.m2, { width: itemWidth }]}
@@ -114,8 +111,23 @@ const WalletScreen = () => {
               <Text style={globalStyles.cardTitle}>{item.instrumentName}</Text>
 
               <Text style={globalStyles.text}>
-                Total quantity:{" "}
+                Quantity:{" "}
                 <Text style={{ fontWeight: "600" }}>{item.totalQuantity}</Text>
+              </Text>
+
+              <Text style={globalStyles.text}>
+                Unit Price:{" "}
+                <Text style={{ fontWeight: "600" }}>
+                  {item.pricePerUnit.toFixed(2)} {item.instrumentCurrency}
+                </Text>
+              </Text>
+
+              <Text style={globalStyles.text}>
+                Value:{" "}
+                <Text style={{ fontWeight: "600", color: COLORS.primary }}>
+                  {item.valueInAccountCurrency.toFixed(2)}{" "}
+                  {walletSummary.accountCurrency}
+                </Text>
               </Text>
             </View>
           ))}

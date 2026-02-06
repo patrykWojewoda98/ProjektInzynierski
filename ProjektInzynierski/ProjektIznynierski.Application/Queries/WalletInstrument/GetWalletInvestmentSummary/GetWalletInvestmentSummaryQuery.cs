@@ -3,6 +3,14 @@ using ProjektIznynierski.Application.Dtos;
 
 namespace ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInvestmentSummary
 {
-    public record GetWalletInvestmentSummaryQuery(int WalletId) : IRequest<List<WalletInvestmentSummaryDto>>;
+    public class GetWalletInvestmentSummaryQuery
+        : IRequest<WalletSummaryDto>
+    {
+        public int WalletId { get; }
 
+        public GetWalletInvestmentSummaryQuery(int walletId)
+        {
+            WalletId = walletId;
+        }
+    }
 }

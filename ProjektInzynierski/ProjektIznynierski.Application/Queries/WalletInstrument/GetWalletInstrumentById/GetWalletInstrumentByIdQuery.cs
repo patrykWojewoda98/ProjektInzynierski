@@ -3,7 +3,5 @@ using ProjektIznynierski.Application.Dtos;
 
 namespace ProjektIznynierski.Application.Queries.WalletInstrument.GetWalletInstrumentById
 {
-    public record GetWalletInstrumentByIdQuery(int id) : IRequest<WalletInstrumentDto>
-    {
-    }
+    public record GetWalletInstrumentByIdQuery(int Id) : IRequest<WalletInstrumentDto>;
 }

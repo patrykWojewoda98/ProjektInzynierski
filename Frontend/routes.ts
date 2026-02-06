@@ -41,7 +41,6 @@ export const ROUTES = {
   CURRENCY: "/currency/currencyListScreen",
 
   EDIT_INVEST_PROFILE: "/investProfile/editInvestProfile",
-  EDIT_WALLET: "/wallet/editWallet",
 
   EDIT_FINANCIAL_REPORT: "/financialReport/editFinancialReport",
   EDIT_FINANCIAL_REPORT_LIST: "/financialReport/editFinancialMetricListScreen",
@@ -71,6 +70,8 @@ export const ROUTES = {
     "/currencyRateHistory/editSpecificsCurrencyRateHistoryScreen",
   EDIT_CURRENCY_RATE_HISTORY_LIST:
     "/currencyRateHistory/editCurrencyRateListScreen",
+  EDIT_WALLET: "/wallet/editWalletScreen",
+  EDIT_WALLET_INSTRUMENT: "/wallet/editWalletInstrumentScreen",
 
   ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
   ADD_REGION: "/regions/addRegionScreen",

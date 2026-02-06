@@ -24,5 +24,12 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                 .Where(wi => wi.WalletId == walletId)
                 .ToListAsync();
         }
+
+        public async Task<Wallet?> GetByIdWithCurrencyAsync(int walletId)
+        {
+            return await _dbContext.Wallets
+                .Include(w => w.Currency)
+                .FirstOrDefaultAsync(w => w.Id == walletId);
+        }
     }
 }
