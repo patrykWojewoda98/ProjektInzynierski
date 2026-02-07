@@ -1,6 +1,4 @@
-import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
-import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -46,59 +44,15 @@ const WalletScreen = () => {
     loadWalletSummary();
   }, [user]);
 
-  const handleShareExcel = async () => {
+  const handleExportExcelWeb = async () => {
+    if (!user?.id) return;
+
     try {
-      if (!user?.id) return;
-
-      setDownloadingExcel(true);
-
       const wallet = await ApiService.getWalletByClientId(user.id);
-      const excelUri = await ApiService.downloadWalletExcel(wallet.id);
-
-      await Sharing.shareAsync(excelUri, {
-        mimeType:
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        dialogTitle: "Export Wallet to Excel",
-        UTI: "com.microsoft.excel.xlsx",
-      });
+      ApiService.openWalletExcelExport(wallet.id);
     } catch (error) {
-      console.error("Excel share error:", error);
+      console.error("Excel export error:", error);
       Alert.alert("Error", "Failed to export wallet to Excel");
-    } finally {
-      setDownloadingExcel(false);
-    }
-  };
-
-  const handleSaveExcelWithPicker = async () => {
-    try {
-      if (!user?.id) return;
-
-      const wallet = await ApiService.getWalletByClientId(user.id);
-      const tempUri = await ApiService.downloadWalletExcelToTemp(wallet.id);
-
-      const permissions =
-        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-      if (!permissions.granted) return;
-
-      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
-        permissions.directoryUri,
-        `Wallet_${wallet.id}.xlsx`,
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      );
-
-      const base64 = await FileSystem.readAsStringAsync(tempUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      Alert.alert("Saved", "Excel file saved successfully");
-    } catch (error) {
-      console.error("Excel save error:", error);
-      Alert.alert("Error", "Failed to save Excel file");
     }
   };
 
@@ -147,8 +101,8 @@ const WalletScreen = () => {
 
       <View style={spacing.mb5}>
         <TouchableOpacity
-          style={[globalStyles.button, spacing.mb2]}
-          onPress={handleShareExcel}
+          style={[globalStyles.button]}
+          onPress={handleExportExcelWeb}
           disabled={downloadingExcel}
         >
           {downloadingExcel ? (
@@ -156,13 +110,6 @@ const WalletScreen = () => {
           ) : (
             <Text style={globalStyles.buttonText}>Export Wallet (Excel)</Text>
           )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[globalStyles.button]}
-          onPress={handleSaveExcelWithPicker}
-        >
-          <Text style={globalStyles.buttonText}>Save Excel as…</Text>
         </TouchableOpacity>
       </View>
 

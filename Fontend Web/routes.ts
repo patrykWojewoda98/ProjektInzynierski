@@ -1,0 +1,91 @@
+export const ROUTES = {
+  MAIN_MENU: "/mainMenu",
+  COMING_SOON: "/ComingSoon",
+  LOGIN: "/auth/login",
+  LOGIN_EMPLOYEE: "/auth/employee/employeeLoginScreen",
+  REGISTER: "/auth/register",
+  INVEST_PROFILE: "/investProfile/investProfile",
+  WATCHLIST: "/watchList/watchList",
+  WALLET: "/wallet/wallet",
+  WALLET_CHART: "/wallet/walletChartScreen",
+  REGION: "/regions/regionListScreen",
+  REGION_CODE: "/regionCode/regionCodesListScreen",
+  COUNTRY: "/country/countryListScreen",
+  EMPLOYEE: "/auth/employee/employeeListScreen",
+  INVEST_HORIZON: "/investHorizon/investHorizonListScreen",
+  INVESTMENT_TYPE: "/investmentType/investmentTypeListScreen",
+  SECTOR: "/sector/sectorListScreen",
+  RISK_LEVEL: "/riskLevel/riskLevelListScreen",
+  MARKET_DATA: "/marketData/marketDataListScreen",
+  CURRENCY_RATE_HISTORY: "/currencyRateHistory/CurrencyRateHistoryListScreen",
+  CURRENCY_PAIR: "/CurrencyPair/currencyPairListScreen",
+  CURRENCY_RATE_HISTORY_EDIT_LIST:
+    "/currencyRateHistory/editCurrencyRateHistoryListScreen",
+
+  WALLET_HISTORY: "/walletHistory/walletHistory",
+  INVEST_INSTRUMENT: "/investInstrument/investInstrument",
+  INVEST_INSTRUMENT_EDIT_LIST: "/investInstrument/investInstrumentListScreen",
+  FINANCIAL_REPORT: "/financialReport/financialReports",
+  FINANCIAL_METRIC: "/financialMetric/financialMetric",
+  FINANCIAL_METRIC_PREVIEW: "/financialMetric/financialMetricPreview",
+  FINANCIAL_REPORT_BY_INSTRUMENT:
+    "/financialReport/financialReportsByInstrument",
+  CREATE_FINANCIAL_REPORT_BY_AI: "/financialReport/createFinancialReportByAI",
+  MY_AI_ANALYSIS_REQUESTS: "/aIRequest/myAIRequests",
+  AI_ANALYSIS_RESULT: "/aIAnalysisResult/aIAnalysisResult",
+
+  EMPLOYEE_2FA: "/auth/employee/employee2FAScreen",
+  EMPLOYEE_MAIN_MENU: "/employeeMainMenu",
+  EMPLOYEE_DASHBOARD: "/employee/employeeDashboard",
+
+  CURRENCY: "/currency/currencyListScreen",
+
+  EDIT_INVEST_PROFILE: "/investProfile/editInvestProfile",
+
+  EDIT_FINANCIAL_REPORT: "/financialReport/editFinancialReport",
+  EDIT_FINANCIAL_REPORT_LIST: "/financialReport/editFinancialMetricListScreen",
+
+  //chyba do usuniecia
+  EDIT_FINANCIAL_METRIC_PREVIEW: "/financialMetric/editFinancialMetricPreview",
+  //chyba do usuniecia
+
+  EDIT_RISK_LEVEL: "/riskLevel/updateRiskLevelScreen",
+  EDIT_REGION: "/regions/updateRegionScreen",
+  EDIT_CURRENCY: "/currency/updateCurrencyScreen",
+  EDIT_REGION_CODE: "/regionCode/updateRegionCodeScreen",
+  EDIT_COUNTRY: "/country/updateCountryScreen",
+  EDIT_EMPLOYEE: "/auth/employee/updateEmployeeScreen",
+  EDIT_INVEST_HORIZON: "/investHorizon/updateInvestHorizonScreen",
+  EDIT_INVESTMENT_TYPE: "/investmentType/updateInvestmentTypeScreen",
+  EDIT_SECTOR: "/sector/updateSectorScreen",
+  EDIT_INVEST_INSTRUMENT: "/investInstrument/updateInvestInstrumentScreen",
+  EDIT_FINANCIAL_METRIC: "/financialMetric/editFinancialMetricScreen",
+  EDIT_FINANCIAL_METRIC_LIST: "/financialMetric/editFinancialMetricListScreen",
+  EDIT_MARKET_DATA_LIST: "/marketData/editMarketDataListScreen",
+  EDIT_MARKET_DATA: "/marketData/editMarketDataScreen",
+  COMMENT_MODERATION: "/comment/commentModerationScreen",
+  EDIT_COMMENT: "/comment/editCommentScreen",
+  EDIT_CURRENCY_PAIR: "/CurrencyPair/updateCurrencyPairScreen",
+  EDIT_SPECIFIC_CURRENCY_RATE_HISTORY:
+    "/currencyRateHistory/editSpecificsCurrencyRateHistoryScreen",
+  EDIT_CURRENCY_RATE_HISTORY_LIST:
+    "/currencyRateHistory/editCurrencyRateListScreen",
+  EDIT_WALLET: "/wallet/editWalletScreen",
+  EDIT_WALLET_INSTRUMENT: "/wallet/editWalletInstrumentScreen",
+
+  ADD_INVEST_HORIZON: "/investHorizon/addInvestHorizonScreen",
+  ADD_REGION: "/regions/addRegionScreen",
+  ADD_REGION_CODE: "/regionCode/addRegionCodeScreen",
+  ADD_COUNTRY: "/country/createCountryScreen",
+  ADD_CURRENCY: "/currency/addCurrencyScreen",
+  ADD_EMPLOYEE: "/auth/employee/addEmployeeScreen",
+  ADD_INVESTMENT_TYPE: "/investmentType/addInvestmentTypeScreen",
+  ADD_SECTOR: "/sector/addSectorScreen",
+  ADD_RISK_LEVEL: "/riskLevel/addRiskLevelScreen",
+  ADD_INVEST_INSTRUMENT: "/investInstrument/createInvestInstrumentScreen",
+  ADD_FINANCIAL_METRIC: "/financialMetric/addFinancialMetricScreen",
+  ADD_FINANCIAL_REPORT: "/financialReport/addFinancialReportScreen",
+  ADD_CURRENCY_PAIR: "/CurrencyPair/addCurrencyPairScreen",
+  ADD_CURRENCY_RATE_HISTORY:
+    "/currencyRateHistory/addCurrencyRateHistoryScreen",
+} as const;

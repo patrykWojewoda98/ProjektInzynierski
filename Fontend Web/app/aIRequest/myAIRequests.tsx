@@ -1,8 +1,6 @@
 import { confirmAction } from "@/utils/confirmAction";
 import { Ionicons } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
-import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -85,47 +83,12 @@ const MyAIRequests = () => {
   const handleDownloadPdf = async (analysisRequestId: number) => {
     try {
       setDownloadingId(analysisRequestId);
-
-      const pdfUri =
-        await ApiService.generateInvestmentRecommendationPdf(analysisRequestId);
-
-      await Sharing.shareAsync(pdfUri);
+      ApiService.openInvestmentRecommendationPdf(analysisRequestId);
     } catch (error) {
-      console.error("Error downloading PDF:", error);
+      console.error("PDF download error:", error);
       Alert.alert("Error", "Failed to download PDF.");
     } finally {
       setDownloadingId(null);
-    }
-  };
-
-  const handleSavePdfWithPicker = async (id: number) => {
-    try {
-      const tempUri =
-        await ApiService.downloadInvestmentRecommendationPdfToTemp(id);
-
-      const permissions =
-        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-      if (!permissions.granted) return;
-
-      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
-        permissions.directoryUri,
-        `Investment_Recommendation_${id}.pdf`,
-        "application/pdf",
-      );
-
-      const pdfBase64 = await FileSystem.readAsStringAsync(tempUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      Alert.alert("Saved", "PDF saved successfully");
-    } catch (error) {
-      console.error("Save as failed:", error);
-      Alert.alert("Error", "Failed to save PDF");
     }
   };
 
@@ -182,7 +145,7 @@ const MyAIRequests = () => {
               {req.aiAnalysisResultId && (
                 <View style={spacing.mt4}>
                   <TouchableOpacity
-                    style={[globalStyles.button, spacing.mb2]}
+                    style={[globalStyles.button]}
                     onPress={() => handleDownloadPdf(req.id)}
                     disabled={downloadingId === req.id}
                   >
@@ -190,16 +153,9 @@ const MyAIRequests = () => {
                       <ActivityIndicator color="#fff" />
                     ) : (
                       <Text style={globalStyles.buttonText}>
-                        Share Investment Report (PDF)
+                        Download Investment Report (PDF)
                       </Text>
                     )}
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[globalStyles.button]}
-                    onPress={() => handleSavePdfWithPicker(req.id)}
-                  >
-                    <Text style={globalStyles.buttonText}>Save PDF as…</Text>
                   </TouchableOpacity>
                 </View>
               )}
