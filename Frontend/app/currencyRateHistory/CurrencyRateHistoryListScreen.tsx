@@ -2,7 +2,6 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Platform,
   ScrollView,
   Text,
   View,
@@ -11,7 +10,6 @@ import {
 import { LineChart } from "react-native-chart-kit";
 
 import { authGuard } from "@/utils/authGuard";
-import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import ApiService from "../../services/api";
@@ -104,36 +102,39 @@ const CurrencyRateHistoryScreen = () => {
           { flexWrap: "wrap", justifyContent: "center", width: "100%" },
         ]}
       >
-        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-          <Text style={globalStyles.label}>Currency Pair</Text>
-
-          <View
-            style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}
-          >
-            <Picker
-              selectedValue={selectedPairId}
-              onValueChange={(v) =>
-                setSelectedPairId(v === "all" ? "all" : Number(v))
-              }
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Currency Pair</Text>
+            <View
               style={[
-                globalStyles.pickerText,
-                Platform.OS === "web" && globalStyles.pickerWeb,
+                globalStyles.pickerWrapper,
+                globalStyles.pickerWebWrapper,
+                {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 12,
+                  height: 48,
+                },
               ]}
             >
-              <Picker.Item label="Select pair" value="all" />
-              {currencyPairs.map((p) => (
-                <Picker.Item key={p.id} label={p.symbol} value={p.id} />
-              ))}
-            </Picker>
-
-            {Platform.OS === "web" && (
-              <Ionicons
-                name="chevron-down"
-                size={20}
-                color={COLORS.textGrey}
-                style={globalStyles.pickerWebArrow}
-              />
-            )}
+              <Picker
+                selectedValue={selectedPairId}
+                onValueChange={(v) =>
+                  setSelectedPairId(v === "all" ? "all" : Number(v))
+                }
+                style={[
+                  globalStyles.pickerText,
+                  globalStyles.pickerWeb,
+                  { flex: 1 },
+                ]}
+                dropdownIconColor={COLORS.textGrey}
+              >
+                <Picker.Item label="Select pair" value="all" />
+                {currencyPairs.map((p) => (
+                  <Picker.Item key={p.id} label={p.symbol} value={p.id} />
+                ))}
+              </Picker>
+            </View>
           </View>
         </View>
       </View>

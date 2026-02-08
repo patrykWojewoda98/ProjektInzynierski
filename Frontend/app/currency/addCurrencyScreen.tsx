@@ -1,11 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -67,7 +65,6 @@ const AddCurrencyScreen = () => {
         name: name.trim(),
         currencyRiskLevelId: riskLevelId,
       });
-
       Alert.alert("Success", "Currency created successfully.");
       router.replace(ROUTES.CURRENCY);
     } catch {
@@ -91,45 +88,50 @@ const AddCurrencyScreen = () => {
           { flexWrap: "wrap", justifyContent: "center", width: "100%" },
         ]}
       >
-        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-          <Text style={globalStyles.label}>Currency Name</Text>
-          <TextInput
-            style={globalStyles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g. USD"
-            placeholderTextColor={COLORS.placeholderGrey}
-          />
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Currency Name</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="e.g. USD"
+              placeholderTextColor={COLORS.placeholderGrey}
+            />
+          </View>
         </View>
 
-        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-          <Text style={globalStyles.label}>Risk Level</Text>
-
-          <View
-            style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}
-          >
-            <Picker
-              selectedValue={riskLevelId}
-              onValueChange={setRiskLevelId}
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Risk Level</Text>
+            <View
               style={[
-                globalStyles.pickerText,
-                Platform.OS === "web" && globalStyles.pickerWeb,
+                globalStyles.pickerWrapper,
+                globalStyles.pickerWebWrapper,
+                {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 12,
+                  height: 48,
+                },
               ]}
             >
-              <Picker.Item label="-- Select risk level --" value={null} />
-              {riskLevels.map((r) => (
-                <Picker.Item key={r.id} label={r.description} value={r.id} />
-              ))}
-            </Picker>
-
-            {Platform.OS === "web" && (
-              <Ionicons
-                name="chevron-down"
-                size={20}
-                color={COLORS.textGrey}
-                style={globalStyles.pickerWebArrow}
-              />
-            )}
+              <Picker
+                selectedValue={riskLevelId}
+                onValueChange={(v) => setRiskLevelId(v)}
+                style={[
+                  globalStyles.pickerText,
+                  globalStyles.pickerWeb,
+                  { flex: 1 },
+                ]}
+                dropdownIconColor={COLORS.textGrey}
+              >
+                <Picker.Item label="Select risk level" value={null} />
+                {riskLevels.map((r) => (
+                  <Picker.Item key={r.id} label={r.description} value={r.id} />
+                ))}
+              </Picker>
+            </View>
           </View>
         </View>
       </View>

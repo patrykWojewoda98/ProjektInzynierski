@@ -1,11 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -62,7 +60,6 @@ const AddCurrencyPairScreen = () => {
     if (baseCurrencyId > 0 && quoteCurrencyId > 0) {
       const base = currencies.find((c) => c.id === baseCurrencyId);
       const quote = currencies.find((c) => c.id === quoteCurrencyId);
-
       if (base && quote) {
         setSymbol(`${base.name}/${quote.name}`);
       }
@@ -96,7 +93,6 @@ const AddCurrencyPairScreen = () => {
         quoteCurrencyId,
         symbol: symbol.trim(),
       });
-
       Alert.alert("Success", "Currency pair created.");
       router.back();
     } catch {
@@ -115,46 +111,38 @@ const AddCurrencyPairScreen = () => {
     value: number,
     setValue: (v: number) => void,
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={(v) => setValue(Number(v))}
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          <Picker.Item label="Select currency" value={0} />
-          {currencies.map((c) => (
-            <Picker.Item key={c.id} label={c.name} value={c.id} />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(Number(v))}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label="Select currency" value={0} />
+            {currencies.map((c) => (
+              <Picker.Item key={c.id} label={c.name} value={c.id} />
+            ))}
+          </Picker>
+        </View>
       </View>
-    </View>
-  );
-
-  const renderInput = () => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>Symbol</Text>
-      <TextInput
-        style={globalStyles.input}
-        value={symbol}
-        onChangeText={setSymbol}
-        placeholder="e.g. EUR/USD"
-        placeholderTextColor={COLORS.textGrey}
-      />
     </View>
   );
 
@@ -170,7 +158,19 @@ const AddCurrencyPairScreen = () => {
       >
         {renderPicker("Base Currency", baseCurrencyId, setBaseCurrencyId)}
         {renderPicker("Quote Currency", quoteCurrencyId, setQuoteCurrencyId)}
-        {renderInput()}
+
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Symbol</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={symbol}
+              onChangeText={setSymbol}
+              placeholder="e.g. EUR/USD"
+              placeholderTextColor={COLORS.textGrey}
+            />
+          </View>
+        </View>
       </View>
 
       <TouchableOpacity

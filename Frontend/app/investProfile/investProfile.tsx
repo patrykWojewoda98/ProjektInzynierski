@@ -12,7 +12,6 @@ import {
   View,
 } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../assets/Constants/colors";
 import { globalStyles, spacing } from "../../assets/styles/styles";
 import { ROUTES } from "../../routes";
@@ -151,36 +150,42 @@ const InvestProfile = () => {
     labelKey = "name",
     format?: (x: any) => string,
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
 
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={setValue}
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          <Picker.Item label="Select" value="" />
-          {data.map((x) => (
-            <Picker.Item
-              key={x.id}
-              label={format ? format(x) : x[labelKey]}
-              value={x.id}
-            />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={setValue}
+            style={[
+              globalStyles.pickerText,
+              Platform.OS === "web" && globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label="Select" value="" />
+            {data.map((x) => (
+              <Picker.Item
+                key={x.id}
+                label={format ? format(x) : x[labelKey]}
+                value={x.id}
+              />
+            ))}
+          </Picker>
+        </View>
       </View>
     </View>
   );
@@ -191,14 +196,16 @@ const InvestProfile = () => {
     onChange: (v: string) => void,
     keyboardType: any = "default",
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-      <TextInput
-        style={globalStyles.input}
-        value={value}
-        keyboardType={keyboardType}
-        onChangeText={onChange}
-      />
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <TextInput
+          style={globalStyles.input}
+          value={value}
+          keyboardType={keyboardType}
+          onChangeText={onChange}
+        />
+      </View>
     </View>
   );
 

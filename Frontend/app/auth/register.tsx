@@ -19,8 +19,8 @@ import ApiService from "../../services/api";
 
 const RegisterScreen = () => {
   const router = useRouter();
-  const [regions, setRegions] = useState([]);
-  const [countries, setCountries] = useState([]);
+  const [regions, setRegions] = useState<any[]>([]);
+  const [countries, setCountries] = useState<any[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -40,7 +40,6 @@ const RegisterScreen = () => {
   });
   const [errors, setErrors] = useState<string[]>([]);
 
-  // Fetch regions on component mount
   useEffect(() => {
     const fetchRegions = async () => {
       try {
@@ -49,24 +48,23 @@ const RegisterScreen = () => {
       } catch {
         setErrors(["Failed to load regions. Please try again."]);
       } finally {
-        setLoading((prev) => ({ ...prev, regions: false }));
+        setLoading((p) => ({ ...p, regions: false }));
       }
     };
     fetchRegions();
   }, []);
 
-  // Fetch countries when region is selected
   useEffect(() => {
     if (selectedRegion) {
       const fetchCountries = async () => {
-        setLoading((prev) => ({ ...prev, countries: true }));
+        setLoading((p) => ({ ...p, countries: true }));
         try {
           const data = await ApiService.getCountriesByRegion(selectedRegion);
           setCountries(data);
         } catch {
           setErrors(["Failed to load countries. Please try again."]);
         } finally {
-          setLoading((prev) => ({ ...prev, countries: false }));
+          setLoading((p) => ({ ...p, countries: false }));
         }
       };
       fetchCountries();
@@ -77,38 +75,35 @@ const RegisterScreen = () => {
   }, [selectedRegion]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((p) => ({ ...p, [field]: value }));
     if (errors.length > 0) setErrors([]);
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: string[] = [];
-
-    if (!selectedRegion) newErrors.push("Please select a region");
-    if (!selectedCountry) newErrors.push("Please select a country");
-    if (!formData.name.trim()) newErrors.push("Full name is required");
-    if (!formData.email.trim()) newErrors.push("Email is required");
+  const validateForm = () => {
+    const e: string[] = [];
+    if (!selectedRegion) e.push("Please select a region");
+    if (!selectedCountry) e.push("Please select a country");
+    if (!formData.name.trim()) e.push("Full name is required");
+    if (!formData.email.trim()) e.push("Email is required");
     else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.push("Please enter a valid email");
-    if (!formData.city.trim()) newErrors.push("City is required");
-    if (!formData.address.trim()) newErrors.push("Address is required");
-    if (!formData.postalCode.trim()) newErrors.push("Postal code is required");
-    if (!formData.password) newErrors.push("Password is required");
+      e.push("Please enter a valid email");
+    if (!formData.city.trim()) e.push("City is required");
+    if (!formData.address.trim()) e.push("Address is required");
+    if (!formData.postalCode.trim()) e.push("Postal code is required");
+    if (!formData.password) e.push("Password is required");
     else if (formData.password.length < 6)
-      newErrors.push("Password must be at least 6 characters long");
+      e.push("Password must be at least 6 characters long");
     if (formData.password !== formData.confirmPassword)
-      newErrors.push("Passwords do not match");
-
-    setErrors(newErrors);
-    return newErrors.length === 0;
+      e.push("Passwords do not match");
+    setErrors(e);
+    return e.length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
-    setLoading((prev) => ({ ...prev, submitting: true }));
+    setLoading((p) => ({ ...p, submitting: true }));
     try {
-      const clientData = {
+      await ApiService.registerClient({
         name: formData.name,
         email: formData.email,
         city: formData.city,
@@ -116,15 +111,13 @@ const RegisterScreen = () => {
         postalCode: formData.postalCode,
         password: formData.password,
         countryId: selectedCountry,
-      };
-
-      await ApiService.registerClient(clientData);
+      });
       Alert.alert("Success", "Registration successful!");
       router.push({ pathname: ROUTES.LOGIN });
     } catch {
       setErrors(["An error occurred during registration. Please try again."]);
     } finally {
-      setLoading((prev) => ({ ...prev, submitting: false }));
+      setLoading((p) => ({ ...p, submitting: false }));
     }
   };
 
@@ -140,86 +133,109 @@ const RegisterScreen = () => {
 
       <Text style={[globalStyles.header, spacing.mb4]}>Register</Text>
 
-      {/* Error Messages */}
       {errors.length > 0 && (
         <View style={[globalStyles.errorContainer, spacing.mb4]}>
-          {errors.map((error, index) => (
-            <Text key={index} style={globalStyles.errorText}>
-              {error}
+          {errors.map((e, i) => (
+            <Text key={i} style={globalStyles.errorText}>
+              {e}
             </Text>
           ))}
         </View>
       )}
 
       <View style={globalStyles.formContainer}>
-        {/* Region Picker */}
-        <Text style={globalStyles.label}>Region</Text>
-        <View style={[globalStyles.pickerWrapper, spacing.mb3]}>
-          <Picker
-            selectedValue={selectedRegion}
-            onValueChange={(itemValue) => {
-              setSelectedRegion(itemValue);
-              setSelectedCountry(null);
-            }}
-            style={globalStyles.pickerText}
-            enabled={!loading.regions}
-          >
-            <Picker.Item label="Select region" value={null} />
-            {regions.map((region) => (
-              <Picker.Item
-                key={region.id}
-                label={region.name}
-                value={region.id}
-              />
-            ))}
-          </Picker>
-          {loading.regions && (
-            <ActivityIndicator
-              color={COLORS.primary}
-              style={{ marginTop: 5 }}
-            />
-          )}
+        <View style={spacing.mb3}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Region</Text>
+            <View
+              style={[
+                globalStyles.pickerWrapper,
+                globalStyles.pickerWebWrapper,
+                {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 12,
+                  height: 48,
+                },
+              ]}
+            >
+              <Picker
+                selectedValue={selectedRegion}
+                onValueChange={(v) => {
+                  setSelectedRegion(v);
+                  setSelectedCountry(null);
+                }}
+                style={[
+                  globalStyles.pickerText,
+                  globalStyles.pickerWeb,
+                  { flex: 1 },
+                ]}
+                dropdownIconColor={COLORS.textGrey}
+                enabled={!loading.regions}
+              >
+                <Picker.Item label="Select region" value={null} />
+                {regions.map((r) => (
+                  <Picker.Item key={r.id} label={r.name} value={r.id} />
+                ))}
+              </Picker>
+            </View>
+            {loading.regions && (
+              <ActivityIndicator color={COLORS.primary} style={spacing.mt2} />
+            )}
+          </View>
         </View>
 
-        {/* Country Picker */}
-        <Text style={globalStyles.label}>Country</Text>
-        <View style={[globalStyles.pickerWrapper, spacing.mb3]}>
-          <Picker
-            selectedValue={selectedCountry}
-            onValueChange={(itemValue) => setSelectedCountry(itemValue)}
-            style={globalStyles.pickerText}
-            enabled={selectedRegion !== null && !loading.countries}
-          >
-            <Picker.Item
-              label={selectedRegion ? "Select country" : "Select region first"}
-              value={null}
-            />
-            {countries.map((country) => (
-              <Picker.Item
-                key={country.id}
-                label={country.name}
-                value={country.id}
-              />
-            ))}
-          </Picker>
-          {loading.countries && (
-            <ActivityIndicator
-              color={COLORS.primary}
-              style={{ marginTop: 5 }}
-            />
-          )}
+        <View style={spacing.mb3}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Country</Text>
+            <View
+              style={[
+                globalStyles.pickerWrapper,
+                globalStyles.pickerWebWrapper,
+                {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 12,
+                  height: 48,
+                },
+              ]}
+            >
+              <Picker
+                selectedValue={selectedCountry}
+                onValueChange={(v) => setSelectedCountry(v)}
+                style={[
+                  globalStyles.pickerText,
+                  globalStyles.pickerWeb,
+                  { flex: 1 },
+                ]}
+                dropdownIconColor={COLORS.textGrey}
+                enabled={!!selectedRegion && !loading.countries}
+              >
+                <Picker.Item
+                  label={
+                    selectedRegion ? "Select country" : "Select region first"
+                  }
+                  value={null}
+                />
+                {countries.map((c) => (
+                  <Picker.Item key={c.id} label={c.name} value={c.id} />
+                ))}
+              </Picker>
+            </View>
+            {loading.countries && (
+              <ActivityIndicator color={COLORS.primary} style={spacing.mt2} />
+            )}
+          </View>
         </View>
 
-        {/* Full Name */}
         <TextInput
           style={[globalStyles.input, spacing.mb3]}
           placeholder="Full Name"
           placeholderTextColor={COLORS.placeholderGrey}
           value={formData.name}
-          onChangeText={(text) => handleInputChange("name", text)}
+          onChangeText={(t) => handleInputChange("name", t)}
         />
 
-        {/* Email */}
         <TextInput
           style={[globalStyles.input, spacing.mb3]}
           placeholder="Email"
@@ -227,38 +243,34 @@ const RegisterScreen = () => {
           keyboardType="email-address"
           autoCapitalize="none"
           value={formData.email}
-          onChangeText={(text) => handleInputChange("email", text)}
+          onChangeText={(t) => handleInputChange("email", t)}
         />
 
-        {/* City */}
         <TextInput
           style={[globalStyles.input, spacing.mb3]}
           placeholder="City"
           placeholderTextColor={COLORS.placeholderGrey}
           value={formData.city}
-          onChangeText={(text) => handleInputChange("city", text)}
+          onChangeText={(t) => handleInputChange("city", t)}
         />
 
-        {/* Address */}
         <TextInput
           style={[globalStyles.input, spacing.mb3]}
           placeholder="Address"
           placeholderTextColor={COLORS.placeholderGrey}
           value={formData.address}
-          onChangeText={(text) => handleInputChange("address", text)}
+          onChangeText={(t) => handleInputChange("address", t)}
         />
 
-        {/* Postal Code */}
         <TextInput
           style={[globalStyles.input, spacing.mb3]}
           placeholder="Postal Code"
           placeholderTextColor={COLORS.placeholderGrey}
           keyboardType="number-pad"
           value={formData.postalCode}
-          onChangeText={(text) => handleInputChange("postalCode", text)}
+          onChangeText={(t) => handleInputChange("postalCode", t)}
         />
 
-        {/* Password */}
         <Text style={globalStyles.label}>Password</Text>
         <View style={[globalStyles.passwordContainer, spacing.mb3]}>
           <TextInput
@@ -270,7 +282,7 @@ const RegisterScreen = () => {
             placeholderTextColor={COLORS.placeholderGrey}
             secureTextEntry={!showPassword}
             value={formData.password}
-            onChangeText={(text) => handleInputChange("password", text)}
+            onChangeText={(t) => handleInputChange("password", t)}
           />
           <TouchableOpacity
             style={globalStyles.eyeIcon}
@@ -284,7 +296,6 @@ const RegisterScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Confirm Password */}
         <Text style={globalStyles.label}>Confirm Password</Text>
         <View style={[globalStyles.passwordContainer, spacing.mb4]}>
           <TextInput
@@ -296,11 +307,10 @@ const RegisterScreen = () => {
             placeholderTextColor={COLORS.placeholderGrey}
             secureTextEntry={!showPassword}
             value={formData.confirmPassword}
-            onChangeText={(text) => handleInputChange("confirmPassword", text)}
+            onChangeText={(t) => handleInputChange("confirmPassword", t)}
           />
         </View>
 
-        {/* Submit Button */}
         <TouchableOpacity
           style={[
             globalStyles.button,
@@ -316,7 +326,6 @@ const RegisterScreen = () => {
           )}
         </TouchableOpacity>
 
-        {/* Login Link */}
         <View style={[globalStyles.row, globalStyles.center, spacing.mt4]}>
           <Text style={[globalStyles.text, spacing.mr1]}>
             Already have an account?

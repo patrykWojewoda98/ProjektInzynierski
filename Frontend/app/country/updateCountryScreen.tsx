@@ -1,11 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -99,7 +97,6 @@ const UpdateCountryScreen = () => {
         currencyId,
         countryRiskLevelId: riskLevelId,
       });
-
       Alert.alert("Success", "Country updated successfully.");
       router.replace(ROUTES.COUNTRY);
     } catch {
@@ -123,16 +120,25 @@ const UpdateCountryScreen = () => {
     <View style={[spacing.m2, { width: itemWidth }]}>
       <View style={globalStyles.card}>
         <Text style={globalStyles.label}>{label}</Text>
-
         <View
-          style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}
+          style={[
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
+          ]}
         >
           <Picker
             selectedValue={value}
             onValueChange={(v) => setValue(v)}
             style={[
               globalStyles.pickerText,
-              Platform.OS === "web" && globalStyles.pickerWeb,
+              globalStyles.pickerWeb,
+              { flex: 1 },
             ]}
             dropdownIconColor={COLORS.textGrey}
           >
@@ -144,15 +150,6 @@ const UpdateCountryScreen = () => {
               />
             ))}
           </Picker>
-
-          {Platform.OS === "web" && (
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color={COLORS.textGrey}
-              style={globalStyles.pickerWebArrow}
-            />
-          )}
         </View>
       </View>
     </View>

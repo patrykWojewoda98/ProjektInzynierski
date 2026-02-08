@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -41,11 +40,9 @@ const CommentModerationScreen = () => {
         ApiService.getAllClients(),
         ApiService.getInvestInstruments(),
       ]);
-
       setClients(clientsData);
       setInstruments(instrumentsData);
     };
-
     loadInitial();
   }, []);
 
@@ -57,7 +54,6 @@ const CommentModerationScreen = () => {
     setLoading(true);
     try {
       let data: any[] = [];
-
       if (selectedClientId !== "all" && selectedInstrumentId !== "all") {
         const all = await ApiService.getAllComments();
         data = all.filter(
@@ -75,7 +71,6 @@ const CommentModerationScreen = () => {
       } else {
         data = await ApiService.getAllComments();
       }
-
       setComments(data);
     } finally {
       setLoading(false);
@@ -110,32 +105,37 @@ const CommentModerationScreen = () => {
     data: any[],
     labelKey = "name",
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={(v) => setValue(v)}
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          <Picker.Item label="Show all" value="all" />
-          {data.map((x) => (
-            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(v)}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label="Show all" value="all" />
+            {data.map((x) => (
+              <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+            ))}
+          </Picker>
+        </View>
       </View>
     </View>
   );

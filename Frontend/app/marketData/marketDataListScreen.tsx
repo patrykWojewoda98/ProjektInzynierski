@@ -1,10 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -38,12 +36,10 @@ const MarketDataListScreen = () => {
   const [instrumentId, setInstrumentId] = useState(0);
 
   useEffect(() => {
-    const check = async () => {
-      const ok = await authGuard();
+    authGuard().then((ok) => {
       setIsReady(!!ok);
       if (!ok) setLoading(false);
-    };
-    check();
+    });
   }, []);
 
   useEffect(() => {
@@ -58,7 +54,6 @@ const MarketDataListScreen = () => {
           ApiService.getAllInvestmentTypes(),
           ApiService.getInvestInstruments(),
         ]);
-
         setSectors(s);
         setRegions(r);
         setCountries(c);
@@ -76,12 +71,10 @@ const MarketDataListScreen = () => {
 
   const filteredInstruments = useMemo(() => {
     let data = instruments;
-
     if (sectorId > 0) data = data.filter((i) => i.sectorId === sectorId);
     if (regionId > 0) data = data.filter((i) => i.regionId === regionId);
     if (countryId > 0) data = data.filter((i) => i.countryId === countryId);
     if (typeId > 0) data = data.filter((i) => i.investmentTypeId === typeId);
-
     return data;
   }, [sectorId, regionId, countryId, typeId, instruments]);
 
@@ -93,36 +86,25 @@ const MarketDataListScreen = () => {
   useEffect(() => {
     if (instrumentId === 0) return;
 
-    const load = async () => {
-      try {
-        const data = await ApiService.getMarketDataByInstrumentId(instrumentId);
-        setMarketData(data);
-      } catch {
-        Alert.alert("Error", "Failed to load market data.");
-      }
-    };
-
-    load();
+    ApiService.getMarketDataByInstrumentId(instrumentId)
+      .then(setMarketData)
+      .catch(() => Alert.alert("Error", "Failed to load market data."));
   }, [instrumentId]);
 
   const handleImportLatest = async () => {
     if (instrumentId === 0) return;
-
     setImporting(true);
 
     try {
       const instrument = instruments.find((i) => i.id === instrumentId);
-
       if (!instrument?.ticker) {
         Alert.alert("Error", "Instrument ticker not found.");
         return;
       }
 
       await ApiService.importMarketDataByTicker(instrument.ticker);
-
       const refreshed =
         await ApiService.getMarketDataByInstrumentId(instrumentId);
-
       setMarketData(refreshed);
       Alert.alert("Success", "Latest market data imported.");
     } catch {
@@ -144,32 +126,37 @@ const MarketDataListScreen = () => {
     labelKey = "name",
     placeholder = "All",
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={(v) => setValue(Number(v))}
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          <Picker.Item label={placeholder} value={0} />
-          {data.map((x) => (
-            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(Number(v))}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label={placeholder} value={0} />
+            {data.map((x) => (
+              <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+            ))}
+          </Picker>
+        </View>
       </View>
     </View>
   );
@@ -200,33 +187,33 @@ const MarketDataListScreen = () => {
 
       {instrumentId > 0 && (
         <>
-          <View style={spacing.mt3}>
-            <TouchableOpacity
-              style={[
-                globalStyles.button,
-                importing && globalStyles.buttonDisabled,
-              ]}
-              disabled={importing}
-              onPress={handleImportLatest}
-            >
-              {importing ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={globalStyles.buttonText}>
-                  Import latest market data
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[
+              globalStyles.button,
+              spacing.mt4,
+              importing && globalStyles.buttonDisabled,
+            ]}
+            disabled={importing}
+            onPress={handleImportLatest}
+          >
+            {importing ? (
+              <ActivityIndicator color={COLORS.whiteHeader} />
+            ) : (
+              <Text style={globalStyles.buttonText}>
+                Import latest market data
+              </Text>
+            )}
+          </TouchableOpacity>
 
           <View
             style={[
               globalStyles.row,
+              spacing.mt4,
               { flexWrap: "wrap", justifyContent: "center", width: "100%" },
             ]}
           >
             {marketData.map((m) => {
-              const dailyColor =
+              const color =
                 m.dailyChange > 0
                   ? COLORS.success
                   : m.dailyChange < 0
@@ -254,10 +241,10 @@ const MarketDataListScreen = () => {
                   <Text style={globalStyles.textSmall}>Low: {m.lowPrice}</Text>
                   <Text style={globalStyles.textSmall}>Volume: {m.volume}</Text>
 
-                  <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
+                  <Text style={[globalStyles.textSmall, { color }]}>
                     Daily change: {m.dailyChange}
                   </Text>
-                  <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
+                  <Text style={[globalStyles.textSmall, { color }]}>
                     Daily change %: {m.dailyChangePercent}%
                   </Text>
                 </View>

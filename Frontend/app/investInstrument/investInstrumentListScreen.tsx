@@ -140,12 +140,6 @@ const InvestmentInstrumentListScreen = () => {
               <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
             ))}
           </Picker>
-          <Ionicons
-            name="chevron-down"
-            size={18}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
         </View>
       </View>
     </View>

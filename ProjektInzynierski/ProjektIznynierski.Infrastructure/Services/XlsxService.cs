@@ -10,9 +10,6 @@ namespace ProjektIznynierski.Infrastructure.Services
         {
             using var workbook = new XLWorkbook();
 
-            // =========================
-            // SHEET 1: WALLET OVERVIEW
-            // =========================
             var walletSheet = workbook.Worksheets.Add("Wallet");
 
             walletSheet.Cell(1, 1).Value = "Wallet ID";
@@ -30,9 +27,6 @@ namespace ProjektIznynierski.Infrastructure.Services
             walletSheet.Range("A1:A4").Style.Font.Bold = true;
             walletSheet.Columns().AdjustToContents();
 
-            // =========================
-            // SHEET 2: INSTRUMENTS
-            // =========================
             var sheet = workbook.Worksheets.Add("Instruments");
 
             sheet.Cell(1, 1).Value = "Instrument";
@@ -59,9 +53,6 @@ namespace ProjektIznynierski.Infrastructure.Services
 
             sheet.Columns().AdjustToContents();
 
-            // =========================
-            // SAVE
-            // =========================
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
             return stream.ToArray();

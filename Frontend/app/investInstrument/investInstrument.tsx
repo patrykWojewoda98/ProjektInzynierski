@@ -5,7 +5,6 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -46,7 +45,6 @@ const InvestInstrument = () => {
 
   const handleAddToWallet = async (instrumentId: number) => {
     if (!user?.id) return;
-
     try {
       const wallet = await ApiService.getWalletByClientId(user.id);
       const quantity = quantities[instrumentId] ?? 1;
@@ -110,7 +108,6 @@ const InvestInstrument = () => {
           ApiService.getAllInvestmentTypes(),
           ApiService.getInvestInstruments(),
         ]);
-
         setRegions(r);
         setSectors(s);
         setTypes(t);
@@ -125,14 +122,12 @@ const InvestInstrument = () => {
 
   const filteredInstruments = useMemo(() => {
     let data = allInstruments;
-
     if (selectedRegion > 0)
       data = data.filter((i) => i.regionId === selectedRegion);
     if (selectedSector > 0)
       data = data.filter((i) => i.sectorId === selectedSector);
     if (selectedType > 0)
       data = data.filter((i) => i.investmentTypeId === selectedType);
-
     return data;
   }, [selectedRegion, selectedSector, selectedType, allInstruments]);
 
@@ -147,32 +142,37 @@ const InvestInstrument = () => {
     data: any[],
     labelKey = "name",
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={(v) => setValue(Number(v))}
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          <Picker.Item label="All" value={0} />
-          {data.map((x) => (
-            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(Number(v))}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label="All" value={0} />
+            {data.map((x) => (
+              <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+            ))}
+          </Picker>
+        </View>
       </View>
     </View>
   );

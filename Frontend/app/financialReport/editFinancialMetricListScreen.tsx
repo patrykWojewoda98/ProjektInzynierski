@@ -145,12 +145,6 @@ const EditFinancialMetricListScreen = () => {
               <Picker.Item key={i.id} label={i.name} value={i.id} />
             ))}
           </Picker>
-          <Ionicons
-            name="chevron-down"
-            size={18}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
         </View>
       </View>
     </View>

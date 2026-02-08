@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -52,12 +51,10 @@ const EditMarketDataListScreen = () => {
   const pickerWidth = `${100 / columns - 4}%`;
 
   useEffect(() => {
-    const check = async () => {
-      const ok = await employeeAuthGuard();
+    employeeAuthGuard().then((ok) => {
       setIsReady(!!ok);
       if (!ok) setLoading(false);
-    };
-    check();
+    });
   }, []);
 
   useEffect(() => {
@@ -105,16 +102,9 @@ const EditMarketDataListScreen = () => {
   useEffect(() => {
     if (instrumentId === 0) return;
 
-    const loadMarketData = async () => {
-      try {
-        const data = await ApiService.getMarketDataByInstrumentId(instrumentId);
-        setMarketData(data);
-      } catch {
-        Alert.alert("Error", "Failed to load market data.");
-      }
-    };
-
-    loadMarketData();
+    ApiService.getMarketDataByInstrumentId(instrumentId)
+      .then(setMarketData)
+      .catch(() => Alert.alert("Error", "Failed to load market data."));
   }, [instrumentId]);
 
   const handleImportLatest = async () => {
@@ -145,12 +135,8 @@ const EditMarketDataListScreen = () => {
       title: "Confirm delete",
       message: "Delete this market data record?",
       onConfirm: async () => {
-        try {
-          await ApiService.deleteMarketData(id);
-          setMarketData((p) => p.filter((x) => x.id !== id));
-        } catch {
-          Alert.alert("Error", "Failed to delete market data.");
-        }
+        await ApiService.deleteMarketData(id);
+        setMarketData((p) => p.filter((x) => x.id !== id));
       },
     });
   };
@@ -166,32 +152,37 @@ const EditMarketDataListScreen = () => {
     data: any[],
     labelKey = "name",
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: pickerWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={(v) => setValue(Number(v))}
+    <View style={[spacing.m2, { width: pickerWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          <Picker.Item label="All" value={0} />
-          {data.map((x) => (
-            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(Number(v))}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            <Picker.Item label="All" value={0} />
+            {data.map((x) => (
+              <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+            ))}
+          </Picker>
+        </View>
       </View>
     </View>
   );
@@ -221,27 +212,26 @@ const EditMarketDataListScreen = () => {
 
       {instrumentId > 0 && (
         <>
-          <View style={spacing.mt4}>
-            <TouchableOpacity
-              style={[
-                globalStyles.button,
-                importing && globalStyles.buttonDisabled,
-              ]}
-              disabled={importing}
-              onPress={handleImportLatest}
-            >
-              {importing ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={globalStyles.buttonText}>
-                  Import latest market data
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[
+              globalStyles.button,
+              spacing.mt4,
+              importing && globalStyles.buttonDisabled,
+            ]}
+            disabled={importing}
+            onPress={handleImportLatest}
+          >
+            {importing ? (
+              <ActivityIndicator color={COLORS.whiteHeader} />
+            ) : (
+              <Text style={globalStyles.buttonText}>
+                Import latest market data
+              </Text>
+            )}
+          </TouchableOpacity>
 
           {marketData.map((m) => {
-            const dailyColor =
+            const color =
               m.dailyChange > 0
                 ? COLORS.success
                 : m.dailyChange < 0
@@ -249,10 +239,7 @@ const EditMarketDataListScreen = () => {
                   : COLORS.textGrey;
 
             return (
-              <View
-                key={m.id}
-                style={[globalStyles.card, globalStyles.fullWidth]}
-              >
+              <View key={m.id} style={[globalStyles.card, spacing.mt3]}>
                 <View
                   style={[
                     globalStyles.row,
@@ -297,10 +284,10 @@ const EditMarketDataListScreen = () => {
                 <Text style={globalStyles.textSmall}>Low: {m.lowPrice}</Text>
                 <Text style={globalStyles.textSmall}>Volume: {m.volume}</Text>
 
-                <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
+                <Text style={[globalStyles.textSmall, { color }]}>
                   Daily change: {m.dailyChange}
                 </Text>
-                <Text style={[globalStyles.textSmall, { color: dailyColor }]}>
+                <Text style={[globalStyles.textSmall, { color }]}>
                   Daily change %: {m.dailyChangePercent}%
                 </Text>
               </View>

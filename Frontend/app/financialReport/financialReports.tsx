@@ -1,6 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,7 +15,6 @@ import ApiService from "../../services/api";
 
 const FinancialReports = () => {
   const { instrumentId } = useLocalSearchParams();
-  const router = useRouter();
   const { width } = useWindowDimensions();
 
   const getColumns = () => {
@@ -101,12 +99,6 @@ const FinancialReports = () => {
               <Picker.Item key={i.id} label={i.name} value={i.id} />
             ))}
           </Picker>
-          <Ionicons
-            name="chevron-down"
-            size={18}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
         </View>
       </View>
     </View>
@@ -162,14 +154,6 @@ const FinancialReports = () => {
                 <Text style={globalStyles.text}>
                   Liabilities: {r.liabilities}
                 </Text>
-
-                <View
-                  style={[
-                    globalStyles.row,
-                    spacing.mt3,
-                    { justifyContent: "center" },
-                  ]}
-                ></View>
               </View>
             </View>
           ))}

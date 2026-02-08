@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -56,11 +55,7 @@ const CreateInvestInstrumentScreen = () => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const check = async () => {
-      const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
-    };
-    check();
+    employeeAuthGuard().then((ok) => ok && setIsReady(true));
   }, []);
 
   useEffect(() => {
@@ -192,17 +187,11 @@ const CreateInvestInstrumentScreen = () => {
             {data.map((x) => (
               <Picker.Item
                 key={x.id}
-                label={labelKey ? x[labelKey] : x.name}
+                label={x[labelKey] ?? x.name}
                 value={x.id}
               />
             ))}
           </Picker>
-          <Ionicons
-            name="chevron-down"
-            size={18}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
         </View>
       </View>
     </View>

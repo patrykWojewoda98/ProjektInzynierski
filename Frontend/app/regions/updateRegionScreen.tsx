@@ -1,11 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -51,8 +49,8 @@ const UpdateRegionScreen = () => {
           ApiService.getAllRegionCodes(),
         ]);
 
-        setName(region.name);
-        setRiskLevelId(region.regionRiskLevelId);
+        setName(region.name ?? "");
+        setRiskLevelId(region.regionRiskLevelId ?? null);
         setRegionCodeId(region.regionCodeId ?? null);
         setRiskLevels(risks);
         setRegionCodes(codes);
@@ -102,34 +100,39 @@ const UpdateRegionScreen = () => {
     setValue: (v: number | null) => void,
     data: any[],
     labelKey: string,
-    emptyLabel?: string,
+    placeholder?: string,
   ) => (
-    <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-      <Text style={globalStyles.label}>{label}</Text>
-
-      <View style={[globalStyles.pickerWrapper, globalStyles.pickerWebWrapper]}>
-        <Picker
-          selectedValue={value}
-          onValueChange={setValue}
+    <View style={[spacing.m2, { width: itemWidth }]}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.label}>{label}</Text>
+        <View
           style={[
-            globalStyles.pickerText,
-            Platform.OS === "web" && globalStyles.pickerWeb,
+            globalStyles.pickerWrapper,
+            globalStyles.pickerWebWrapper,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              height: 48,
+            },
           ]}
         >
-          {emptyLabel && <Picker.Item label={emptyLabel} value={null} />}
-          {data.map((x) => (
-            <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
-          ))}
-        </Picker>
-
-        {Platform.OS === "web" && (
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={COLORS.textGrey}
-            style={globalStyles.pickerWebArrow}
-          />
-        )}
+          <Picker
+            selectedValue={value}
+            onValueChange={(v) => setValue(v)}
+            style={[
+              globalStyles.pickerText,
+              globalStyles.pickerWeb,
+              { flex: 1 },
+            ]}
+            dropdownIconColor={COLORS.textGrey}
+          >
+            {placeholder && <Picker.Item label={placeholder} value={null} />}
+            {data.map((x) => (
+              <Picker.Item key={x.id} label={x[labelKey]} value={x.id} />
+            ))}
+          </Picker>
+        </View>
       </View>
     </View>
   );
@@ -144,13 +147,15 @@ const UpdateRegionScreen = () => {
           { flexWrap: "wrap", justifyContent: "center", width: "100%" },
         ]}
       >
-        <View style={[globalStyles.card, spacing.m2, { width: itemWidth }]}>
-          <Text style={globalStyles.label}>Region Name</Text>
-          <TextInput
-            style={globalStyles.input}
-            value={name}
-            onChangeText={setName}
-          />
+        <View style={[spacing.m2, { width: itemWidth }]}>
+          <View style={globalStyles.card}>
+            <Text style={globalStyles.label}>Region Name</Text>
+            <TextInput
+              style={globalStyles.input}
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
         </View>
 
         {renderPicker(
@@ -175,6 +180,7 @@ const UpdateRegionScreen = () => {
         style={[
           globalStyles.button,
           globalStyles.fullWidth,
+          spacing.mt4,
           saving && globalStyles.buttonDisabled,
         ]}
         disabled={saving}
