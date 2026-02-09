@@ -21,11 +21,7 @@ namespace ProjektIznynierski.Application.Queries.CurrencyRateHistory.GetLatestRa
                 );
 
             if (latestRate == null)
-            {
-                throw new Exception(
-                    $"No latest rate found for currency pair ID {request.currencyPairId}."
-                );
-            }
+                return null;
 
             return new CurrencyRateHistoryDto
             {

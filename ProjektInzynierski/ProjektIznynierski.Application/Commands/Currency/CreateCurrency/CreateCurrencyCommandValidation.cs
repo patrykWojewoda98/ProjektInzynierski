@@ -7,11 +7,12 @@ namespace ProjektIznynierski.Application.Commands.Currency.CreateCurrency
         public CreateCurrencyCommandValidation()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa waluty jest wymagana.")
-                .MaximumLength(100).WithMessage("Nazwa waluty nie może przekraczać 100 znaków.");
+                .NotEmpty().WithMessage("Currency name is required.")
+                .MaximumLength(100).WithMessage("Currency name cannot exceed 100 characters.");
 
             RuleFor(x => x.CurrencyRiskLevelId)
-                .GreaterThan(0).WithMessage("CurrencyRiskLevelId can't be 0 or less.");
+                .GreaterThan(0)
+                .WithMessage("Currency risk level identifier is required and must be greater than zero.");
         }
     }
 }

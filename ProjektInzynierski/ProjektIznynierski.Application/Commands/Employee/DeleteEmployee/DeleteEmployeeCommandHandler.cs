@@ -3,8 +3,7 @@ using ProjektIznynierski.Domain.Abstractions;
 
 namespace ProjektIznynierski.Application.Commands.Employee.DeleteEmployee
 {
-    internal class DeleteEmployeeCommandHandler
-        : IRequestHandler<DeleteEmployeeCommand, Unit>
+    internal class DeleteEmployeeCommandHandler: IRequestHandler<DeleteEmployeeCommand, Unit>
     {
         private readonly IEmployeeRepository _repository;
         private readonly IUnitOfWork _unitOfWork;

@@ -7,17 +7,13 @@ using System.Text;
 
 namespace ProjektIznynierski.Application.Commands.Employee.UpdateEmployee
 {
-    internal class UpdateEmployeeCommandHandler
-        : IRequestHandler<UpdateEmployeeCommand, EmployeeDto>
+    internal class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, EmployeeDto>
     {
         private readonly IEmployeeRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<UpdateEmployeeCommand> _validator;
 
-        public UpdateEmployeeCommandHandler(
-            IEmployeeRepository repository,
-            IUnitOfWork unitOfWork,
-            IValidator<UpdateEmployeeCommand> validator)
+        public UpdateEmployeeCommandHandler(IEmployeeRepository repository, IUnitOfWork unitOfWork, IValidator<UpdateEmployeeCommand> validator)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;

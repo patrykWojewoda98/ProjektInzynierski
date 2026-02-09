@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,10 +17,14 @@ import { ROUTES } from "../../routes";
 import ApiService from "../../services/api";
 import { confirmAction } from "../../utils/confirmAction";
 import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
+import { AuthContext } from "../_layout";
 
 const CommentModerationScreen = () => {
   const router = useRouter();
   const { itemWidth } = useResponsiveColumns();
+
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.isAdmin === true;
 
   const [comments, setComments] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
@@ -36,13 +40,18 @@ const CommentModerationScreen = () => {
 
   useEffect(() => {
     const loadInitial = async () => {
-      const [clientsData, instrumentsData] = await Promise.all([
-        ApiService.getAllClients(),
-        ApiService.getInvestInstruments(),
-      ]);
-      setClients(clientsData);
-      setInstruments(instrumentsData);
+      try {
+        const [clientsData, instrumentsData] = await Promise.all([
+          ApiService.getAllClients(),
+          ApiService.getInvestInstruments(),
+        ]);
+        setClients(clientsData);
+        setInstruments(instrumentsData);
+      } catch {
+        Alert.alert("Error", "Failed to load filters.");
+      }
     };
+
     loadInitial();
   }, []);
 
@@ -54,6 +63,7 @@ const CommentModerationScreen = () => {
     setLoading(true);
     try {
       let data: any[] = [];
+
       if (selectedClientId !== "all" && selectedInstrumentId !== "all") {
         const all = await ApiService.getAllComments();
         data = all.filter(
@@ -71,7 +81,10 @@ const CommentModerationScreen = () => {
       } else {
         data = await ApiService.getAllComments();
       }
+
       setComments(data);
+    } catch {
+      Alert.alert("Error", "Failed to load comments.");
     } finally {
       setLoading(false);
     }
@@ -84,13 +97,18 @@ const CommentModerationScreen = () => {
     instruments.find((i) => i.id === id)?.name ?? "Unknown instrument";
 
   const handleDeleteComment = (id: number) => {
+    if (!isAdmin) {
+      Alert.alert("Access denied", "Admin permissions required.");
+      return;
+    }
+
     confirmAction({
       title: "Confirm delete",
       message: "Delete this comment?",
       onConfirm: async () => {
         try {
           await ApiService.deleteComment(id);
-          setComments((p) => p.filter((c) => c.id !== id));
+          setComments((prev) => prev.filter((c) => c.id !== id));
         } catch {
           Alert.alert("Error", "Failed to delete comment.");
         }
@@ -108,10 +126,10 @@ const CommentModerationScreen = () => {
     <View style={[spacing.m2, { width: itemWidth }]}>
       <View style={globalStyles.card}>
         <Text style={globalStyles.label}>{label}</Text>
+
         <View
           style={[
             globalStyles.pickerWrapper,
-            globalStyles.pickerWebWrapper,
             {
               flexDirection: "row",
               alignItems: "center",
@@ -122,12 +140,8 @@ const CommentModerationScreen = () => {
         >
           <Picker
             selectedValue={value}
-            onValueChange={(v) => setValue(v)}
-            style={[
-              globalStyles.pickerText,
-              globalStyles.pickerWeb,
-              { flex: 1 },
-            ]}
+            onValueChange={setValue}
+            style={[globalStyles.pickerText, { flex: 1 }]}
             dropdownIconColor={COLORS.textGrey}
           >
             <Picker.Item label="Show all" value="all" />
@@ -195,29 +209,31 @@ const CommentModerationScreen = () => {
                 {new Date(c.dateTime).toLocaleString()}
               </Text>
 
-              <View
-                style={[
-                  globalStyles.row,
-                  spacing.mt3,
-                  { justifyContent: "center" },
-                ]}
-              >
-                <TouchableOpacity
-                  style={spacing.mr4}
-                  onPress={() =>
-                    router.push({
-                      pathname: ROUTES.EDIT_COMMENT,
-                      params: { id: c.id },
-                    })
-                  }
+              {isAdmin && (
+                <View
+                  style={[
+                    globalStyles.row,
+                    spacing.mt3,
+                    { justifyContent: "center" },
+                  ]}
                 >
-                  <Ionicons name="pencil" size={22} color={COLORS.primary} />
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={spacing.mr4}
+                    onPress={() =>
+                      router.push({
+                        pathname: ROUTES.EDIT_COMMENT,
+                        params: { id: c.id },
+                      })
+                    }
+                  >
+                    <Ionicons name="pencil" size={22} color={COLORS.primary} />
+                  </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => handleDeleteComment(c.id)}>
-                  <Ionicons name="trash" size={22} color={COLORS.error} />
-                </TouchableOpacity>
-              </View>
+                  <TouchableOpacity onPress={() => handleDeleteComment(c.id)}>
+                    <Ionicons name="trash" size={22} color={COLORS.error} />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))}
         </View>

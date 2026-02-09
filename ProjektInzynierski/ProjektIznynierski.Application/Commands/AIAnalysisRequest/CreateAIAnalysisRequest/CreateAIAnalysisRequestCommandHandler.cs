@@ -2,8 +2,6 @@ using MediatR;
 using ProjektInzynierski.Application.Interfaces;
 using ProjektIznynierski.Application.Dtos;
 using ProjektIznynierski.Domain.Abstractions;
-using ProjektIznynierski.Domain.Entities;
-using System.Text;
 using System.Text.Json;
 
 namespace ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnalysisRequest

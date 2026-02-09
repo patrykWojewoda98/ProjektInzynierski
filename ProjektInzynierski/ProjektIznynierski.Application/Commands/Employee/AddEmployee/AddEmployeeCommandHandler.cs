@@ -8,17 +8,13 @@ using System.Text;
 
 namespace ProjektIznynierski.Application.Commands.Employee.AddEmployee
 {
-    internal class AddEmployeeCommandHandler
-        : IRequestHandler<AddEmployeeCommand, EmployeeDto>
+    internal class AddEmployeeCommandHandler : IRequestHandler<AddEmployeeCommand, EmployeeDto>
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<AddEmployeeCommand> _validator;
 
-        public AddEmployeeCommandHandler(
-            IEmployeeRepository employeeRepository,
-            IUnitOfWork unitOfWork,
-            IValidator<AddEmployeeCommand> validator)
+        public AddEmployeeCommandHandler(IEmployeeRepository employeeRepository, IUnitOfWork unitOfWork, IValidator<AddEmployeeCommand> validator)
         {
             _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;

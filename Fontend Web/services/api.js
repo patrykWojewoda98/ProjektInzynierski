@@ -392,6 +392,8 @@ async getLatestCurrencyRate(currencyPairId: number) {
 },
 
 async createCurrencyRateHistory(dto: any) {
+  console.log("asdsad");
+  console.error("asdasdsa");
   try {
     const response = await axios.post(
       `${API_BASE_URL}/CurrencyRateHistory`,

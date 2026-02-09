@@ -35,7 +35,7 @@ export default function RootLayout() {
         setUser({
           id: decoded.id,
           name: decoded.name,
-          isAdmin: decoded.isAdmin,
+          isAdmin: String(decoded.isAdmin).toLowerCase() === "true",
         });
 
         // 🔥 redirect employee

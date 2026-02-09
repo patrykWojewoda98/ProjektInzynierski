@@ -17,13 +17,11 @@ import { employeeAuthGuard } from "../../utils/employeeAuthGuard";
 import { useResponsiveColumns } from "../../utils/useResponsiveColumns";
 
 const AddCurrencyRateHistoryScreen = () => {
-  const { currencyPairId } = useLocalSearchParams();
+  const { pairId } = useLocalSearchParams();
   const router = useRouter();
   const { itemWidth } = useResponsiveColumns();
 
-  const pairId = Number(
-    Array.isArray(currencyPairId) ? currencyPairId[0] : currencyPairId,
-  );
+  const parsedPairId = Number(Array.isArray(pairId) ? pairId[0] : pairId);
 
   const [openRate, setOpenRate] = useState("");
   const [highRate, setHighRate] = useState("");
@@ -47,7 +45,7 @@ const AddCurrencyRateHistoryScreen = () => {
   const parse = (v: string) => (v === "" ? null : Number(v));
 
   const handleSave = async () => {
-    if (!pairId) {
+    if (!parsedPairId || isNaN(parsedPairId)) {
       Alert.alert("Error", "Invalid currency pair.");
       return;
     }
@@ -56,6 +54,22 @@ const AddCurrencyRateHistoryScreen = () => {
     const h = parse(highRate);
     const l = parse(lowRate);
     const c = parse(closeRate);
+    console.log("PARSED VALUES", {
+      openRate,
+      highRate,
+      lowRate,
+      closeRate,
+      o,
+      h,
+      l,
+      c,
+      types: {
+        o: typeof o,
+        h: typeof h,
+        l: typeof l,
+        c: typeof c,
+      },
+    });
 
     if (c === null || c <= 0) {
       Alert.alert("Validation error", "Close rate must be greater than zero.");
@@ -78,7 +92,7 @@ const AddCurrencyRateHistoryScreen = () => {
 
     try {
       await ApiService.createCurrencyRateHistory({
-        currencyPairId: pairId,
+        currencyPairId: parsedPairId,
         date,
         closeRate: c,
         openRate: o,

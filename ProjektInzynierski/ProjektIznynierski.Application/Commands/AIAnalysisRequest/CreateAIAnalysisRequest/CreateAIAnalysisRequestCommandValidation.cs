@@ -2,8 +2,7 @@ using FluentValidation;
 
 namespace ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnalysisRequest
 {
-    public class CreateAIAnalysisRequestCommandValidation
-        : AbstractValidator<CreateAIAnalysisRequestCommand>
+    public class CreateAIAnalysisRequestCommandValidation : AbstractValidator<CreateAIAnalysisRequestCommand>
     {
         public CreateAIAnalysisRequestCommandValidation()
         {

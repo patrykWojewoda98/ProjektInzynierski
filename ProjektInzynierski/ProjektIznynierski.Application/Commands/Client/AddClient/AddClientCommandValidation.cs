@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+
 namespace ProjektIznynierski.Application.Commands.Client.AddClient
 {
     public class AddClientCommandValidation : AbstractValidator<AddClientCommand>
@@ -6,31 +7,33 @@ namespace ProjektIznynierski.Application.Commands.Client.AddClient
         public AddClientCommandValidation()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Imię i nazwisko klienta jest wymagane.")
-                .MaximumLength(150).WithMessage("Imię i nazwisko nie może przekraczać 150 znaków.");
+                .NotEmpty().WithMessage("Client full name is required.")
+                .MaximumLength(150).WithMessage("Client full name cannot exceed 150 characters.");
 
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Adres e-mail jest wymagany.")
-                .EmailAddress().WithMessage("Podano nieprawidłowy format adresu e-mail.")
-                .MaximumLength(255).WithMessage("Adres e-mail nie może przekraczać 255 znaków.");
+                .NotEmpty().WithMessage("Email address is required.")
+                .EmailAddress().WithMessage("Invalid email address format.")
+                .MaximumLength(255).WithMessage("Email address cannot exceed 255 characters.");
 
             RuleFor(x => x.City)
                 .MaximumLength(150)
-                .WithMessage("Nazwa miasta nie może przekraczać 150 znaków.");
+                .WithMessage("City name cannot exceed 150 characters.");
 
             RuleFor(x => x.Address)
                 .MaximumLength(255)
-                .WithMessage("Adres nie może przekraczać 255 znaków.");
+                .WithMessage("Address cannot exceed 255 characters.");
 
             RuleFor(x => x.PostalCode)
                 .MaximumLength(20)
-                .WithMessage("Kod pocztowy nie może przekraczać 20 znaków.");
+                .WithMessage("Postal code cannot exceed 20 characters.");
 
             RuleFor(x => x.CountryId)
-                .GreaterThan(0).WithMessage("Identyfikator kraju jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Country identifier is required and must be greater than zero.");
 
             RuleFor(x => x.Password)
-                .MinimumLength(6).WithMessage("Hasło musi mieć co najmniej 6 znaków.");
+                .MinimumLength(6)
+                .WithMessage("Password must be at least 6 characters long.");
         }
     }
 }

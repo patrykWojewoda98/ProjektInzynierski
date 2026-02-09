@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -16,10 +16,14 @@ import { ROUTES } from "../../../routes";
 import ApiService from "../../../services/api";
 import { employeeAuthGuard } from "../../../utils/employeeAuthGuard";
 import { useResponsiveColumns } from "../../../utils/useResponsiveColumns";
+import { AuthContext } from "../../_layout";
 
 const EmployeeListScreen = () => {
   const router = useRouter();
   const { itemWidth } = useResponsiveColumns(4);
+
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.isAdmin === true;
 
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +32,8 @@ const EmployeeListScreen = () => {
   useEffect(() => {
     const check = async () => {
       const ok = await employeeAuthGuard();
-      if (ok) setIsReady(true);
+      setIsReady(!!ok);
+      if (!ok) setLoading(false);
     };
     check();
   }, []);
@@ -43,6 +48,11 @@ const EmployeeListScreen = () => {
   }, [isReady]);
 
   const handleDelete = (id: number) => {
+    if (!isAdmin) {
+      Alert.alert("Access denied", "Admin permissions required.");
+      return;
+    }
+
     Alert.alert("Confirm delete", "Delete this employee?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -51,7 +61,7 @@ const EmployeeListScreen = () => {
         onPress: async () => {
           try {
             await ApiService.deleteEmployee(id);
-            setEmployees((p) => p.filter((e) => e.id !== id));
+            setEmployees((prev) => prev.filter((e) => e.id !== id));
           } catch {
             Alert.alert("Error", "Failed to delete employee.");
           }
@@ -68,12 +78,14 @@ const EmployeeListScreen = () => {
     <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
       <Text style={[globalStyles.header, spacing.mb4]}>Employees</Text>
 
-      <TouchableOpacity
-        style={[globalStyles.button, spacing.mb4]}
-        onPress={() => router.push(ROUTES.ADD_EMPLOYEE)}
-      >
-        <Text style={globalStyles.buttonText}>Add new employee</Text>
-      </TouchableOpacity>
+      {isAdmin && (
+        <TouchableOpacity
+          style={[globalStyles.button, spacing.mb4]}
+          onPress={() => router.push(ROUTES.ADD_EMPLOYEE)}
+        >
+          <Text style={globalStyles.buttonText}>Add new employee</Text>
+        </TouchableOpacity>
+      )}
 
       <View
         style={[
@@ -93,23 +105,29 @@ const EmployeeListScreen = () => {
                   </Text>
                 </View>
 
-                <View style={globalStyles.row}>
-                  <TouchableOpacity
-                    style={spacing.mr3}
-                    onPress={() =>
-                      router.push({
-                        pathname: ROUTES.EDIT_EMPLOYEE,
-                        params: { id: e.id },
-                      })
-                    }
-                  >
-                    <Ionicons name="pencil" size={22} color={COLORS.primary} />
-                  </TouchableOpacity>
+                {isAdmin && (
+                  <View style={globalStyles.row}>
+                    <TouchableOpacity
+                      style={spacing.mr3}
+                      onPress={() =>
+                        router.push({
+                          pathname: ROUTES.EDIT_EMPLOYEE,
+                          params: { id: e.id },
+                        })
+                      }
+                    >
+                      <Ionicons
+                        name="pencil"
+                        size={22}
+                        color={COLORS.primary}
+                      />
+                    </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => handleDelete(e.id)}>
-                    <Ionicons name="trash" size={22} color={COLORS.error} />
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity onPress={() => handleDelete(e.id)}>
+                      <Ionicons name="trash" size={22} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </View>
           </View>

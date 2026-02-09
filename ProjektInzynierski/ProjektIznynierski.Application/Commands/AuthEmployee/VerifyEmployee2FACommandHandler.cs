@@ -16,7 +16,7 @@ namespace ProjektIznynierski.Application.Commands.AuthEmployee
             _employeeRepository = employeeRepository;
             _jwtTokenService = jwtTokenService;
         }
-
+        
         public async Task<VerifyEmployee2FADto> Handle(VerifyEmployee2FACommand request,CancellationToken cancellationToken)
         {
             var employee = await _employeeRepository.GetByIdAsync(request.EmployeeId, cancellationToken) ?? throw new Exception("Employee not found");

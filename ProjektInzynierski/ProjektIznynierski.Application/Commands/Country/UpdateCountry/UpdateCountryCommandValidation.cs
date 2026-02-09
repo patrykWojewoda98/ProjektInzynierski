@@ -7,24 +7,28 @@ namespace ProjektIznynierski.Application.Commands.Country.UpdateCountry
         public UpdateCountryCommandValidation()
         {
             RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("Identyfikator kraju jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Country identifier is required and must be greater than zero.");
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa kraju jest wymagana.")
-                .MaximumLength(150).WithMessage("Nazwa kraju nie może przekraczać 150 znaków.");
+                .NotEmpty().WithMessage("Country name is required.")
+                .MaximumLength(150).WithMessage("Country name cannot exceed 150 characters.");
 
             RuleFor(x => x.IsoCode)
-                .NotEmpty().WithMessage("Kod ISO jest wymagany.")
-                .Length(2, 3).WithMessage("Kod ISO musi mieć długość 2-3 znaki.");
+                .NotEmpty().WithMessage("ISO code is required.")
+                .Length(2, 3).WithMessage("ISO code must be 2–3 characters long.");
 
             RuleFor(x => x.RegionId)
-                .GreaterThan(0).WithMessage("Identyfikator regionu jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Region identifier is required and must be greater than zero.");
 
             RuleFor(x => x.CurrencyId)
-                .GreaterThan(0).WithMessage("Identyfikator waluty jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Currency identifier is required and must be greater than zero.");
 
             RuleFor(x => x.CountryRiskLevelId)
-                .GreaterThan(0).WithMessage("CountryRiskLevelId can't be 0 or less.");
+                .GreaterThan(0)
+                .WithMessage("Country risk level identifier is required and must be greater than zero.");
         }
     }
 }
