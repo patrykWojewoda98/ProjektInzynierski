@@ -4,8 +4,7 @@ using ProjektIznynierski.Domain.Abstractions;
 
 namespace ProjektIznynierski.Application.Queries.Comment.GetCommentsByInvestInstrumentId
 {
-    internal class GetCommentsByInvestInstrumentIdQueryHandler
-        : IRequestHandler<GetCommentsByInvestInstrumentIdQuery, List<CommentDto>>
+    internal class GetCommentsByInvestInstrumentIdQueryHandler : IRequestHandler<GetCommentsByInvestInstrumentIdQuery, List<CommentDto>>
     {
         private readonly ICommentRepository _commentRepository;
 

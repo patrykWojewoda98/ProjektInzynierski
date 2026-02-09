@@ -6,8 +6,7 @@ using System.Xml.Linq;
 
 namespace ProjektIznynierski.Application.Queries.Comment.GetAllComments
 {
-    public class GetAllCommentsQueryHandler
-        : IRequestHandler<GetAllCommentsQuery, List<CommentDto>>
+    public class GetAllCommentsQueryHandler: IRequestHandler<GetAllCommentsQuery, List<CommentDto>>
     {
         private readonly ICommentRepository _commentRepository;
 

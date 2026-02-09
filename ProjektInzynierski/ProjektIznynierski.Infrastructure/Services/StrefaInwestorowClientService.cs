@@ -11,7 +11,6 @@ namespace ProjektIznynierski.Application.Services.Sources
     {
         public async Task<List<FinancialReportSnapshot>> GetFinancialReportsAsync(string isin, CancellationToken ct)
         {
-            //LOAD FINANCIAL TABLE
             var url = $"https://strefainwestorow.pl/notowania/spolki/{isin}/wyniki-finansowe";
             var htmlDoc = new HtmlWeb().Load(url);
 
@@ -24,7 +23,6 @@ namespace ProjektIznynierski.Application.Services.Sources
                 })
                 .ToList();
 
-            //ROW → PROPERTY MAP
             var rowMap = new Dictionary<string, Action<FinancialReportSnapshot, decimal?>>
             {
                 ["Przychody ze sprzedaży"] = (s, v) => s.Revenue = v,
@@ -36,7 +34,6 @@ namespace ProjektIznynierski.Application.Services.Sources
             };
 
 
-            //PARSE TABLE BODY
             var rows = htmlDoc.QuerySelectorAll("table tbody tr");
 
             foreach (var row in rows)
@@ -57,7 +54,6 @@ namespace ProjektIznynierski.Application.Services.Sources
                 }
             }
 
-            //LOAD TOTAL SHARES
             url = $"https://strefainwestorow.pl/notowania/spolki/{isin}/akcjonariat";
             htmlDoc = new HtmlWeb().Load(url);
 
@@ -71,9 +67,6 @@ namespace ProjektIznynierski.Application.Services.Sources
 
             var totalShares = ParseToLong(valueNode?.InnerText);
 
-            Debug.WriteLine($"TOTAL SHARES: {totalShares}");
-
-            //CALCULATE EPS
 
             if (totalShares.HasValue && totalShares.Value > 0)
             {
@@ -86,12 +79,10 @@ namespace ProjektIznynierski.Application.Services.Sources
                 }
             }
 
-            ShowAllSnapshotsData(snapshots);
 
             return snapshots;
         }
 
-        //HELPERS
         private static decimal? ParseToDecimal(string? text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -131,28 +122,7 @@ namespace ProjektIznynierski.Application.Services.Sources
                 : null;
         }
 
-        private static void ShowAllSnapshotsData(IEnumerable<FinancialReportSnapshot> snapshots)
-        {
-            Debug.WriteLine("========== FINANCIAL REPORT SNAPSHOTS ==========");
-
-            foreach (var s in snapshots)
-            {
-                Debug.WriteLine("-----------------------------------------------");
-                Debug.WriteLine($"Period: {s.Period}");
-
-                Debug.WriteLine($"Revenue: {s.Revenue}");
-                Debug.WriteLine($"NetIncome: {s.NetIncome}");
-                Debug.WriteLine($"EPS: {s.EPS}");
-
-                Debug.WriteLine($"Assets: {s.Assets}");
-                Debug.WriteLine($"Liabilities: {s.Liabilities}");
-
-                Debug.WriteLine($"OperatingCashFlow: {s.OperatingCashFlow}");
-                Debug.WriteLine($"FreeCashFlow: {s.FreeCashFlow}");
-            }
-
-            Debug.WriteLine("===============================================");
-        }
+       
 
         public async Task<FinancialIndicatorsSnapshot> GetFinancialIndicatorsAsync(string isin,CancellationToken ct)
         {
@@ -200,14 +170,6 @@ namespace ProjektIznynierski.Application.Services.Sources
             {
                 indicators.DividendYield = latestDividendYield;
             }
-
-            Debug.WriteLine("==== FINANCIAL Metric ====");
-            Debug.WriteLine($"PE: {indicators.PE}");
-            Debug.WriteLine($"PB: {indicators.PB}");
-            Debug.WriteLine($"ROE: {indicators.ROE}");
-            Debug.WriteLine($"DebtToEquity: {indicators.DebtToEquity}");
-            Debug.WriteLine($"DividendYield: {indicators.DividendYield}");
-
             return indicators;
         }
 
