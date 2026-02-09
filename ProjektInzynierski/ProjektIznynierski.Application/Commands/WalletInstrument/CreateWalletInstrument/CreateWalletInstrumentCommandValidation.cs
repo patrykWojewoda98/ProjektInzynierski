@@ -7,13 +7,16 @@ namespace ProjektIznynierski.Application.Commands.WalletInstrument.CreateWalletI
         public CreateWalletInstrumentCommandValidation()
         {
             RuleFor(x => x.WalletId)
-                .GreaterThan(0).WithMessage("Identyfikator portfela jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Wallet identifier is required and must be greater than zero.");
 
             RuleFor(x => x.InvestInstrumentId)
-                .GreaterThan(0).WithMessage("Identyfikator instrumentu jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Investment instrument identifier is required and must be greater than zero.");
 
             RuleFor(x => x.Quantity)
-                .GreaterThan(0).WithMessage("Ilość musi być większa od zera.");
+                .GreaterThan(0)
+                .WithMessage("Quantity must be greater than zero.");
         }
     }
 }

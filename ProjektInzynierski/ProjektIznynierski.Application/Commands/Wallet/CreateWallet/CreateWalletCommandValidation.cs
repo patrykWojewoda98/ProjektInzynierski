@@ -7,13 +7,17 @@ namespace ProjektIznynierski.Application.Commands.Wallet.CreateWallet
         public CreateWalletCommandValidation()
         {
             RuleFor(x => x.ClientId)
-                .GreaterThan(0).When(x => x.ClientId.HasValue).WithMessage("Identyfikator klienta musi być większy od zera.");
+                .GreaterThan(0)
+                .When(x => x.ClientId.HasValue)
+                .WithMessage("Client identifier must be greater than zero.");
 
             RuleFor(x => x.CashBalance)
-                .GreaterThanOrEqualTo(0).WithMessage("Saldo gotówkowe nie może być ujemne.");
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Cash balance cannot be negative.");
 
             RuleFor(x => x.CurrencyId)
-                .GreaterThan(0).WithMessage("Identyfikator waluty jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Currency identifier is required and must be greater than zero.");
         }
     }
 }

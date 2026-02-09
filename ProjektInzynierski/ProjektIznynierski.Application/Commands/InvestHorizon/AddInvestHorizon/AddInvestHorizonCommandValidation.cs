@@ -1,4 +1,5 @@
 using FluentValidation;
+
 namespace ProjektIznynierski.Application.Commands.InvestHorizon.AddInvestHorizon
 {
     public class AddInvestHorizonCommandValidation : AbstractValidator<AddInvestHorizonCommand>
@@ -6,8 +7,10 @@ namespace ProjektIznynierski.Application.Commands.InvestHorizon.AddInvestHorizon
         public AddInvestHorizonCommandValidation()
         {
             RuleFor(x => x.Horizon)
-                .NotEmpty().WithMessage("Horyzont inwestycyjny jest wymagany.")
-                .MaximumLength(255).WithMessage("Horyzont inwestycyjny nie może przekraczać 255 znaków.");
+                .NotEmpty()
+                .WithMessage("Investment horizon is required.")
+                .MaximumLength(255)
+                .WithMessage("Investment horizon cannot exceed 255 characters.");
         }
     }
 }

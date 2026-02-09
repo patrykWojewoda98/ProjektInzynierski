@@ -7,36 +7,51 @@ namespace ProjektIznynierski.Application.Commands.InvestInstrument.CreateInvestI
         public CreateInvestInstrumentCommandValidation()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa instrumentu jest wymagana.")
-                .MaximumLength(200).WithMessage("Nazwa instrumentu nie może przekraczać 200 znaków.");
+                .NotEmpty()
+                .WithMessage("Investment instrument name is required.")
+                .MaximumLength(200)
+                .WithMessage("Investment instrument name cannot exceed 200 characters.");
 
             RuleFor(x => x.Ticker)
-                .NotEmpty().WithMessage("Ticker jest wymagany.")
-                .MaximumLength(20).WithMessage("Ticker nie może przekraczać 20 znaków.");
+                .NotEmpty()
+                .WithMessage("Ticker is required.")
+                .MaximumLength(20)
+                .WithMessage("Ticker cannot exceed 20 characters.");
 
             RuleFor(x => x.InvestmentTypeId)
-                .InclusiveBetween(0, 10).WithMessage("InvestmentTypeId can't be 0 or less");
+                .InclusiveBetween(1, 10)
+                .WithMessage("Investment type identifier must be between 1 and 10.");
 
             RuleFor(x => x.Description)
-                .MaximumLength(1000).WithMessage("Opis nie może przekraczać 1000 znaków.");
+                .MaximumLength(1000)
+                .WithMessage("Description cannot exceed 1000 characters.");
 
             RuleFor(x => x.SectorId)
-                .GreaterThan(0).WithMessage("Identyfikator sektora jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Sector identifier is required and must be greater than zero.");
 
             RuleFor(x => x.RegionId)
-                .GreaterThan(0).WithMessage("Identyfikator regionu jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Region identifier is required and must be greater than zero.");
 
             RuleFor(x => x.CountryId)
-                .GreaterThan(0).WithMessage("Identyfikator kraju jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Country identifier is required and must be greater than zero.");
 
             RuleFor(x => x.CurrencyId)
-                .GreaterThan(0).WithMessage("Identyfikator waluty jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Currency identifier is required and must be greater than zero.");
 
             RuleFor(x => x.FinancialMetricId)
-                .GreaterThan(0).When(x => x.FinancialMetricId.HasValue).WithMessage("Identyfikator metryki finansowej musi być większy od zera.");
+                .GreaterThan(0)
+                .When(x => x.FinancialMetricId.HasValue)
+                .WithMessage("Financial metric identifier must be greater than zero.");
+
             RuleFor(x => x.Isin)
-                .NotEmpty().WithMessage("ISIN jest wymagany.")
-                .Length(12).WithMessage("ISIN musi mieć dokładnie 12 znaków.");
+                .NotEmpty()
+                .WithMessage("ISIN is required.")
+                .Length(12)
+                .WithMessage("ISIN must be exactly 12 characters long.");
         }
     }
 }

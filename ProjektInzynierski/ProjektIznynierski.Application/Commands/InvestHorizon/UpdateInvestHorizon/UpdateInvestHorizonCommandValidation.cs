@@ -1,4 +1,5 @@
 using FluentValidation;
+
 namespace ProjektIznynierski.Application.Commands.InvestHorizon.UpdateInvestHorizon
 {
     public class UpdateInvestHorizonCommandValidation : AbstractValidator<UpdateInvestHorizonCommand>
@@ -6,11 +7,14 @@ namespace ProjektIznynierski.Application.Commands.InvestHorizon.UpdateInvestHori
         public UpdateInvestHorizonCommandValidation()
         {
             RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("Identyfikator horyzontu inwestycyjnego jest wymagany i musi być większy od zera.");
-                
+                .GreaterThan(0)
+                .WithMessage("Investment horizon identifier is required and must be greater than zero.");
+
             RuleFor(x => x.Horizon)
-                .NotEmpty().WithMessage("Horyzont inwestycyjny jest wymagany.")
-                .MaximumLength(255).WithMessage("Horyzont inwestycyjny nie może przekraczać 255 znaków.");
+                .NotEmpty()
+                .WithMessage("Investment horizon is required.")
+                .MaximumLength(255)
+                .WithMessage("Investment horizon cannot exceed 255 characters.");
         }
     }
 }

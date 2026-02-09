@@ -5,26 +5,20 @@ using ProjektIznynierski.Domain.Abstractions;
 
 namespace ProjektIznynierski.Application.Commands.InvestHorizon.UpdateInvestHorizon
 {
-    internal class UpdateInvestHorizonCommandHandler
-        : IRequestHandler<UpdateInvestHorizonCommand, InvestHorizonDto>
+    internal class UpdateInvestHorizonCommandHandler : IRequestHandler<UpdateInvestHorizonCommand, InvestHorizonDto>
     {
         private readonly IInvestHorizonRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<UpdateInvestHorizonCommand> _validator;
 
-        public UpdateInvestHorizonCommandHandler(
-            IInvestHorizonRepository repository,
-            IUnitOfWork unitOfWork,
-            IValidator<UpdateInvestHorizonCommand> validator)
+        public UpdateInvestHorizonCommandHandler(IInvestHorizonRepository repository, IUnitOfWork unitOfWork, IValidator<UpdateInvestHorizonCommand> validator)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _validator = validator;
         }
 
-        public async Task<InvestHorizonDto> Handle(
-            UpdateInvestHorizonCommand request,
-            CancellationToken cancellationToken)
+        public async Task<InvestHorizonDto> Handle(UpdateInvestHorizonCommand request, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)

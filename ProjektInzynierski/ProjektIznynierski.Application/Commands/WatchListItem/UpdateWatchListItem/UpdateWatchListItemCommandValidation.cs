@@ -7,16 +7,17 @@ namespace ProjektIznynierski.Application.Commands.WatchListItem.UpdateWatchListI
         public UpdateWatchListItemCommandValidation()
         {
             RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("Identyfikator pozycji listy obserwacyjnej jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Watch list item identifier is required and must be greater than zero.");
 
             RuleFor(x => x.WatchListId)
-                .GreaterThan(0).WithMessage("Identyfikator listy obserwacyjnej jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Watch list identifier is required and must be greater than zero.");
 
             RuleFor(x => x.InvestInstrumentId)
-                .GreaterThan(0).WithMessage("Identyfikator instrumentu jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Investment instrument identifier is required and must be greater than zero.");
 
-            RuleFor(x => x.AddedAt)
-                .NotEmpty().WithMessage("Data dodania jest wymagana.");
         }
     }
 }

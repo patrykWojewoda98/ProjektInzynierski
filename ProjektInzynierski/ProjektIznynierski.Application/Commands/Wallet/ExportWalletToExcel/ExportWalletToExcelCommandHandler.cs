@@ -26,19 +26,16 @@ namespace ProjektIznynierski.Application.Commands.Wallet.ExportWalletToExcel
             ExportWalletToExcelCommand request,
             CancellationToken cancellationToken)
         {
-            // 1️⃣ Pobierz summary (SPRAWDZONA LOGIKA)
             var summary = await _mediator.Send(
                 new GetWalletInvestmentSummaryQuery(request.WalletId),
                 cancellationToken);
 
-            // 2️⃣ Pobierz wallet (cash + waluta)
             var wallet = await _walletRepository
                 .GetByIdWithCurrencyAsync(request.WalletId);
 
             if (wallet == null)
                 throw new Exception("Wallet not found");
 
-            // 3️⃣ Zbuduj snapshot
             var snapshot = new WalletSnapshot
             {
                 WalletId = wallet.Id,
@@ -60,7 +57,6 @@ namespace ProjektIznynierski.Application.Commands.Wallet.ExportWalletToExcel
                     }).ToList()
             };
 
-            // 4️⃣ Excel
             return _xlsxService.GenerateWalletExcel(snapshot);
         }
     }

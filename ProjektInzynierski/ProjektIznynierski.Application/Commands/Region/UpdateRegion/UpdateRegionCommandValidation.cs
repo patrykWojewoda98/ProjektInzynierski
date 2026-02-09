@@ -7,17 +7,22 @@ namespace ProjektIznynierski.Application.Commands.Region.UpdateRegion
         public UpdateRegionCommandValidation()
         {
             RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("Identyfikator regionu jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Region identifier is required and must be greater than zero.");
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa regionu jest wymagana.")
-                .MaximumLength(150).WithMessage("Nazwa regionu nie może przekraczać 150 znaków.");
+                .NotEmpty()
+                .WithMessage("Region name is required.")
+                .MaximumLength(150)
+                .WithMessage("Region name cannot exceed 150 characters.");
 
             RuleFor(x => x.RegionCodeId)
-                .InclusiveBetween(0, 10).WithMessage("RegionCodeId can't be 0 or less");
+                .InclusiveBetween(1, 10)
+                .WithMessage("Region code identifier must be between 1 and 10.");
 
             RuleFor(x => x.RegionRiskLevelId)
-                .GreaterThan(0).WithMessage("RegionRiskLevelId can't be 0 or less.");
+                .GreaterThan(0)
+                .WithMessage("Region risk level identifier must be greater than zero.");
         }
     }
 }

@@ -7,10 +7,12 @@ namespace ProjektIznynierski.Application.Commands.WatchList.CreateWatchList
         public CreateWatchListCommandValidation()
         {
             RuleFor(x => x.ClientId)
-                .GreaterThan(0).WithMessage("Identyfikator klienta jest wymagany i musi być większy od zera.");
+                .GreaterThan(0)
+                .WithMessage("Client identifier is required and must be greater than zero.");
 
             RuleFor(x => x.CreatedAt)
-                .NotEmpty().WithMessage("Data utworzenia jest wymagana.");
+                .NotEmpty()
+                .WithMessage("Creation date is required.");
         }
     }
 }

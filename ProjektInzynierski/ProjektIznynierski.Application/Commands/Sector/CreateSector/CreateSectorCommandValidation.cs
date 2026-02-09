@@ -7,15 +7,21 @@ namespace ProjektIznynierski.Application.Commands.Sector.CreateSector
         public CreateSectorCommandValidation()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Nazwa sektora jest wymagana.")
-                .MaximumLength(150).WithMessage("Nazwa sektora nie może przekraczać 150 znaków.");
+                .NotEmpty()
+                .WithMessage("Sector name is required.")
+                .MaximumLength(150)
+                .WithMessage("Sector name cannot exceed 150 characters.");
 
             RuleFor(x => x.Code)
-                .NotEmpty().WithMessage("Kod sektora jest wymagany.")
-                .MaximumLength(50).WithMessage("Kod sektora nie może przekraczać 50 znaków.");
+                .NotEmpty()
+                .WithMessage("Sector code is required.")
+                .MaximumLength(50)
+                .WithMessage("Sector code cannot exceed 50 characters.");
 
             RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Opis nie może przekraczać 500 znaków.");
+                .MaximumLength(500)
+                .WithMessage("Description cannot exceed 500 characters.");
         }
     }
 }
+`
