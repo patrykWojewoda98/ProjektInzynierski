@@ -50,6 +50,8 @@ namespace ProjektIznynierski.Application.Services.Sources
                 for (int i = 1; i < cells.Count && i <= snapshots.Count; i++)
                 {
                     var value = ParseToDecimal(cells[i].InnerText);
+                    if (value.HasValue)
+                        value *= 1000;   
                     setter(snapshots[i - 1], value);
                 }
             }
@@ -118,7 +120,7 @@ namespace ProjektIznynierski.Application.Services.Sources
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
                 out var value)
-                ? value *1000
+                ? value 
                 : null;
         }
 

@@ -3,6 +3,7 @@ using ProjektIznynierski.Application;
 using ProjektIznynierski.Presentation;
 using DotNetEnv;
 using QuestPDF.Infrastructure;
+using ProjektIznynierski.Application.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 app.UseCors("AllowAllOrigins");
+app.UseMiddleware<ValidationExceptionMiddleware>();
 app.UsePresentation();
 
 

@@ -24,4 +24,4 @@ namespace ProjektIznynierski.Application.Commands.Sector.CreateSector
         }
     }
 }
-`
+

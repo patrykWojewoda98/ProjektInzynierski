@@ -26,6 +26,7 @@ const EditWalletScreen = () => {
   const [walletId, setWalletId] = useState<number | null>(null);
   const [cash, setCash] = useState(0);
   const [currency, setCurrency] = useState("");
+  const [currencyId, setCurrencyId] = useState<number | null>(null);
 
   const [investments, setInvestments] = useState<any[]>([]);
   const [instrumentMap, setInstrumentMap] = useState<Record<number, string>>(
@@ -47,6 +48,7 @@ const EditWalletScreen = () => {
         const summary = await ApiService.getWalletInvestmentSummary(wallet.id);
         setCash(summary.cashBalance);
         setCurrency(summary.accountCurrency);
+        setCurrencyId(wallet.currencyId);
 
         // WALLET INSTRUMENTS
         const walletInstruments =
@@ -73,13 +75,20 @@ const EditWalletScreen = () => {
   }, [user]);
 
   const handleUpdateCash = async () => {
-    if (!walletId) return;
+    if (walletId === null || currencyId === null || !user?.id) return;
 
     setSavingCash(true);
+
     try {
-      await ApiService.updateWallet(walletId, { cashBalance: cash });
+      await ApiService.updateWallet(walletId, {
+        clientId: user.id,
+        cashBalance: cash,
+        currencyId: currencyId,
+      });
+
       Alert.alert("Success", "Cash balance updated");
-    } catch {
+    } catch (err) {
+      console.error(err);
       Alert.alert("Error", "Failed to update cash");
     } finally {
       setSavingCash(false);
@@ -121,6 +130,8 @@ const EditWalletScreen = () => {
       {/* CASH */}
       <View style={[globalStyles.card, spacing.mb3, globalStyles.fullWidth]}>
         <Text style={globalStyles.cardTitle}>Cash</Text>
+        <Text style={globalStyles.cardTitle}>{currency}</Text>
+        <Text style={globalStyles.cardTitle}>Id waluty:{currencyId}</Text>
 
         <View style={[globalStyles.row, spacing.mt2]}>
           <TextInput

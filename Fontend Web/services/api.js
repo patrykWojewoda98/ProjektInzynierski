@@ -1,1258 +1,667 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import Constants from "expo-constants";
-import { Platform } from "react-native";
-
-const getApiBaseUrl = () => {
-  if (Platform.OS === "web") {
-    return "http://localhost:5036/api";
-  }
-
-  if (Platform.OS === "android") {
-    return "http://10.0.2.2:5036/api";
-  }
-
-  const host = Constants.expoConfig?.hostUri?.split(":")[0];
-
-  if (!host) {
-    return "http://localhost:5036/api";
-  }
-
-  return `http://${host}:5036/api`;
-};
-
-const API_BASE_URL = getApiBaseUrl();
+import api from "./apiClient";
 
 const ApiService = {
-  // Authentication endpoints
+  // =========================
+  // AUTHENTICATION
+  // =========================
+
   async login(data) {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    const response = await api.post("/auth/login", data);
 
-    if (!response.ok) {
-      throw new Error("Invalid credentials");
+    if (response.data?.token) {
+      await AsyncStorage.setItem("userToken", response.data.token);
     }
 
-    const json = await response.json();
-
-    // Zapis tokenu do AsyncStorage
-    if (json?.token) {
-      await AsyncStorage.setItem("userToken", json.token);
-    }
-
-    return json;
+    return response.data;
   },
 
   async loginEmployee(data) {
-    const response = await fetch(`${API_BASE_URL}/auth/login-employee`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    const json = await response.json();
-
-    if (!response.ok) {
-      throw new Error(json?.message || "Login failed");
-    }
-    return json;
+    const response = await api.post("/auth/login-employee", data);
+    return response.data;
   },
 
   async verifyEmployee2FA(data) {
-    const response = await fetch(`${API_BASE_URL}/auth/verify-employee-2fa`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+    const response = await api.post("/auth/verify-employee-2fa", data);
+
+    if (response.data?.token) {
+      await AsyncStorage.setItem("employeeToken", response.data.token);
+    }
+
+    return response.data;
+  },
+
+  // =========================
+  // AI REQUESTS
+  // =========================
+
+  async createAnalysisRequest(investInstrumentId, clientId) {
+    const response = await api.post("/AIAnalysisRequest", {
+      investInstrumentId,
+      clientId,
     });
 
-    const json = await response.json();
-
-    if (!response.ok) {
-      throw new Error(json?.message || "Invalid verification code");
-    }
-
-    if (json?.token) {
-      await AsyncStorage.setItem("employeeToken", json.token);
-    }
-
-    return json;
+    return response.data;
   },
 
-  //AI Requests endpoints
-  async createAnalysisRequest(investInstrumentId, clientId) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/AIAnalysisRequest`, {
-        investInstrumentId,
-        clientId,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error creating analysis request:", error);
-      throw ["An error occurred while creating the analysis request."];
-    }
-  },
   async getAnalysisRequestsByClientId(clientId) {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/AIAnalysisRequest/my-requests/${clientId}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching analysis requests:", error);
-      throw ["An error occurred while fetching analysis requests."];
-    }
+    const response = await api.get(
+      `/AIAnalysisRequest/my-requests/${clientId}`,
+    );
+
+    return response.data;
   },
+
   async deleteAIAnalysisRequest(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/AIAnalysisRequest/${id}`);
-    } catch (error) {
-      console.error("Error deleting analysis request:", error);
-      throw ["An error occurred while deleting the analysis request."];
-    }
+    await api.delete(`/AIAnalysisRequest/${id}`);
   },
 
-  //AI Analysis Result endpoints
+  // =========================
+  // AI ANALYSIS RESULT
+  // =========================
+
   async getAIAnalysisResultById(id) {
-    const res = await axios.get(`${API_BASE_URL}/AIAnalysisResult/${id}`);
-    return res.data;
+    const response = await api.get(`/AIAnalysisResult/${id}`);
+    return response.data;
   },
-
-
 
   // Client endpoints
-  async registerClient(clientData) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/Client`, clientData);
-    return response.data;
-  } catch (error) {
-    if (error.response?.data?.errors) {
-      throw error.response.data.errors;
-    }
-    console.error("Registration error:", error);
-    throw ["An error occurred during registration. Please try again."];
-  }
-},
 
-async getAllClients() {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/Client`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching clients:", error);
-    throw ["Failed to load clients."];
-  }
-},
-
-async getClientById(id) {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/Client/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching client:", error);
-    throw ["Failed to load client."];
-  }
-},
-
-async updateClient(id, dto) {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/Client/${id}`, {
-      id,
-      ...dto,
-    });
-    return response.data;
-  } catch (error) {
-    if (error.response?.data?.errors) {
-      throw error.response.data.errors;
-    }
-    console.error("Error updating client:", error);
-    throw ["Failed to update client."];
-  }
-},
-
-async deleteClient(id) {
-  try {
-    await axios.delete(`${API_BASE_URL}/Client/${id}`);
-  } catch (error) {
-    console.error("Error deleting client:", error);
-    throw ["Failed to delete client."];
-  }
-},
-
-  //Country endpoints
-  async getAllCountries() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Country`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching countries:", error);
-      throw ["Failed to load countries."];
-    }
+  registerClient(clientData) {
+    return api.post("/Client", clientData).then((r) => r.data);
   },
 
-  async getCountryById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Country/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching country:", error);
-      throw ["Failed to load country."];
-    }
-  },
-  async getCountriesByRegion(regionId) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Country/region/${regionId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching countries by region:", error);
-      throw ["Failed to load countries for the selected region."];
-    }
+  getAllClients() {
+    return api.get("/Client").then((r) => r.data);
   },
 
-  async createCountry(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Country`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating country:", error);
-      throw ["Failed to create country."];
-    }
+  getClientById(id) {
+    return api.get(`/Client/${id}`).then((r) => r.data);
   },
 
-  async updateCountry(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/Country/${id}`, {
-        id,
-        ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating country:", error);
-      throw ["Failed to update country."];
-    }
+  updateClient(id, dto) {
+    return api.put(`/Client/${id}`, { id, ...dto }).then((r) => r.data);
   },
 
-  async deleteCountry(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/Country/${id}`);
-    } catch (error) {
-      console.error("Error deleting country:", error);
-      throw ["Failed to delete country."];
-    }
+  deleteClient(id) {
+    return api.delete(`/Client/${id}`);
+  },
+
+  // Country endpoints
+
+  getAllCountries() {
+    return api.get("/Country").then((r) => r.data);
+  },
+
+  getCountryById(id) {
+    return api.get(`/Country/${id}`).then((r) => r.data);
+  },
+
+  getCountriesByRegion(regionId) {
+    return api.get(`/Country/region/${regionId}`).then((r) => r.data);
+  },
+
+  createCountry(dto) {
+    return api.post("/Country", dto).then((r) => r.data);
+  },
+
+  updateCountry(id, dto) {
+    return api.put(`/Country/${id}`, { id, ...dto }).then((r) => r.data);
+  },
+
+  deleteCountry(id) {
+    return api.delete(`/Country/${id}`);
   },
 
   // Comment endpoints
-async getAllComments() {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/Comment`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    throw ["Failed to load comments."];
-  }
-},
 
-async getCommentById(id) {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/Comment/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching comment:", error);
-    throw ["Failed to load comment."];
-  }
-},
+  getAllComments() {
+    return api.get("/Comment").then((r) => r.data);
+  },
 
-async getCommentsByClientId(clientId) {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/Comment/client/${clientId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching client comments:", error);
-    throw ["Failed to load client comments."];
-  }
-},
+  getCommentById(id) {
+    return api.get(`/Comment/${id}`).then((r) => r.data);
+  },
 
-async getCommentsByInvestInstrumentId(instrumentId) {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/Comment/instrument/${instrumentId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching instrument comments:", error);
-    throw ["Failed to load comments for this instrument."];
-  }
-},
+  getCommentsByClientId(clientId) {
+    return api.get(`/Comment/client/${clientId}`).then((r) => r.data);
+  },
 
-async createComment(dto) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/Comment`, dto);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating comment:", error);
-    throw ["Failed to add comment."];
-  }
-},
+  getCommentsByInvestInstrumentId(instrumentId) {
+    return api.get(`/Comment/instrument/${instrumentId}`).then((r) => r.data);
+  },
 
-async updateComment(id, dto) {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/Comment/${id}`, {
-      id,
-      ...dto,
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error updating comment:", error);
-    throw ["Failed to update comment."];
-  }
-},
+  createComment(dto) {
+    return api.post("/Comment", dto).then((r) => r.data);
+  },
 
-async deleteComment(id) {
-  try {
-    await axios.delete(`${API_BASE_URL}/Comment/${id}`);
-  } catch (error) {
-    console.error("Error deleting comment:", error);
-    throw ["Failed to delete comment."];
-  }
-},
-// CurrencyPair endpoints
-async getCurrencyPairs() {
-  const res = await axios.get(`${API_BASE_URL}/CurrencyPair`);
-  return res.data;
-},
+  updateComment(id, dto) {
+    return api.put(`/Comment/${id}`, { id, ...dto }).then((r) => r.data);
+  },
 
-async getCurrencyPairById(id) {
-  const res = await axios.get(`${API_BASE_URL}/CurrencyPair/${id}`);
-  return res.data;
-},
+  deleteComment(id) {
+    return api.delete(`/Comment/${id}`);
+  },
 
-async createCurrencyPair(data) {
-  const res = await axios.post(`${API_BASE_URL}/CurrencyPair`, data);
-  return res.data;
-},
+  // CurrencyPair endpoints
 
-async updateCurrencyPair(id, data) {
-  const res = await axios.put(`${API_BASE_URL}/CurrencyPair/${id}`, data);
-  return res.data;
-},
+  getCurrencyPairs() {
+    return api.get("/CurrencyPair").then((r) => r.data);
+  },
 
-async deleteCurrencyPair(id: number) {
-  const res = await axios.delete(`${API_BASE_URL}/CurrencyPair/${id}`);
-  return res.data;
-},
+  getCurrencyPairById(id) {
+    return api.get(`/CurrencyPair/${id}`).then((r) => r.data);
+  },
 
-async getCurrencyPairByCurrencies(baseCurrencyId, quoteCurrencyId) {
-  const res = await axios.get(
-    `${API_BASE_URL}/CurrencyPair/by-currencies`,
-    {
-      params: { baseCurrencyId, quoteCurrencyId },
-    }
-  );
-  return res.data;
-},
+  createCurrencyPair(data) {
+    return api.post("/CurrencyPair", data).then((r) => r.data);
+  },
 
-// CurrencyRateHistory endpoints
-async getCurrencyRateHistoryById(id: number) {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/CurrencyRateHistory/${id}`,
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching currency rate history by id:", error);
-    throw ["Failed to load currency rate history."];
-  }
-},
-async getCurrencyRateHistoryByPair(currencyPairId: number) {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/CurrencyRateHistory/by-pair/${currencyPairId}`,
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching currency rate history:", error);
-    throw ["Failed to load currency rate history."];
-  }
-},
+  updateCurrencyPair(id, data) {
+    return api.put(`/CurrencyPair/${id}`, data).then((r) => r.data);
+  },
 
-async getLatestCurrencyRate(currencyPairId: number) {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/CurrencyRateHistory/latest/${currencyPairId}`,
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching latest currency rate:", error);
-    throw ["Failed to load latest currency rate."];
-  }
-},
+  deleteCurrencyPair(id) {
+    return api.delete(`/CurrencyPair/${id}`);
+  },
 
-async createCurrencyRateHistory(dto: any) {
-  console.log("asdsad");
-  console.error("asdasdsa");
-  try {
-    const response = await axios.post(
-      `${API_BASE_URL}/CurrencyRateHistory`,
-      dto,
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error creating currency rate history:", error);
-    throw ["Failed to create currency rate history."];
-  }
-},
+  getCurrencyPairByCurrencies(baseCurrencyId, quoteCurrencyId) {
+    return api
+      .get("/CurrencyPair/by-currencies", {
+        params: { baseCurrencyId, quoteCurrencyId },
+      })
+      .then((r) => r.data);
+  },
 
-async updateCurrencyRateHistory(id: number, dto: any) {
-  try {
-    const response = await axios.put(
-      `${API_BASE_URL}/CurrencyRateHistory/${id}`,
-      {
+  // CurrencyRateHistory endpoints
+
+  getCurrencyRateHistoryById(id) {
+    return api.get(`/CurrencyRateHistory/${id}`).then((r) => r.data);
+  },
+
+  getCurrencyRateHistoryByPair(currencyPairId) {
+    return api
+      .get(`/CurrencyRateHistory/by-pair/${currencyPairId}`)
+      .then((r) => r.data);
+  },
+
+  getLatestCurrencyRate(currencyPairId) {
+    return api
+      .get(`/CurrencyRateHistory/latest/${currencyPairId}`)
+      .then((r) => r.data);
+  },
+
+  createCurrencyRateHistory(dto) {
+    return api.post("/CurrencyRateHistory", dto).then((r) => r.data);
+  },
+
+  updateCurrencyRateHistory(id, dto) {
+    return api
+      .put(`/CurrencyRateHistory/${id}`, {
         id,
         ...dto,
-      },
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating currency rate history:", error);
-    throw ["Failed to update currency rate history."];
-  }
-},
-
-async deleteCurrencyRateHistory(id: number) {
-  try {
-    await axios.delete(`${API_BASE_URL}/CurrencyRateHistory/${id}`);
-  } catch (error) {
-    console.error("Error deleting currency rate history:", error);
-    throw ["Failed to delete currency rate history."];
-  }
-},
-
-  //Employee endpoints
-  async getAllEmployees() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Employee`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-      throw ["Failed to load employees."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async getEmployeeById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Employee/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching employee:", error);
-      throw ["Failed to load employee."];
-    }
+  deleteCurrencyRateHistory(id) {
+    return api.delete(`/CurrencyRateHistory/${id}`);
   },
 
-  async createEmployee(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Employee`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating employee:", error);
-      throw ["Failed to create employee."];
-    }
+  // Employee endpoints
+
+  getAllEmployees() {
+    return api.get("/Employee").then((r) => r.data);
   },
 
-  async updateEmployee(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/Employee/${id}`, {
+  getEmployeeById(id) {
+    return api.get(`/Employee/${id}`).then((r) => r.data);
+  },
+
+  createEmployee(dto) {
+    return api.post("/Employee", dto).then((r) => r.data);
+  },
+
+  updateEmployee(id, dto) {
+    return api
+      .put(`/Employee/${id}`, {
         id,
         ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating employee:", error);
-      throw ["Failed to update employee."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteEmployee(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/Employee/${id}`);
-    } catch (error) {
-      console.error("Error deleting employee:", error);
-      throw ["Failed to delete employee."];
-    }
+  deleteEmployee(id) {
+    return api.delete(`/Employee/${id}`);
   },
 
   // PDF Generation endpoints
-openInvestmentRecommendationPdf(analysisRequestId: number) {
-  const url = `${API_BASE_URL}/InvestmentRecommendationPdf/${analysisRequestId}`;
 
-  // omija Expo Router i SPA – prawdziwy request HTTP
-  window.location.assign(url);
-},
+  openInvestmentRecommendationPdf(analysisRequestId) {
+    const url = `${api.defaults.baseURL}/InvestmentRecommendationPdf/${analysisRequestId}`;
+    window.location.assign(url);
+  },
 
   // Region endpoints
-  async getAllRegions() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Region`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching regions:", error);
-      throw ["An error occurred while fetching regions."];
-    }
+
+  getAllRegions() {
+    return api.get("/Region").then((r) => r.data);
   },
 
-  async getRegionById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Region/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching region:", error);
-      throw ["An error occurred while fetching region."];
-    }
+  getRegionById(id) {
+    return api.get(`/Region/${id}`).then((r) => r.data);
   },
 
-  async createRegion(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Region`, {
+  createRegion(dto) {
+    return api
+      .post("/Region", {
         name: dto.name,
-        regionCodeId: dto.regionCodeId, // może być null
-        regionRiskLevelId: dto.regionRiskLevelId, // wymagane
-      });
-
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-
-      console.error("Error creating region:", error);
-      throw ["An error occurred while creating region."];
-    }
-  },
-  async updateRegion(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/Region/${id}`, dto);
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-      console.error("Error updating region:", error);
-      throw ["An error occurred while updating region."];
-    }
+        regionCodeId: dto.regionCodeId,
+        regionRiskLevelId: dto.regionRiskLevelId,
+      })
+      .then((r) => r.data);
   },
 
-  async deleteRegion(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/Region/${id}`);
-    } catch (error) {
-      console.error("Error deleting region:", error);
-      throw ["An error occurred while deleting region."];
-    }
+  updateRegion(id, dto) {
+    return api.put(`/Region/${id}`, dto).then((r) => r.data);
+  },
+
+  deleteRegion(id) {
+    return api.delete(`/Region/${id}`);
   },
 
   // RegionCode endpoints
-  async getAllRegionCodes() {
-    const res = await axios.get(`${API_BASE_URL}/RegionCode`);
-    return res.data;
+
+  getAllRegionCodes() {
+    return api.get("/RegionCode").then((r) => r.data);
   },
 
-  async getRegionCodeById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/RegionCode/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching region code:", error);
-      throw ["Failed to fetch region code."];
-    }
+  getRegionCodeById(id) {
+    return api.get(`/RegionCode/${id}`).then((r) => r.data);
   },
 
-  async createRegionCode(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/RegionCode`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating region code:", error);
-      throw ["Failed to create region code."];
-    }
+  createRegionCode(dto) {
+    return api.post("/RegionCode", dto).then((r) => r.data);
   },
 
-  async updateRegionCode(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/RegionCode/${id}`, {
+  updateRegionCode(id, dto) {
+    return api
+      .put(`/RegionCode/${id}`, {
         id,
         ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating region code:", error);
-      throw ["Failed to update region code."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteRegionCode(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/RegionCode/${id}`);
-    } catch (error) {
-      console.error("Error deleting region code:", error);
-      throw ["Failed to delete region code."];
-    }
-  },
-  // Client endpoints
-  async getClientById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Client/${id}`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 404) {
-        throw ["Client not found. Please check your ID."];
-      }
-      console.error("Error fetching client:", error);
-      throw ["An error occurred while fetching client data. Please try again."];
-    }
+  deleteRegionCode(id) {
+    return api.delete(`/RegionCode/${id}`);
   },
 
-  //Currency endpoints
-  async getAllCurrencies() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Currency`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching currencies:", error);
-      throw ["An error occurred while fetching currencies."];
-    }
-  },
-  async getCurrencyByID(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Currency/${id}`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 404) {
-        throw ["Client not found. Please check your ID."];
-      }
-      console.error("Error fetching client:", error);
-      throw ["An error occurred while fetching client data. Please try again."];
-    }
+  // Currency endpoints
+
+  getAllCurrencies() {
+    return api.get("/Currency").then((r) => r.data);
   },
 
-  async createCurrency(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Currency`, {
+  getCurrencyByID(id) {
+    return api.get(`/Currency/${id}`).then((r) => r.data);
+  },
+
+  createCurrency(dto) {
+    return api
+      .post("/Currency", {
         name: dto.name,
         currencyRiskLevelId: dto.currencyRiskLevelId,
-      });
-
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-
-      console.error("Error creating currency:", error);
-      throw ["An error occurred while creating currency."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async updateCurrency(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/Currency/${id}`, dto);
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-      console.error("Error updating currency:", error);
-      throw ["An error occurred while updating currency."];
-    }
+  updateCurrency(id, dto) {
+    return api.put(`/Currency/${id}`, dto).then((r) => r.data);
   },
 
-  async deleteCurrency(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/Currency/${id}`);
-    } catch (error) {
-      console.error("Error deleting currency:", error);
-      throw ["An error occurred while deleting currency."];
-    }
+  deleteCurrency(id) {
+    return api.delete(`/Currency/${id}`);
   },
 
   // InvestProfile endpoints
-  async createInvestProfile(profileDto) {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/InvestProfile`,
-        profileDto
-      );
-      return response.data;
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-      console.error("Error creating investment profile:", error);
-      throw ["An error occurred while creating the investment profile."];
-    }
+
+  createInvestProfile(profileDto) {
+    return api.post("/InvestProfile", profileDto).then((r) => r.data);
   },
 
-  async getInvestProfileByClientId(clientId) {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/InvestProfile/${clientId}`
-      );
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 404) {
-        return null;
-      }
-      throw error;
-    }
+  getInvestProfileByClientId(clientId) {
+    return api
+      .get(`/InvestProfile/${clientId}`)
+      .then((r) => r.data)
+      .catch((error) => {
+        if (error.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      });
   },
 
-  async updateInvestProfile(id, profileDto) {
-    const response = await axios.put(
-      `${API_BASE_URL}/InvestProfile/${id}`,
-      profileDto
-    );
-    return response.data;
+  updateInvestProfile(id, profileDto) {
+    return api.put(`/InvestProfile/${id}`, profileDto).then((r) => r.data);
   },
 
   // InvestmentType endpoints
-  async getAllInvestmentTypes() {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/InvestmentType`);
-      return res.data;
-    } catch (e) {
-      console.error("Error fetching investment types:", e);
-      throw ["Failed to load investment types."];
-    }
+
+  getAllInvestmentTypes() {
+    return api.get("/InvestmentType").then((r) => r.data);
   },
 
-  async getInvestmentTypeById(id) {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/InvestmentType/${id}`);
-      return res.data;
-    } catch {
-      throw ["Failed to load investment type."];
-    }
+  getInvestmentTypeById(id) {
+    return api.get(`/InvestmentType/${id}`).then((r) => r.data);
   },
 
-  async createInvestmentType(dto) {
-    try {
-      const res = await axios.post(`${API_BASE_URL}/InvestmentType`, dto);
-      return res.data;
-    } catch {
-      throw ["Failed to create investment type."];
-    }
+  createInvestmentType(dto) {
+    return api.post("/InvestmentType", dto).then((r) => r.data);
   },
 
-  async updateInvestmentType(id, dto) {
-    try {
-      const res = await axios.put(`${API_BASE_URL}/InvestmentType/${id}`, {
+  updateInvestmentType(id, dto) {
+    return api
+      .put(`/InvestmentType/${id}`, {
         id,
         ...dto,
-      });
-      return res.data;
-    } catch {
-      throw ["Failed to update investment type."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteInvestmentType(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/InvestmentType/${id}`);
-    } catch {
-      throw ["Failed to delete investment type."];
-    }
+  deleteInvestmentType(id) {
+    return api.delete(`/InvestmentType/${id}`);
   },
 
   // RiskLevel endpoints
-  async getRiskLevels() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/RiskLevel`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching risk levels:", error);
-      throw ["Failed to load risk levels"];
-    }
-  },
-  async getRiskLevelById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/RiskLevel/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching risk level:", error);
-      throw ["Failed to load risk level."];
-    }
+
+  getRiskLevels() {
+    return api.get("/RiskLevel").then((r) => r.data);
   },
 
-  async createRiskLevel(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/RiskLevel`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating risk level:", error);
-      throw ["Failed to create risk level."];
-    }
+  getRiskLevelById(id) {
+    return api.get(`/RiskLevel/${id}`).then((r) => r.data);
   },
 
-  async updateRiskLevel(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/RiskLevel/${id}`, {
+  createRiskLevel(dto) {
+    return api.post("/RiskLevel", dto).then((r) => r.data);
+  },
+
+  updateRiskLevel(id, dto) {
+    return api
+      .put(`/RiskLevel/${id}`, {
         id,
         ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating risk level:", error);
-      throw ["Failed to update risk level."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteRiskLevel(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/RiskLevel/${id}`);
-    } catch (error) {
-      console.error("Error deleting risk level:", error);
-      throw ["Failed to delete risk level."];
-    }
+  deleteRiskLevel(id) {
+    return api.delete(`/RiskLevel/${id}`);
   },
 
-  //MarketData endpoints
-  async getAllMarketData() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/MarketData`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching market data:", error);
-      throw ["Failed to fetch market data."];
-    }
+  // MarketData endpoints
+
+  getAllMarketData() {
+    return api.get("/MarketData").then((r) => r.data);
   },
 
-  async getMarketDataById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/MarketData/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching market data by id:", error);
-      throw ["Failed to fetch market data."];
-    }
+  getMarketDataById(id) {
+    return api.get(`/MarketData/${id}`).then((r) => r.data);
   },
 
-  async getMarketDataByInstrumentId(instrumentId) {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/MarketData/invest-instrument/${instrumentId}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching market data for instrument:", error);
-      throw ["Failed to fetch market data for selected instrument."];
-    }
+  getMarketDataByInstrumentId(instrumentId) {
+    return api
+      .get(`/MarketData/invest-instrument/${instrumentId}`)
+      .then((r) => r.data);
   },
 
-  async createMarketData(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/MarketData`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating market data:", error);
-      throw ["Failed to create market data."];
-    }
+  createMarketData(dto) {
+    return api.post("/MarketData", dto).then((r) => r.data);
   },
 
-  async updateMarketData(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/MarketData/${id}`, {
+  updateMarketData(id, dto) {
+    return api
+      .put(`/MarketData/${id}`, {
         id,
         ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating market data:", error);
-      throw ["Failed to update market data."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteMarketData(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/MarketData/${id}`);
-    } catch (error) {
-      console.error("Error deleting market data:", error);
-      throw ["Failed to delete market data."];
-    }
+  deleteMarketData(id) {
+    return api.delete(`/MarketData/${id}`);
   },
 
-  async importMarketDataByTicker(ticker) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/MarketData/import`, {
-        ticker,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error importing market data:", error);
-
-      if (error.response?.data?.errors) {
-        throw error.response.data.errors;
-      }
-
-      throw ["Failed to import market data for given ticker."];
-    }
+  importMarketDataByTicker(ticker) {
+    return api.post("/MarketData/import", { ticker }).then((r) => r.data);
   },
 
   // InvestHorizon endpoints
-  async getInvestHorizons() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/InvestHorizon`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching invest horizons:", error);
-      throw error;
-    }
+
+  getInvestHorizons() {
+    return api.get("/InvestHorizon").then((r) => r.data);
   },
 
-  async getInvestHorizonById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/InvestHorizon/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching invest horizon:", error);
-      throw ["Failed to load investment horizon."];
-    }
+  getInvestHorizonById(id) {
+    return api.get(`/InvestHorizon/${id}`).then((r) => r.data);
   },
 
-  async createInvestHorizon(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/InvestHorizon`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating invest horizon:", error);
-      throw ["Failed to create investment horizon."];
-    }
+  createInvestHorizon(dto) {
+    return api.post("/InvestHorizon", dto).then((r) => r.data);
   },
 
-  async updateInvestHorizon(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/InvestHorizon/${id}`, {
+  updateInvestHorizon(id, dto) {
+    return api
+      .put(`/InvestHorizon/${id}`, {
         id,
         ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating invest horizon:", error);
-      throw ["Failed to update investment horizon."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteInvestHorizon(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/InvestHorizon/${id}`);
-    } catch (error) {
-      console.error("Error deleting invest horizon:", error);
-      throw ["Failed to delete investment horizon."];
-    }
+  deleteInvestHorizon(id) {
+    return api.delete(`/InvestHorizon/${id}`);
   },
 
-  //FinancialMetric endpoints
-  async getFinancialMetricById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/FinancialMetric/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching financial metric:", error);
-      throw error;
-    }
-  },
-  async createFinancialMetricForInstrument(instrumentId, dto) {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/InvestInstrument/${instrumentId}/FinancialMetric`,
-        dto
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating financial metric:", error);
-      throw error;
-    }
-  },
-  async updateFinancialMetric(id, dto) {
-    try {
-      const response = await axios.put(
-        `${API_BASE_URL}/FinancialMetric/${id}`,
-        {
-          id,
-          ...dto,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating financial metric:", error);
-      throw error;
-    }
-  },
-  async deleteFinancialMetric(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/FinancialMetric/${id}`);
-    } catch (error) {
-      console.error("Error deleting financial metric:", error);
-      throw error;
-    }
+  // FinancialMetric endpoints
+
+  getFinancialMetricById(id) {
+    return api.get(`/FinancialMetric/${id}`).then((r) => r.data);
   },
 
-  async importFinancialMetric(dto) {
-  try {
-    const response = await axios.post(
-      `${API_BASE_URL}/FinancialMetric/import`,
-      dto
-    );
-    return response.data; // zwraca metricId
-  } catch (error) {
-    console.error(
-      "Error importing financial metric automatically:",
-      error
-    );
-    throw error;
-  }
-},
+  createFinancialMetricForInstrument(instrumentId, dto) {
+    return api
+      .post(`/InvestInstrument/${instrumentId}/FinancialMetric`, dto)
+      .then((r) => r.data);
+  },
+
+  updateFinancialMetric(id, dto) {
+    return api
+      .put(`/FinancialMetric/${id}`, {
+        id,
+        ...dto,
+      })
+      .then((r) => r.data);
+  },
+
+  deleteFinancialMetric(id) {
+    return api.delete(`/FinancialMetric/${id}`);
+  },
+
+  importFinancialMetric(dto) {
+    return api.post("/FinancialMetric/import", dto).then((r) => r.data);
+  },
 
   // FinancialReport endpoints
-  async getFinancialReportsByInvestInstrumentId(instrumentId) {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/FinancialReport/invest-instrument/${instrumentId}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching financial reports:", error);
-      throw error;
-    }
+
+  getFinancialReportsByInvestInstrumentId(instrumentId) {
+    return api
+      .get(`/FinancialReport/invest-instrument/${instrumentId}`)
+      .then((r) => r.data);
   },
 
   getFinancialReports() {
-    return axios.get(`${API_BASE_URL}/FinancialReport`).then((r) => r.data);
+    return api.get("/FinancialReport").then((r) => r.data);
   },
 
   getFinancialReportById(id) {
-    return axios
-      .get(`${API_BASE_URL}/FinancialReport/${id}`)
-      .then((res) => res.data);
+    return api.get(`/FinancialReport/${id}`).then((r) => r.data);
   },
+
   createFinancialReport(dto) {
-    return axios.post(`${API_BASE_URL}/FinancialReport`, dto);
+    return api.post("/FinancialReport", dto).then((r) => r.data);
   },
+
   updateFinancialReport(id, dto) {
-    return axios.put(`${API_BASE_URL}/FinancialReport/${id}`, dto);
+    return api.put(`/FinancialReport/${id}`, dto).then((r) => r.data);
   },
 
   deleteFinancialReport(id) {
-    return axios.delete(`${API_BASE_URL}/FinancialReport/${id}`);
+    return api.delete(`/FinancialReport/${id}`);
   },
 
-  async importFinancialReportsByIsin(isin: string) {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/FinancialReport/import`,
-        { isin }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error importing financial reports:", error);
-      throw error;
-    }
+  importFinancialReportsByIsin(isin) {
+    return api.post("/FinancialReport/import", { isin }).then((r) => r.data);
   },
 
-  //Sector endpoints
-  async getSectors() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Sector`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching sectors:", error);
-      throw error;
-    }
-  },
-  async getSectorById(id) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/Sector/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching sector:", error);
-      throw ["Failed to load sector."];
-    }
+  // Sector endpoints
+
+  getSectors() {
+    return api.get("/Sector").then((r) => r.data);
   },
 
-  async createSector(dto) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Sector`, dto);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating sector:", error);
-      throw ["Failed to create sector."];
-    }
+  getSectorById(id) {
+    return api.get(`/Sector/${id}`).then((r) => r.data);
   },
 
-  async updateSector(id, dto) {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/Sector/${id}`, {
+  createSector(dto) {
+    return api.post("/Sector", dto).then((r) => r.data);
+  },
+
+  updateSector(id, dto) {
+    return api
+      .put(`/Sector/${id}`, {
         id,
         ...dto,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating sector:", error);
-      throw ["Failed to update sector."];
-    }
+      })
+      .then((r) => r.data);
   },
 
-  async deleteSector(id) {
-    try {
-      await axios.delete(`${API_BASE_URL}/Sector/${id}`);
-    } catch (error) {
-      console.error("Error deleting sector:", error);
-      throw ["Failed to delete sector."];
-    }
+  deleteSector(id) {
+    return api.delete(`/Sector/${id}`);
   },
 
   // InvestInstrument endpoints
-  async getInvestInstruments() {
-    const res = await axios.get(`${API_BASE_URL}/InvestInstrument`);
-    return res.data;
+
+  getInvestInstruments() {
+    return api.get("/InvestInstrument").then((r) => r.data);
   },
 
-  async getInvestInstrumentById(id) {
-    const res = await axios.get(`${API_BASE_URL}/InvestInstrument/${id}`);
-    return res.data;
+  getInvestInstrumentById(id) {
+    return api.get(`/InvestInstrument/${id}`).then((r) => r.data);
   },
 
-  async getInvestInstrumentsByRegion(regionId) {
-    const res = await axios.get(
-      `${API_BASE_URL}/InvestInstrument/region/${regionId}`
-    );
-    return res.data;
+  getInvestInstrumentsByRegion(regionId) {
+    return api.get(`/InvestInstrument/region/${regionId}`).then((r) => r.data);
   },
 
-  async getInvestInstrumentsByType(typeId) {
-    const res = await axios.get(
-      `${API_BASE_URL}/InvestInstrument/type/${typeId}`
-    );
-    return res.data;
+  getInvestInstrumentsByType(typeId) {
+    return api.get(`/InvestInstrument/type/${typeId}`).then((r) => r.data);
   },
 
-  async getInvestInstrumentsBySector(sectorId) {
-    const res = await axios.get(
-      `${API_BASE_URL}/InvestInstrument/sector/${sectorId}`
-    );
-    return res.data;
+  getInvestInstrumentsBySector(sectorId) {
+    return api.get(`/InvestInstrument/sector/${sectorId}`).then((r) => r.data);
   },
 
-  async createInvestInstrument(dto) {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/InvestInstrument`,
-        dto
-      );
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  createInvestInstrument(dto) {
+    return api.post("/InvestInstrument", dto).then((r) => r.data);
   },
 
-  async updateInvestInstrument(id, dto) {
-    try {
-      const response = await axios.put(
-        `${API_BASE_URL}/InvestInstrument/${id}`,
-        {
-          id,
-          ...dto,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating instrument:", error);
-      throw ["Failed to update investment instrument."];
-    }
+  updateInvestInstrument(id, dto) {
+    return api
+      .put(`/InvestInstrument/${id}`, {
+        id,
+        ...dto,
+      })
+      .then((r) => r.data);
   },
 
-  async deleteInvestInstrument(id) {
-    await axios.delete(`${API_BASE_URL}/InvestInstrument/${id}`);
+  deleteInvestInstrument(id) {
+    return api.delete(`/InvestInstrument/${id}`);
   },
 
   // WatchListItem endpoints
-  async getWatchListItemsByClientId(clientId) {
-    const response = await axios.get(
-      `${API_BASE_URL}/WatchListItem/client/${clientId}`
-    );
-    return response.data;
+
+  getWatchListItemsByClientId(clientId) {
+    return api.get(`/WatchListItem/client/${clientId}`).then((r) => r.data);
   },
 
-  async addWatchListItem(clientId, investInstrumentId) {
-    const response = await axios.post(`${API_BASE_URL}/WatchListItem`, {
-      clientId,
-      investInstrumentId,
-    });
-    return response.data;
+  addWatchListItem(clientId, investInstrumentId) {
+    return api
+      .post("/WatchListItem", {
+        clientId,
+        investInstrumentId,
+      })
+      .then((r) => r.data);
   },
-  async deleteWatchListItem(id) {
-    await axios.delete(`${API_BASE_URL}/WatchListItem/${id}`);
+
+  deleteWatchListItem(id) {
+    return api.delete(`/WatchListItem/${id}`);
   },
 
   // Wallet endpoints
-  async getWalletByClientId(clientId) {
-    const res = await axios.get(`${API_BASE_URL}/Wallet/client/${clientId}`);
-    return res.data;
+
+  getWalletByClientId(clientId) {
+    return api.get(`/Wallet/client/${clientId}`).then((r) => r.data);
   },
 
-  async getWalletInstrumentsByWalletId(walletId) {
-    const res = await axios.get(
-      `${API_BASE_URL}/WalletInstrument/wallet/${walletId}`
-    );
-    return res.data;
+  getWalletInstrumentsByWalletId(walletId) {
+    return api.get(`/WalletInstrument/wallet/${walletId}`).then((r) => r.data);
   },
 
-  async addWalletInstrument(walletId, investInstrumentId, quantity) {
-    const response = await axios.post(`${API_BASE_URL}/WalletInstrument`, {
-      walletId,
-      investInstrumentId,
-      quantity,
-    });
-    return response.data;
+  addWalletInstrument(walletId, investInstrumentId, quantity) {
+    return api
+      .post("/WalletInstrument", {
+        walletId,
+        investInstrumentId,
+        quantity,
+      })
+      .then((r) => r.data);
   },
-  async getWalletInvestmentSummary(walletId) {
-    const res = await axios.get(
-      `${API_BASE_URL}/WalletInstrument/${walletId}/investments-summary`
-    );
-    return res.data;
+
+  getWalletInvestmentSummary(walletId) {
+    return api
+      .get(`/WalletInstrument/${walletId}/investments-summary`)
+      .then((r) => r.data);
   },
-getWalletInstrumentById(id: number) {
-  return axios
-    .get(`${API_BASE_URL}/WalletInstrument/${id}`)
-    .then((res) => res.data);
-},
-updateWalletInstrument(id: number, data: any) {
-  return axios.put(
-    `${API_BASE_URL}/WalletInstrument/${id}`,
-    data,
-  );
-},
 
-async deleteWalletInstrument(id: number) {
-  await axios.delete(`${API_BASE_URL}/WalletInstrument/${id}`);
-},
+  getWalletInstrumentById(id) {
+    return api.get(`/WalletInstrument/${id}`).then((r) => r.data);
+  },
 
-  async updateWallet(walletId, data) {
-  const res = await axios.put(
-    `${API_BASE_URL}/Wallet/${walletId}`,
-    data
-  );
-  return res.data;
-},
+  updateWalletInstrument(id, data) {
+    return api.put(`/WalletInstrument/${id}`, data).then((r) => r.data);
+  },
 
-// Excel export endpoints
-openWalletExcelExport(walletId: number) {
-  const url = `${API_BASE_URL}/Wallet/${walletId}/export`;
+  deleteWalletInstrument(id) {
+    return api.delete(`/WalletInstrument/${id}`);
+  },
 
-  // pełny redirect do backendu (poza Expo Router)
-  window.location.assign(url);
-},
+  updateWallet(walletId, data) {
+    return api
+      .put(`/Wallet/${walletId}`, {
+        id: walletId,
+        ...data,
+      })
+      .then((res) => res.data);
+  },
+  // Excel export endpoints
+
+  openWalletExcelExport(walletId) {
+    const url = `${api.defaults.baseURL}/Wallet/${walletId}/export`;
+    window.location.assign(url);
+  },
 };
 
 export default ApiService;
