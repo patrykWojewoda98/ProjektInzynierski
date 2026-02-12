@@ -95,10 +95,6 @@ namespace ProjektIznynierski.Application.Commands.AIAnalysisRequest.CreateAIAnal
                   <h2>{parsedResponse.ConfidenceScore}</h2>
                   """ );
 
-            //do testów
-            await _emailService.SendAsync(
-                  client.Email, "Test Promptu", prompt);
-
             return new AIAnalysisRequestDto
             {
                 Id = entity.Id,

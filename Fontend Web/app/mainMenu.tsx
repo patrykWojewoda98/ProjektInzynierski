@@ -1,6 +1,14 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
+
 import { globalStyles, spacing } from "../assets/styles/styles";
 import { ROUTES } from "../routes";
 import { authGuard } from "../utils/authGuard";
@@ -75,7 +83,18 @@ const tiles = [
 
 const MainMenu = () => {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const [isReady, setIsReady] = useState(false);
+
+  const getColumns = () => {
+    if (width >= 1400) return 4;
+    if (width >= 1100) return 3;
+    if (width >= 700) return 2;
+    return 1;
+  };
+
+  const columns = getColumns();
+  const tileWidth = `${100 / columns - 4}%`;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,7 +109,7 @@ const MainMenu = () => {
 
   if (!isReady) {
     return (
-      <View style={[globalStyles.centerContainer]}>
+      <View style={globalStyles.centerContainer}>
         <Text style={globalStyles.header}>Checking authentication...</Text>
       </View>
     );
@@ -104,7 +123,6 @@ const MainMenu = () => {
       ]}
       keyboardShouldPersistTaps="handled"
     >
-      {/* Nagłówek */}
       <View style={[globalStyles.center, spacing.mb6]}>
         <Image
           source={require("../assets/images/Logo.png")}
@@ -116,13 +134,21 @@ const MainMenu = () => {
         </Text>
       </View>
 
-      {/* Siatka kafelków */}
-      <View style={globalStyles.menuGrid}>
+      <View
+        style={[
+          globalStyles.row,
+          { flexWrap: "wrap", justifyContent: "center", width: "100%" },
+        ]}
+      >
         {tiles.map((t) => (
           <TouchableOpacity
             key={t.key}
             onPress={() => router.push(t.route)}
-            style={globalStyles.menuTile}
+            style={[
+              globalStyles.menuTile,
+              spacing.m2,
+              { width: tileWidth, minHeight: 170 },
+            ]}
           >
             <Image source={t.icon} style={globalStyles.menuIcon} />
             <Text style={globalStyles.menuLabel}>{t.label}</Text>
