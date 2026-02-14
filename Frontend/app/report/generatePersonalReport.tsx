@@ -479,6 +479,43 @@ const GeneratePersonalReport = () => {
         </TouchableOpacity>
       )}
 
+      <TouchableOpacity
+        style={[
+          globalStyles.button,
+          spacing.mb4,
+          { backgroundColor: COLORS.mediumGrey },
+        ]}
+        onPress={() => {
+          if (!canGenerate || loadingDetails) return;
+          if (
+            includeFinancialReports &&
+            reports.length > 0 &&
+            selectedReportIds.length === 0
+          ) {
+            Alert.alert(
+              "Select periods",
+              "Select at least one report period to include, or turn off Financial reports."
+            );
+            return;
+          }
+          router.push({
+            pathname: ROUTES.PERSONAL_REPORT_EDITOR,
+            params: {
+              selectedInstrumentId: String(selectedInstrumentId ?? ""),
+              includeInstrumentInfo: String(includeInstrumentInfo),
+              includeFinancialMetrics: String(includeFinancialMetrics),
+              metricFields: JSON.stringify(selectedMetricFields),
+              includeFinancialReports: String(includeFinancialReports),
+              reportIds: JSON.stringify(selectedReportIds),
+              includePortfolioComposition: String(includePortfolioComposition),
+            },
+          });
+        }}
+        disabled={!canGenerate || loadingDetails}
+      >
+        <Text style={globalStyles.buttonText}>Open editor</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity onPress={() => router.push(ROUTES.MAIN_MENU)}>
         <Text style={globalStyles.link}>Back to Main Menu</Text>
       </TouchableOpacity>

@@ -10,5 +10,9 @@ namespace ProjektIznynierski.Application.Dtos
         public bool IncludeFinancialReports { get; set; }
         public List<int>? IncludedFinancialReportIds { get; set; }
         public bool IncludePortfolioComposition { get; set; }
+        public string? CustomIntroText { get; set; }
+        public string? CustomOutroText { get; set; }
+        public string? FontFamily { get; set; }
+        public int? FontSize { get; set; }
     }
 }

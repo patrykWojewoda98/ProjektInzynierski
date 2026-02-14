@@ -10,6 +10,10 @@ namespace ProjektIznynierski.Application.Commands.Pdf
         IReadOnlyList<string>? IncludedMetricFields,
         bool IncludeFinancialReports,
         IReadOnlyList<int>? IncludedFinancialReportIds,
-        bool IncludePortfolioComposition
+        bool IncludePortfolioComposition,
+        string? CustomIntroText,
+        string? CustomOutroText,
+        string? FontFamily,
+        int? FontSize
     ) : IRequest<byte[]>;
 }

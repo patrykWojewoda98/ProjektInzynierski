@@ -85,7 +85,11 @@ namespace ProjektIznynierski.Application.Commands.Pdf
                 metrics,
                 reports,
                 wallet,
-                walletInstruments);
+                walletInstruments,
+                request.CustomIntroText,
+                request.CustomOutroText,
+                request.FontFamily,
+                request.FontSize);
         }
     }
 }

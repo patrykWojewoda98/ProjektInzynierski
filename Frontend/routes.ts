@@ -34,6 +34,7 @@ export const ROUTES = {
   MY_AI_ANALYSIS_REQUESTS: "/aIRequest/myAIRequests",
   AI_ANALYSIS_RESULT: "/aIAnalysisResult/aIAnalysisResult",
   GENERATE_PERSONAL_REPORT: "/report/generatePersonalReport",
+  PERSONAL_REPORT_EDITOR: "/report/personalReportEditor",
 
   EMPLOYEE_2FA: "/auth/employee/employee2FAScreen",
   EMPLOYEE_MAIN_MENU: "/employeeMainMenu",

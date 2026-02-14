@@ -35,7 +35,11 @@ namespace ProjektIznynierski.Presentation.Controllers
                 request.IncludedMetricFields,
                 request.IncludeFinancialReports,
                 request.IncludedFinancialReportIds,
-                request.IncludePortfolioComposition);
+                request.IncludePortfolioComposition,
+                request.CustomIntroText,
+                request.CustomOutroText,
+                request.FontFamily,
+                request.FontSize);
 
             var pdfBytes = await _mediator.Send(command);
 

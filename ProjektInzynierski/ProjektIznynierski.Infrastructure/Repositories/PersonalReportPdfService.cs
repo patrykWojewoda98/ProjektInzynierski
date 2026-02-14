@@ -18,12 +18,18 @@ namespace ProjektIznynierski.Infrastructure.Repositories
             FinancialMetric? metrics,
             IEnumerable<FinancialReport> reports,
             Wallet? wallet,
-            List<WalletInstrument>? walletInstruments)
+            List<WalletInstrument>? walletInstruments,
+            string? customIntroText = null,
+            string? customOutroText = null,
+            string? fontFamily = null,
+            int? fontSize = null)
         {
             var hasAnySection = includeInstrumentInfo || includeFinancialMetrics || includeFinancialReports
                 || includePortfolioComposition;
             if (!hasAnySection)
                 throw new Exception("At least one report section must be selected.");
+
+            var effectiveFontSize = fontSize ?? 10;
 
             return Document.Create(container =>
             {
@@ -31,7 +37,13 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                 {
                     page.Size(PageSizes.A4);
                     page.Margin(30);
-                    page.DefaultTextStyle(x => x.FontSize(10));
+                    page.DefaultTextStyle(x =>
+                    {
+                        x = x.FontSize(effectiveFontSize);
+                        if (!string.IsNullOrWhiteSpace(fontFamily))
+                            x = x.FontFamily(fontFamily);
+                        return x;
+                    });
 
                     page.Header().Element(e => BuildHeader(e, includeInstrumentInfo, instrument));
 
@@ -46,7 +58,9 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                         metrics,
                         reports ?? Enumerable.Empty<FinancialReport>(),
                         wallet,
-                        walletInstruments ?? new List<WalletInstrument>()));
+                        walletInstruments ?? new List<WalletInstrument>(),
+                        customIntroText,
+                        customOutroText));
 
                     page.Footer().AlignCenter().Text(text =>
                     {
@@ -89,10 +103,18 @@ namespace ProjektIznynierski.Infrastructure.Repositories
             FinancialMetric? metrics,
             IEnumerable<FinancialReport> reports,
             Wallet? wallet,
-            List<WalletInstrument> walletInstruments)
+            List<WalletInstrument> walletInstruments,
+            string? customIntroText = null,
+            string? customOutroText = null)
         {
             container.Column(col =>
             {
+                if (!string.IsNullOrWhiteSpace(customIntroText))
+                {
+                    col.Item().Text(customIntroText);
+                    col.Item().PaddingVertical(10);
+                }
+
                 if (includeInstrumentInfo && instrument != null)
                 {
                     col.Item().Text("Instrument details").Bold().FontSize(12);
@@ -163,6 +185,12 @@ namespace ProjektIznynierski.Infrastructure.Repositories
                                 .Text($"{name}: Quantity {wi.Quantity}");
                         }
                     }
+                }
+
+                if (!string.IsNullOrWhiteSpace(customOutroText))
+                {
+                    col.Item().PaddingVertical(10);
+                    col.Item().Text(customOutroText);
                 }
             });
         }

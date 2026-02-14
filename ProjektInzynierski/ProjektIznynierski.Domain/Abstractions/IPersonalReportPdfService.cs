@@ -14,6 +14,10 @@ namespace ProjektIznynierski.Domain.Abstractions
             FinancialMetric? metrics,
             IEnumerable<FinancialReport> reports,
             Wallet? wallet,
-            List<WalletInstrument>? walletInstruments);
+            List<WalletInstrument>? walletInstruments,
+            string? customIntroText = null,
+            string? customOutroText = null,
+            string? fontFamily = null,
+            int? fontSize = null);
     }
 }
