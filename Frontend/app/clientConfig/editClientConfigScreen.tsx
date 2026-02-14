@@ -150,7 +150,7 @@ const EditClientConfigScreen = () => {
       </View>
 
       <View style={[globalStyles.card, spacing.m2]}>
-        <Text style={globalStyles.label}>Image path (optional)</Text>
+        <Text style={globalStyles.label}>Image path</Text>
         <TextInput
           style={globalStyles.input}
           value={imagePath}

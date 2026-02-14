@@ -244,7 +244,8 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: COLORS.darkGrey,
     borderRadius: 12,
     width: 150,
-    height: 150,
+    minHeight: 150,
+    padding: 12,
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 8,
@@ -252,6 +253,7 @@ export const globalStyles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 3,
+    overflow: "hidden",
   },
 
   menuLabel: {

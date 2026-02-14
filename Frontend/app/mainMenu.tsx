@@ -48,14 +48,14 @@ const PLATFORM = "Mobile";
 const MainMenu = () => {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
-  const [menuItems, setMenuItems] = useState<{ key: string; label: string; route: string; imagePath?: string }[]>([]);
+  const [menuItems, setMenuItems] = useState<{ key: string; label: string; route: string; imagePath?: string; description?: string }[]>([]);
 
   const loadMenu = useCallback(async () => {
     try {
       const items = await ApiService.getClientConfigMenu(PLATFORM);
       if (Array.isArray(items) && items.length > 0) {
         const mapped = items
-          .map((item: { key: string; displayText: string; imagePath?: string; orderIndex: number }) => {
+          .map((item: { key: string; displayText: string; description?: string; imagePath?: string; orderIndex: number }) => {
             const route = KEY_TO_ROUTE[item.key];
             if (!route) return null;
             return {
@@ -63,15 +63,16 @@ const MainMenu = () => {
               label: item.displayText,
               route,
               imagePath: item.imagePath,
+              description: item.description,
             };
           })
-          .filter(Boolean) as { key: string; label: string; route: string; imagePath?: string }[];
+          .filter(Boolean) as { key: string; label: string; route: string; imagePath?: string; description?: string }[];
         setMenuItems(mapped);
       } else {
-        setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined })));
+        setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined, description: undefined })));
       }
     } catch {
-      setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined })));
+      setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined, description: undefined })));
     }
   }, []);
 
@@ -121,25 +122,27 @@ const MainMenu = () => {
             key={t.key}
             onPress={() => router.push(t.route)}
             style={globalStyles.menuTile}
+            activeOpacity={0.8}
           >
-            {t.imagePath ? (
-              <Image
-                source={{
-                  uri: t.imagePath.startsWith("http")
-                    ? t.imagePath
-                    : `${API_BASE}/${t.imagePath}`,
-                }}
-                style={globalStyles.menuIcon}
-                resizeMode="contain"
-              />
-            ) : (
-              <Image
-                source={fallbackIcons[t.key] ?? fallbackIcons.InvestProfile}
-                style={globalStyles.menuIcon}
-                resizeMode="contain"
-              />
-            )}
+            <Image
+              source={
+                t.imagePath
+                  ? {
+                      uri: t.imagePath.startsWith("http")
+                        ? t.imagePath
+                        : `${API_BASE}/${t.imagePath}`,
+                    }
+                  : fallbackIcons[t.key] ?? fallbackIcons.InvestProfile
+              }
+              style={globalStyles.menuIcon}
+              resizeMode="contain"
+            />
             <Text style={globalStyles.menuLabel}>{t.label}</Text>
+            {t.description ? (
+              <Text style={[globalStyles.textSmall, { textAlign: "center", marginTop: 4 }]}>
+                {t.description}
+              </Text>
+            ) : null}
           </TouchableOpacity>
         ))}
       </View>

@@ -82,7 +82,7 @@ const MainMenu = () => {
   const { width } = useWindowDimensions();
   const [isReady, setIsReady] = useState(false);
   const [menuItems, setMenuItems] = useState<
-    { key: string; label: string; route: string; imagePath?: string }[]
+    { key: string; label: string; route: string; imagePath?: string; description?: string }[]
   >([]);
 
   const getColumns = () => {
@@ -101,6 +101,7 @@ const MainMenu = () => {
             (item: {
               key: string;
               displayText: string;
+              description?: string;
               imagePath?: string;
               orderIndex: number;
             }) => {
@@ -111,6 +112,7 @@ const MainMenu = () => {
                 label: item.displayText,
                 route,
                 imagePath: item.imagePath,
+                description: item.description,
               };
             },
           )
@@ -119,13 +121,14 @@ const MainMenu = () => {
           label: string;
           route: string;
           imagePath?: string;
+          description?: string;
         }[];
         setMenuItems(mapped);
       } else {
-        setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined })));
+        setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined, description: undefined })));
       }
     } catch {
-      setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined })));
+      setMenuItems(defaultTiles.map((t) => ({ ...t, imagePath: undefined, description: undefined })));
     }
   }, []);
 
@@ -206,6 +209,11 @@ const MainMenu = () => {
               />
             )}
             <Text style={globalStyles.menuLabel}>{t.label}</Text>
+            {t.description ? (
+              <Text style={[globalStyles.textSmall, { textAlign: "center", marginTop: 4 }]}>
+                {t.description}
+              </Text>
+            ) : null}
           </TouchableOpacity>
         ))}
       </View>
