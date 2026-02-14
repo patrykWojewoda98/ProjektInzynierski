@@ -662,6 +662,86 @@ const ApiService = {
     const url = `${api.defaults.baseURL}/Wallet/${walletId}/export`;
     window.location.assign(url);
   },
+
+  // =========================
+  // CLIENT CONFIG (menu for Client interface)
+  // =========================
+
+  getClientConfigMenu(platform) {
+    return api.get(`/client-config/menu`, { params: { platform } }).then((r) => r.data);
+  },
+
+  // =========================
+  // EMPLOYEE: Client interface config management
+  // =========================
+
+  async _employeeAuthHeaders() {
+    const token = await AsyncStorage.getItem("employeeToken");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  },
+
+  getEmployeeClientConfigList(platform) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.get("/EmployeeClientConfig", { params: { platform }, headers }).then((r) => r.data)
+    );
+  },
+
+  getEmployeeClientConfigById(id) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.get(`/EmployeeClientConfig/${id}`, { headers }).then((r) => r.data)
+    );
+  },
+
+  createEmployeeClientConfigItem(body) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.post("/EmployeeClientConfig", body, { headers }).then((r) => r.data)
+    );
+  },
+
+  updateEmployeeClientConfigItem(id, body) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.put(`/EmployeeClientConfig/${id}`, { ...body, id }, { headers }).then((r) => r.data)
+    );
+  },
+
+  deleteEmployeeClientConfigItem(id) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.delete(`/EmployeeClientConfig/${id}`, { headers })
+    );
+  },
+
+  reorderEmployeeClientConfig(items) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.patch("/EmployeeClientConfig/reorder", { items }, { headers })
+    );
+  },
+
+  toggleVisibilityEmployeeClientConfig(id) {
+    return this._employeeAuthHeaders().then((headers) =>
+      api.patch(`/EmployeeClientConfig/${id}/toggle-visibility`, null, { headers }).then((r) => r.data)
+    );
+  },
+
+  uploadEmployeeClientConfigImage(platform, file) {
+    return this._employeeAuthHeaders().then((headers) => {
+      const formData = new FormData();
+      // On web, use the real File so the server receives actual file bytes (required for IFormFile binding).
+      if (typeof File !== "undefined" && file instanceof File) {
+        formData.append("file", file);
+      } else if (file?.uri != null) {
+        // React Native: append uri/name/type for native upload handling.
+        formData.append("file", { uri: file.uri, name: file.name || "image.png", type: file.type || "image/png" });
+      } else {
+        formData.append("file", file);
+      }
+      // Omit Content-Type so axios sets multipart/form-data with the correct boundary
+      return api
+        .post(`/EmployeeClientConfig/upload-image?platform=${platform}`, formData, {
+          headers,
+        })
+        .then((r) => r.data);
+    });
+  },
 };
 
 export default ApiService;

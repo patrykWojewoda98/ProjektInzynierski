@@ -31,6 +31,7 @@ namespace ProjektIznynierski.Infrastructure.Context
         public DbSet<Comment> Comments { get; set; }
         public DbSet<CurrencyPair> CurrencyPairs { get; set; }
         public DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }
+        public DbSet<ClientInterfaceConfig> ClientInterfaceConfigs { get; set; }
         public ProjektInzynierskiDbContext(DbContextOptions options) : base(options)
         {
         }

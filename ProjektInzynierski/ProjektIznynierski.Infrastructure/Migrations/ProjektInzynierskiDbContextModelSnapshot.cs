@@ -172,6 +172,63 @@ namespace ProjektIznynierski.Infrastructure.Migrations
                     b.ToTable("Clients", "ProjektInzynierski");
                 });
 
+            modelBuilder.Entity("ProjektIznynierski.Domain.Entities.ClientInterfaceConfig", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("DisplayText")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImagePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("InterfaceType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ModifiedByEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModifiedByEmployeeId");
+
+                    b.HasIndex("Platform", "InterfaceType", "Key")
+                        .IsUnique();
+
+                    b.ToTable("ClientInterfaceConfigs", "ProjektInzynierski");
+                });
+
             modelBuilder.Entity("ProjektIznynierski.Domain.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -1041,6 +1098,16 @@ namespace ProjektIznynierski.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("ProjektIznynierski.Domain.Entities.ClientInterfaceConfig", b =>
+                {
+                    b.HasOne("ProjektIznynierski.Domain.Entities.Employee", "ModifiedByEmployee")
+                        .WithMany()
+                        .HasForeignKey("ModifiedByEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ModifiedByEmployee");
                 });
 
             modelBuilder.Entity("ProjektIznynierski.Domain.Entities.Comment", b =>

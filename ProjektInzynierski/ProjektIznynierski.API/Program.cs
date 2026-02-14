@@ -29,6 +29,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseCors("AllowAllOrigins");
 app.UseMiddleware<ValidationExceptionMiddleware>();
+app.UseStaticFiles(); // Serves wwwroot (e.g. /assets/images/xxx for client menu images)
 app.UsePresentation();
 
 

@@ -46,6 +46,8 @@ using ProjektIznynierski.Application.Commands.CurrencyPair.AddCurrencyPair;
 using ProjektIznynierski.Application.Commands.CurrencyPair.UpdateCurrencyPair;
 using ProjektIznynierski.Application.Commands.CurrencyRateHistory.AddCurrencyRateHistory;
 using ProjektIznynierski.Application.Commands.CurrencyRateHistory.UpdateCurrencyRateHistory;
+using ProjektIznynierski.Application.Commands.ClientInterfaceConfig.CreateClientInterfaceConfig;
+using ProjektIznynierski.Application.Commands.ClientInterfaceConfig.UpdateClientInterfaceConfig;
 
 namespace ProjektIznynierski.Application
 {
@@ -127,6 +129,8 @@ namespace ProjektIznynierski.Application
 
             services.AddScoped<IValidator<ImportFinancialMetricCommand>, ImportFinancialMetricCommandValidator>();
 
+            services.AddScoped<IValidator<CreateClientInterfaceConfigCommand>, CreateClientInterfaceConfigCommandValidation>();
+            services.AddScoped<IValidator<UpdateClientInterfaceConfigCommand>, UpdateClientInterfaceConfigCommandValidation>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 

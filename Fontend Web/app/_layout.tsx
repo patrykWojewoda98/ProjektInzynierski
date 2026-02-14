@@ -87,6 +87,7 @@ export default function RootLayout() {
         <Image
           source={require("../assets/images/Logo.png")}
           style={globalStyles.logoSmall}
+          resizeMode="contain"
         />
         {user && (
           <Text style={[globalStyles.text, { color: "white", marginLeft: 10 }]}>

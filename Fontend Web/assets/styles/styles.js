@@ -196,24 +196,21 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: 16,
   },
 
-  // Icons
+  // Icons (use resizeMode prop on <Image>, not in style)
   icon: {
     width: 24,
     height: 24,
-    resizeMode: "contain",
   },
   menuIcon: {
     width: 50,
     height: 50,
     marginBottom: 10,
-    resizeMode: "contain",
   },
 
   // Logo
   logo: {
     width: 150,
     height: 150,
-    resizeMode: "contain",
   },
   logoLarge: {
     width: 250,

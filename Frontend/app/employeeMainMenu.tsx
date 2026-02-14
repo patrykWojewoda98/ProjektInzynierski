@@ -131,6 +131,12 @@ const tiles = [
     icon: icons.CurrencyPair,
     route: ROUTES.CURRENCY_PAIR,
   },
+  {
+    key: "ClientConfig",
+    label: "Client interface (Mobile)",
+    icon: require("../assets/images/Client-Icon.png"),
+    route: ROUTES.CLIENT_CONFIG,
+  },
 ];
 
 const EmployeeMainMenu = () => {

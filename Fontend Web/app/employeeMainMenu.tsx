@@ -131,6 +131,12 @@ const tiles = [
     icon: icons.CurrencyPair,
     route: ROUTES.CURRENCY_PAIR,
   },
+  {
+    key: "ClientConfig",
+    label: "Client interface (Web)",
+    icon: require("../assets/images/Client-Icon.png"),
+    route: ROUTES.CLIENT_CONFIG,
+  },
 ];
 
 const EmployeeMainMenu = () => {
@@ -175,6 +181,7 @@ const EmployeeMainMenu = () => {
         <Image
           source={require("../assets/images/Logo.png")}
           style={[globalStyles.logo, spacing.mb4]}
+          resizeMode="contain"
         />
         <Text style={[globalStyles.header, spacing.mb2]}>Main Menu</Text>
       </View>
@@ -195,7 +202,7 @@ const EmployeeMainMenu = () => {
               { width: tileWidth, minHeight: 170 },
             ]}
           >
-            <Image source={t.icon} style={globalStyles.menuIcon} />
+            <Image source={t.icon} style={globalStyles.menuIcon} resizeMode="contain" />
             <Text style={globalStyles.menuLabel}>{t.label}</Text>
           </TouchableOpacity>
         ))}

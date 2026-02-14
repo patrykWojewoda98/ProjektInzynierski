@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProjektInzynierski.Application.Interfaces;
@@ -42,6 +42,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<ICurrencyPairRepository, CurrencyPairRepository>();
             services.AddScoped<ICurrencyRateHistoryRepository, CurrencyRateHistoryRepository>();
+            services.AddScoped<IClientInterfaceConfigRepository, ClientInterfaceConfigRepository>();
 
             services.AddScoped<IJwtTokenService, JwtService>();
             services.AddHttpClient<IChatGPTService, ChatGPTService>();

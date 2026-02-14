@@ -29,6 +29,7 @@ export default function HomeScreen() {
       <Image
         source={require("../assets/images/Logo.png")}
         style={[globalStyles.logo]}
+        resizeMode="contain"
       />
 
       <View style={[globalStyles.section, { width: "80%" }]}>

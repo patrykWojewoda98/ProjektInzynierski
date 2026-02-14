@@ -88,4 +88,7 @@ export const ROUTES = {
   ADD_CURRENCY_PAIR: "/CurrencyPair/addCurrencyPairScreen",
   ADD_CURRENCY_RATE_HISTORY:
     "/currencyRateHistory/addCurrencyRateHistoryScreen",
+
+  CLIENT_CONFIG: "/clientConfig/clientConfigListScreen",
+  EDIT_CLIENT_CONFIG: "/clientConfig/editClientConfigScreen",
 } as const;

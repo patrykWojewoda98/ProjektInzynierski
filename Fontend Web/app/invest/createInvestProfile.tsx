@@ -96,6 +96,7 @@ const CreateInvestProfile = () => {
       <Image
         source={require("../../assets/images/Logo.png")}
         style={[globalStyles.logo, spacing.mb4]}
+        resizeMode="contain"
       />
 
       <Text style={[globalStyles.header, spacing.mb3]}>

@@ -62,6 +62,7 @@ const LoginScreen = () => {
       <Image
         source={require("../../assets/images/Logo.png")}
         style={[globalStyles.logo, globalStyles.logoLarge]}
+        resizeMode="contain"
       />
 
       <Text style={[globalStyles.header, spacing.mb2]}>Login</Text>

@@ -16,6 +16,12 @@ const getApiBaseUrl = () => {
   return host ? `http://${host}:5036/api` : "http://localhost:5036/api";
 };
 
+/** Base URL of the API server without /api (e.g. http://localhost:5036). Use for static assets like client menu images. */
+export const getApiOrigin = () => {
+  const base = getApiBaseUrl();
+  return base.replace(/\/api\/?$/, "") || base;
+};
+
 const api = axios.create({
   baseURL: getApiBaseUrl(),
 });
