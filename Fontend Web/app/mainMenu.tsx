@@ -25,6 +25,7 @@ const KEY_TO_ROUTE: Record<string, string> = {
   FinancialMetric: ROUTES.FINANCIAL_METRIC_PREVIEW,
   MyAIAnalysisRequests: ROUTES.MY_AI_ANALYSIS_REQUESTS,
   CurrencyRateHistory: ROUTES.CURRENCY_RATE_HISTORY,
+  GeneratePersonalReport: ROUTES.GENERATE_PERSONAL_REPORT,
 };
 
 const fallbackIcons: Record<string, number> = {
@@ -37,6 +38,7 @@ const fallbackIcons: Record<string, number> = {
   FinancialMetric: require("../assets/images/FinancialMetric-Icon.png"),
   MyAIAnalysisRequests: require("../assets/images/MyAIAnalysisRequests-Icon.png"),
   CurrencyRateHistory: require("../assets/images/CurrencyRateHistoryIcon.png"),
+  GeneratePersonalReport: require("../assets/images/FinancialReport-Icon.png"),
 };
 
 const defaultTiles = [
@@ -72,6 +74,11 @@ const defaultTiles = [
     key: "CurrencyRateHistory",
     label: "Currency Rate History",
     route: ROUTES.CURRENCY_RATE_HISTORY,
+  },
+  {
+    key: "GeneratePersonalReport",
+    label: "Generate Personal Report",
+    route: ROUTES.GENERATE_PERSONAL_REPORT,
   },
 ];
 

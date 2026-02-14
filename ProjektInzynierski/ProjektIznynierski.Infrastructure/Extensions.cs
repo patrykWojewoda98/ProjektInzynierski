@@ -52,6 +52,7 @@ namespace ProjektIznynierski.Infrastructure
             services.AddScoped<ITwoFactorCodeService, TwoFactorCodeService>();
             services.AddScoped<IYahooFinanceService, YahooFinanceService>();
             services.AddScoped<IInvestmentRecommendationPdfService, InvestmentRecommendationPdfService>();
+            services.AddScoped<IPersonalReportPdfService, PersonalReportPdfService>();
             services.AddScoped<IXlsxService, XlsxService>();
 
 

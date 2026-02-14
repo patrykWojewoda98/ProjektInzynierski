@@ -33,6 +33,7 @@ export const ROUTES = {
   CREATE_FINANCIAL_REPORT_BY_AI: "/financialReport/createFinancialReportByAI",
   MY_AI_ANALYSIS_REQUESTS: "/aIRequest/myAIRequests",
   AI_ANALYSIS_RESULT: "/aIAnalysisResult/aIAnalysisResult",
+  GENERATE_PERSONAL_REPORT: "/report/generatePersonalReport",
 
   EMPLOYEE_2FA: "/auth/employee/employee2FAScreen",
   EMPLOYEE_MAIN_MENU: "/employeeMainMenu",

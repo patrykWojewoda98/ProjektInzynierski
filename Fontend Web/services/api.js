@@ -242,6 +242,18 @@ const ApiService = {
     window.location.assign(url);
   },
 
+  async generatePersonalReportPdf(options) {
+    const token = await AsyncStorage.getItem("userToken");
+    const response = await api.post("/PersonalReportPdf/generate", options, {
+      responseType: "arraybuffer",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    return url;
+  },
+
   // Region endpoints
 
   getAllRegions() {

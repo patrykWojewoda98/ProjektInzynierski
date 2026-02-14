@@ -717,6 +717,36 @@ updateWallet(walletId, data) {
     });
   },
 
+  async generatePersonalReportPdf(options) {
+    const token = await AsyncStorage.getItem("userToken");
+    const response = await api.post("/PersonalReportPdf/generate", options, {
+      responseType: "arraybuffer",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const arrayBuffer = response.data;
+    const fileName = `Personal_Report_${Date.now()}.pdf`;
+
+    if (Platform.OS === "web") {
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      return url;
+    }
+
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 =
+      typeof globalThis.Buffer !== "undefined"
+        ? globalThis.Buffer.from(bytes).toString("base64")
+        : btoa(binary);
+    const fileUri = FileSystem.documentDirectory + fileName;
+    await FileSystem.writeAsStringAsync(fileUri, base64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    return fileUri;
+  },
+
 // =========================
 // FILE EXPORTS
 // =========================

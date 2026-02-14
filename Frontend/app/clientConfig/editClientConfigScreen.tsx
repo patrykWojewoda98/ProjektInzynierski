@@ -29,6 +29,7 @@ const MENU_KEYS = [
   "FinancialMetric",
   "MyAIAnalysisRequests",
   "CurrencyRateHistory",
+  "GeneratePersonalReport",
 ];
 
 const EditClientConfigScreen = () => {
@@ -165,16 +166,6 @@ const EditClientConfigScreen = () => {
             {uploading ? "Uploading…" : "Pick & upload image"}
           </Text>
         </TouchableOpacity>
-      </View>
-
-      <View style={[globalStyles.card, spacing.m2]}>
-        <Text style={globalStyles.label}>Order index</Text>
-        <TextInput
-          style={globalStyles.input}
-          value={String(orderIndex)}
-          onChangeText={(t) => setOrderIndex(parseInt(t, 10) || 0)}
-          keyboardType="number-pad"
-        />
       </View>
 
       <View
